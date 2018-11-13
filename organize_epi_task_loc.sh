@@ -1,6 +1,8 @@
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampData'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
+#codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+
 cd ${wd}
 
 #get subject directory names
