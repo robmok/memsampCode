@@ -7,12 +7,13 @@ cd ${wd}
 
 #get subject directory names
 if ! [ -f subNames.txt ]; then
-s=`ls -d *0*` #all dirs with subs have 0s
-echo ${s} >> subNames.txt
+  s=`ls -d *0*` #all dirs with subs have 0s
+  echo "${s}" >> subNames.txt #"" so outputs line by line
 fi
 
 #organize and rename GRE/EPI/task_epi/localizer_epi files
-subCounter=`printf "%.2d" 1` #for zero padding sub-01
+#subCounter=`printf "%.2d" 1` #for zero padding sub-01
+subCounter=`printf "%.2d" 3` #3 since i did 2 already manually
 
 while read iSub; do
   mkdir ${bidsDir}/sub-${subCounter}
@@ -30,7 +31,7 @@ while read iSub; do
   for iDir in ${dirs}; do #go through each dir
 
   #FIELDMAPS
-  fname=`ls ${iDir}/*gre*.nii`
+  fname=`ls ${iDir}/*gre*.nii 2> /dev/null` # 2> /dev/null suppresses error messages (here, file doesnt exist) (sends them away)
   for iFile in ${fname}; do
       if [ -f ${iFile} ]; then
         #rename gre file depending on type
@@ -52,7 +53,7 @@ while read iSub; do
 
   #EPIs - figure out epi task vs localisers based on trials.tsv, put into appropriate dir
   #go through each dir, if there is a tsv file then check first line, if task, associate with task_epi. if loc, check which
-  fname=`ls ${iDir}/*epi*.nii`
+  fname=`ls ${iDir}/*epi*.nii 2> /dev/null`
   for iFile in ${fname}; do
     if [ -f ${iFile} ]; then
       firstline=`head -n 1 ${iDir}/trials.tsv`
@@ -74,20 +75,19 @@ while read iSub; do
   done
 
   #T1
-  fname=`ls ${iDir}/*T1*.nii`
+  fname=`ls ${iDir}/*T1*.nii 2> /dev/null`
   for iFile in ${fname}; do
     if [ -f ${iFile} ]; then
       scp ${iFile} ${bidsDir}/sub-${subCounter}/anat/sub-${subCounter}_T1w.nii
       scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/anat/sub-${subCounter}_T1w.json
     fi
   done
-
-  #zip
-  gzip ${bidsDir}/sub-${subCounter}/fmap/*.nii
-  gzip ${bidsDir}/sub-${subCounter}/func/*.nii
-  gzip ${bidsDir}/sub-${subCounter}/anat/*.nii
-
 done # for iDir
+#zip
+gzip ${bidsDir}/sub-${subCounter}/fmap/*.nii
+gzip ${bidsDir}/sub-${subCounter}/func/*.nii
+gzip ${bidsDir}/sub-${subCounter}/anat/*.nii
+#subject counter
 let subCounter=subCounter+1
 subCounter=`printf "%.2d" ${subCounter}`
 done < ${wd}/subNames.txt #while read
