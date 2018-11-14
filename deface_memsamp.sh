@@ -1,7 +1,7 @@
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 cd ${bidsDir}
 source activate py36
-for iSub in {17..33}; do
+for iSub in {01..33}; do
   subNum=`printf "%.2d" ${iSub}` #zero padding
   anatDir="${bidsDir}/sub-${subNum}/anat"
   printf "Defacing subject ${subNum} \n"
