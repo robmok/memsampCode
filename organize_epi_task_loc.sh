@@ -12,14 +12,17 @@ if ! [ -f subNames.txt ]; then
 fi
 
 #organize and rename GRE/EPI/task_epi/localizer_epi files
-#subCounter=`printf "%.2d" 1` #for zero padding sub-01
-subCounter=`printf "%.2d" 3` #3 since i did 2 already manually
+#subCounter=1
+subCounter=1 #3 since i did 2 already manually
 
+printf "Starting script organize_epi_task.sh. This will organise memsamp fMRI data into BIDS compliant directories. \n"
 while read iSub; do
-  mkdir ${bidsDir}/sub-${subCounter}
-  mkdir ${bidsDir}/sub-${subCounter}/fmap
-  mkdir ${bidsDir}/sub-${subCounter}/func
-  mkdir ${bidsDir}/sub-${subCounter}/anat
+  subCounterP=`printf "%.2d" ${subCounter}` #zero pad subject number
+  printf "Organising subject ${subCounterP}, aka ${iSub} \n"
+  mkdir ${bidsDir}/sub-${subCounterP}
+  mkdir ${bidsDir}/sub-${subCounterP}/fmap
+  mkdir ${bidsDir}/sub-${subCounterP}/func
+  mkdir ${bidsDir}/sub-${subCounterP}/anat
 
   cd ${wd}/${iSub}
 
@@ -39,14 +42,14 @@ while read iSub; do
         grefnames[2]='gre_field_mapping_1acq_rl_e2.nii'
         grefnames[3]='gre_field_mapping_1acq_rl_e2_ph.nii'
         if [[ ${iFile} == ${iDir}/${grefnames[1]} ]]; then #~= means ==; Use the =~ operator to make regular expression comparsions:
-          scp ${iFile} ${bidsDir}/sub-${subCounter}/fmap/sub-${subCounter}_magnitude1.nii
-          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/fmap/sub-${subCounter}_magnitude1.json # ${#iFile}-4 - to remove .nii
+          scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude1.nii
+          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude1.json # ${#iFile}-4 - to remove .nii
         elif [[ ${iFile} == ${iDir}/${grefnames[2]} ]]; then
-          scp ${iFile} ${bidsDir}/sub-${subCounter}/fmap/sub-${subCounter}_magnitude2.nii
-          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/fmap/sub-${subCounter}_magnitude2.json
+          scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude2.nii
+          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude2.json
         elif [[ ${iFile} == ${iDir}/${grefnames[3]} ]]; then
-          scp ${iFile} ${bidsDir}/sub-${subCounter}/fmap/sub-${subCounter}_phasediff1.nii
-          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/fmap/sub-${subCounter}_phasediff1.json
+          scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_phasediff1.nii
+          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_phasediff1.json
         fi
       fi
   done
@@ -59,17 +62,17 @@ while read iSub; do
       firstline=`head -n 1 ${iDir}/trials.tsv`
       if ((${#firstline} == 218)); then
         #"main" - move to func - but also need to rename - sub-01_task, also depending on how many RUNS, _run01..
-        scp ${iFile} ${bidsDir}/sub-${subCounter}/func/sub-${subCounter}_task-memsamp_run-${runCounter}.nii
-        scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/func/sub-${subCounter}_task-memsamp_run-${runCounter}.json
-        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounter}/func/trials_run-${runCounter}.tsv
+        scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}.nii
+        scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}.json
+        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/trials_run-${runCounter}.tsv
         let runCounter=runCounter+1 #only for main task, with more than 1 run
         runCounter=`printf "%.2d" ${runCounter}`
       elif ((${#firstline} == 179)); then
         # motion or exemplar/category localiser
         locTask=`awk 'NR==5 {print $(NF-2)}' ${iDir}/trials.tsv`;#this outputs 'motion' or 'exemplar'
-        scp ${iFile} ${bidsDir}/sub-${subCounter}/func/sub-${subCounter}_task-${locTask}Localiser.nii
-        scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/func/sub-${subCounter}_task-${locTask}Localiser.json
-        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounter}/func/trials_${locTask}Localiser.tsv
+        scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser.nii
+        scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser.json
+        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/trials_${locTask}Localiser.tsv
       fi
     fi
   done
@@ -78,16 +81,15 @@ while read iSub; do
   fname=`ls ${iDir}/*T1*.nii 2> /dev/null`
   for iFile in ${fname}; do
     if [ -f ${iFile} ]; then
-      scp ${iFile} ${bidsDir}/sub-${subCounter}/anat/sub-${subCounter}_T1w.nii
-      scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounter}/anat/sub-${subCounter}_T1w.json
+      scp ${iFile} ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.nii
+      scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.json
     fi
   done
 done # for iDir
 #zip
-gzip ${bidsDir}/sub-${subCounter}/fmap/*.nii
-gzip ${bidsDir}/sub-${subCounter}/func/*.nii
-gzip ${bidsDir}/sub-${subCounter}/anat/*.nii
+gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
+gzip ${bidsDir}/sub-${subCounterP}/func/*.nii
+gzip ${bidsDir}/sub-${subCounterP}/anat/*.nii
 #subject counter
 let subCounter=subCounter+1
-subCounter=`printf "%.2d" ${subCounter}`
 done < ${wd}/subNames.txt #while read
