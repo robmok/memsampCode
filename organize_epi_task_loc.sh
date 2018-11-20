@@ -64,7 +64,7 @@ while read iSub; do
         #"main" - move to func - but also need to rename - sub-01_task, also depending on how many RUNS, _run01..
         scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}.nii
         scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}.json
-        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/trials_run-${runCounter}.tsv
+        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_event.tsv
         let runCounter=runCounter+1 #only for main task, with more than 1 run
         runCounter=`printf "%.2d" ${runCounter}`
       elif ((${#firstline} == 179)); then
@@ -72,7 +72,7 @@ while read iSub; do
         locTask=`awk 'NR==5 {print $(NF-2)}' ${iDir}/trials.tsv`;#this outputs 'motion' or 'exemplar'
         scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser.nii
         scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser.json
-        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/trials_${locTask}Localiser.tsv
+        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_event.tsv
       fi
     fi
   done
