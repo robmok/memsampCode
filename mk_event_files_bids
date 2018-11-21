@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov 21 16:07:13 2018
+
+@author: robert.mok
+"""
+import os
+import glob
+import pandas as pd
+
+bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
+os.chdir(bidsDir)
+
+
+subs = range(0,32)
+#for iSub in subs:
+#   print(f'{iSub:02d}')
+    
+    
+iSub=1 #temp
+subNum=f'{iSub:02d}'
+
+fnames    = os.path.join(bidsDir, "sub-" + subNum, 'func', "*memsamp*." + 'tsv')
+datafiles = sorted(glob.glob(fnames))
+
+
+#for iFile in datafiles:   
+iFile = datafiles[1] #temp
+dat=pd.read_csv(iFile, sep="\t")
+
+
+# Variables I want: Onset, duration, trial_type, response_time 
+# variable names: cuetime, feedtime, direction, category, rt, correct, aresp
+
+#extract cue conditions (time, motionDir), and separately the feedback (time, category); then merge the dataframes after
+
+#onset, duration, trial_type, response_time 
+trials1=dat[['cuetime', 'direction', 'rt', 'correct']] #need to add duration, trial_type (cue/motion)
+trials1.insert(1, 'duration', 0.5) #need to find out durations!
+trials1.insert(2, 'trial_type', 'cue')
+trials1.columns = trials1.columns.str.replace('cuetime', 'onset')
+trials1.columns = trials1.columns.str.replace('rt','response_time')
+#trials1.rename(columns={'cuetime': 'onset', 'rt': 'response_time'}, inplace=True) #works, but throws a weird error
+#trials1.rename({'cuetime':'onset', 'rt':'response_time'}, axis='columns') #better, but pandas v0.21
+
+
+trials2=dat[['feedtime','category']] #need to add duration, trial_type (feedback/category)
+#trials2=dat[['feedtime','category','cat','rawcategory']] #need to add duration, trial_type (feedback/category)
+
+
+
+# ??? category and cat are different?
+
+
+
+
+trials2.insert(1, 'duration', 0.5) #need to find out durations!
+trials2.insert(2, 'trial_type', 'feedback')
+trials2.columns = trials2.columns.str.replace('feedtime', 'onset')
+

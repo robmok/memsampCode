@@ -30,7 +30,7 @@ while read iSub; do
   runCounter=`printf "%.2d" ${runCounter}`
 
   #dirs=`ls -d *`
-  dirs=`find . -regex '.*/[0-9]*'` #only dirs with numbers
+  dirs=`find . -regex '.*/[0-9]*' | sort -V` #only dirs with numbers; sorts in ascending order even without zeropadding
   for iDir in ${dirs}; do #go through each dir
 
   #FIELDMAPS
