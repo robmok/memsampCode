@@ -36,8 +36,8 @@ dat=pd.read_csv(iFile, sep="\t")
 #extract cue conditions (time, motionDir), and separately the feedback (time, category); then merge the dataframes after
 
 #onset, duration, trial_type, response_time 
-trials1=dat[['cuetime', 'direction', 'rt', 'correct']] #need to add duration, trial_type (cue/motion)
-trials1.insert(1, 'duration', 0.5) #need to find out durations!
+trials1=dat[['cuetime', 'direction', 'category','rt', 'correct']] #need to add duration, trial_type (cue/motion)
+trials1.insert(1, 'duration', 1) 
 trials1.insert(2, 'trial_type', 'cue')
 trials1.columns = trials1.columns.str.replace('cuetime', 'onset')
 trials1.columns = trials1.columns.str.replace('rt','response_time')
@@ -45,17 +45,21 @@ trials1.columns = trials1.columns.str.replace('rt','response_time')
 #trials1.rename({'cuetime':'onset', 'rt':'response_time'}, axis='columns') #better, but pandas v0.21
 
 
-trials2=dat[['feedtime','category']] #need to add duration, trial_type (feedback/category)
+trials2=dat[['feedtime','direction', 'category','rt', 'correct']] #need to add duration, trial_type (feedback/category)
 #trials2=dat[['feedtime','category','cat','rawcategory']] #need to add duration, trial_type (feedback/category)
 
 
-
 # ??? category and cat are different?
+#check notes - what is cat, cat1 - different to category
 
-
-
-
-trials2.insert(1, 'duration', 0.5) #need to find out durations!
+trials2.insert(1, 'duration', 1)
 trials2.insert(2, 'trial_type', 'feedback')
 trials2.columns = trials2.columns.str.replace('feedtime', 'onset')
+trials2.columns = trials1.columns.str.replace('rt','response_time')
 
+trials=pd.concat([trials1, trials2])
+
+
+#can i save original file as sth else? e.g. just mv it in python
+
+#save as fname
