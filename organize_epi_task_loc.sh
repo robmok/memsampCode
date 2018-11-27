@@ -35,25 +35,25 @@ while read iSub; do
   for iDir in ${dirs}; do #go through each dir
 
   #FIELDMAPS
-  # fname=`ls ${iDir}/*gre*.nii 2> /dev/null` # 2> /dev/null suppresses error messages (here, file doesnt exist) (sends them away)
-  # for iFile in ${fname}; do
-  #     if [ -f ${iFile} ]; then
-  #       #rename gre file depending on type
-  #       grefnames[1]='gre_field_mapping_1acq_rl_e1.nii'
-  #       grefnames[2]='gre_field_mapping_1acq_rl_e2.nii'
-  #       grefnames[3]='gre_field_mapping_1acq_rl_e2_ph.nii'
-  #       if [[ ${iFile} == ${iDir}/${grefnames[1]} ]]; then #~= means ==; Use the =~ operator to make regular expression comparsions:
-  #         scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude1.nii
-  #         scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude1.json # ${#iFile}-4 - to remove .nii
-  #       elif [[ ${iFile} == ${iDir}/${grefnames[2]} ]]; then
-  #         scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude2.nii
-  #         scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude2.json
-  #       elif [[ ${iFile} == ${iDir}/${grefnames[3]} ]]; then
-  #         scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_phasediff.nii
-  #         scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_phasediff.json
-  #       fi
-  #     fi
-  # done
+  fname=`ls ${iDir}/*gre*.nii 2> /dev/null` # 2> /dev/null suppresses error messages (here, file doesnt exist) (sends them away)
+  for iFile in ${fname}; do
+      if [ -f ${iFile} ]; then
+        #rename gre file depending on type
+        grefnames[1]='gre_field_mapping_1acq_rl_e1.nii'
+        grefnames[2]='gre_field_mapping_1acq_rl_e2.nii'
+        grefnames[3]='gre_field_mapping_1acq_rl_e2_ph.nii'
+        if [[ ${iFile} == ${iDir}/${grefnames[1]} ]]; then #~= means ==; Use the =~ operator to make regular expression comparsions:
+          scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude1.nii
+          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude1.json # ${#iFile}-4 - to remove .nii
+        elif [[ ${iFile} == ${iDir}/${grefnames[2]} ]]; then
+          scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude2.nii
+          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_magnitude2.json
+        elif [[ ${iFile} == ${iDir}/${grefnames[3]} ]]; then
+          scp ${iFile} ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_phasediff.nii
+          scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/fmap/sub-${subCounterP}_phasediff.json
+        fi
+      fi
+  done
 
   #EPIs - figure out epi task vs localisers based on trials.tsv, put into appropriate dir
   #go through each dir, if there is a tsv file then check first line, if task, associate with task_epi. if loc, check which
@@ -79,18 +79,18 @@ while read iSub; do
   done
 
   #T1
-#   fname=`ls ${iDir}/*T1*.nii 2> /dev/null`
-#   for iFile in ${fname}; do
-#     if [ -f ${iFile} ]; then
-#       scp ${iFile} ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.nii
-#       scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.json
-#     fi
-#   done
+  fname=`ls ${iDir}/*T1*.nii 2> /dev/null`
+  for iFile in ${fname}; do
+    if [ -f ${iFile} ]; then
+      scp ${iFile} ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.nii
+      scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.json
+    fi
+  done
  done # for iDir
 #zip
-# gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
-# gzip ${bidsDir}/sub-${subCounterP}/func/*.nii
-# gzip ${bidsDir}/sub-${subCounterP}/anat/*.nii
+gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
+gzip ${bidsDir}/sub-${subCounterP}/func/*.nii
+gzip ${bidsDir}/sub-${subCounterP}/anat/*.nii
 #subject counter
 let subCounter=subCounter+1
 done < ${wd}/subNames.txt #while read
