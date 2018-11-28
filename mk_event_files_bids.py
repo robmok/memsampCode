@@ -3,6 +3,8 @@
 """
 Created on Wed Nov 21 16:07:13 2018
 
+Make BIDS-compliant event files - run after running 'organize_epi_task_loc.sh' (organises imaging and tsv files from memsampData to memsampBids)
+
 @author: robert.mok
 """
 import os
@@ -47,6 +49,11 @@ for iSub in subs:
         # ??? category and cat are different?
         #check notes - what is cat, cat1 - different to category
 
+
+
+        #is cat the actualy category, cat1 the feedback (probabilistic) - can check by comparing direction and cat / cat1
+
+
         
         #mv original tsv file out
         os.rename(iFile,  os.path.join(eventsDir, os.path.basename(iFile)))                               
@@ -54,9 +61,33 @@ for iSub in subs:
         trials.to_csv(iFile,sep='\t', header=True, index=False)
 
 
+    #Localisers
+    #motion loc
+    fnameLoc = os.path.join(bidsDir, "sub-" + subNum, 'func', "*motionLoc*." + 'tsv')
+    iFileLoc = glob.glob(fnameLoc)
+    trials=dat[['cuetime', 'direction']] #'rt', 'correct' - # empty rts sometime, bids doesnt like empty tsv cells
+    trials.insert(1, 'duration', 1) #stim duration
+    trials.columns = trials.columns.str.replace('cuetime', 'onset')
+    #mv original tsv file out
+    os.rename(iFileLoc[0],  os.path.join(eventsDir, os.path.basename(iFileLoc[0])))                               
+    #save as iFile
+    trials.to_csv(iFileLoc[0],sep='\t', header=True, index=False)
 
-    #localisers- move the localiser events out
-    fnameLoc = os.path.join(bidsDir, "sub-" + subNum, 'func', "*Loc*." + 'tsv')
-    datafilesLoc = (glob.glob(fnameLoc))
-    for iFileLoc in datafilesLoc:   
-        os.rename(iFileLoc,  os.path.join(eventsDir, os.path.basename(iFileLoc)))                               
+    #exemplar loc
+    fnameLoc = os.path.join(bidsDir, "sub-" + subNum, 'func', "*exemplarLoc*." + 'tsv')
+    iFileLoc = glob.glob(fnameLoc)
+    trials=dat[['cuetime', 'category']] #'rt', 'correct'
+    trials.insert(1, 'duration', 1) #stim duration
+    trials.columns = trials.columns.str.replace('cuetime', 'onset')
+
+    #mv original tsv file out
+    os.rename(iFileLoc[0],  os.path.join(eventsDir, os.path.basename(iFileLoc[0])))                               
+    #save as iFile
+    trials.to_csv(iFileLoc[0],sep='\t', header=True, index=False)
+        
+        
+        
+        
+        
+        
+        
