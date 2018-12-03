@@ -86,7 +86,7 @@ while read iSub; do
  #      scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/anat/sub-${subCounterP}_T1w.json
  #    fi
  #  done
- # done # for iDir
+done # for iDir
 #zip
 # gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
 # gzip ${bidsDir}/sub-${subCounterP}/func/*.nii

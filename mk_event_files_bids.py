@@ -31,35 +31,25 @@ for iSub in subs:
         # variable names: cuetime, feedtime, direction, category, rt, correct, aresp
         # extract cue conditions (time, motionDir), and separately the feedback (time, category); then merge the dataframes after
         #onset, duration, trial_type, response_time 
-        trials1=dat[['cuetime', 'direction', 'category']] #'rt', 'correct' - # empty rts sometime, bids doesnt like empty tsv cells
+        trials1=dat[['cuetime', 'direction']] #'category', 'rt', 'correct' - # empty rts sometime, bids doesnt like empty tsv cells
         trials1.insert(1, 'duration', 1) #stim duration
         trials1.insert(2, 'trial_type', 'cue')
         trials1.columns = trials1.columns.str.replace('cuetime', 'onset')
         #trials1.columns = trials1.columns.str.replace('rt','response_time') 
         #trials1.rename(columns={'cuetime': 'onset', 'rt': 'response_time'}, inplace=True) #works, but throws a weird error
         #trials1.rename({'cuetime':'onset', 'rt':'response_time'}, axis='columns') #better, but pandas v0.21
-        trials2=dat[['feedtime','direction', 'category']] #'rt', 'correct'
+        trials2=dat[['feedtime','direction']] #'category', 'rt', 'correct'
         #trials2=dat[['feedtime','category','cat','rawcategory']] #need to add duration, trial_type (feedback/category)
         trials2.insert(1, 'duration', 1) #feedback duration
         trials2.insert(2, 'trial_type', 'feedback')
         trials2.columns = trials2.columns.str.replace('feedtime', 'onset')
         #trials2.columns = trials1.columns.str.replace('rt','response_time')
         trials=pd.concat([trials1, trials2])
-
-        # ??? category and cat are different?
-        #check notes - what is cat, cat1 - different to category
-
-
-
-        #is cat the actualy category, cat1 the feedback (probabilistic) - can check by comparing direction and cat / cat1
-
-
         
         #mv original tsv file out
         os.rename(iFile,  os.path.join(eventsDir, os.path.basename(iFile)))                               
         #save as iFile
         trials.to_csv(iFile,sep='\t', header=True, index=False)
-
 
     #Localisers
     #motion loc
