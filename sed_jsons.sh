@@ -25,14 +25,15 @@ fname=${subDir}/anat/
 
 
 #temp
-fname=${subDir}/func/sub-01_task-memsamp_run-01_bold.json
+fname=${subDir}/func/sub-01_task-memsamp_run-01_bold
 
-tmp=$(mktemp) #mk temp file since json needs to be edited to a tmp file first
-jq '.PatientSex = ""' ${fname}.json > "$tmp" && mv "$tmp" ${fname}1.json #this should work
+#both work now
+tmp=$(mktemp)
+sed -e 's/"PatientSex": ""/"PatientSex": ""/' ${fname}.json > ${tmp} && mv "$tmp" ${fname}.json #this removes a control character from this "^P"
+jq --arg TaskName memsamp '. + {TaskName: $TaskName}' ${fname}.json > ${tmp} && mv "$tmp" ${fname}.json #works
 
-jq --arg TaskName memsamp '. + {TaskName: $TaskName}' ${fname}1.json #might need testing out
 
-
+#TE1 and TE2 now
 
 
 
