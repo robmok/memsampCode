@@ -3,6 +3,9 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampData'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 #codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
 
+# Note - if want to pass BIDS validation, comment out the lines editing RepetitionTime. Siemens give TR per slice, so bids validator will complain diff to jsons
+# fmriprep just looks at the jsons so fine to edit it at the final stage
+
 cd ${wd}
 
 subCounter=1
@@ -33,12 +36,16 @@ for iSub in {01..33}; do
   # get TE1 from mag1, and add "EchoTime1" and "EchoTime2" to phasediff .json (TE2 already in 'EchoTime' in phasediff json)
   fname=${subDir}/fmap/sub-${subCounterP}_magnitude1.json
   TE1=`jq -r '.EchoTime' ${fname}` #get TE1
+  fname=${subDir}/fmap/sub-${subCounterP}_magnitude2.json
+  TE2=`jq -r '.EchoTime' ${fname}` #get TE2
   fname=${subDir}/fmap/sub-${subCounterP}_phasediff.json
   tmp=$(mktemp)
-  jq '. + {"EchoTime2": .EchoTime} | del(.EchoTime)' ${fname} > ${tmp} && mv "$tmp" ${fname} #change TE to TE2, remove TE
   jq --argjson TE1val ${TE1} '. + {EchoTime1: $TE1val}' ${fname} > ${tmp} && mv "$tmp" ${fname} # add TE1; argjson for number
+  jq --argjson TE2val ${TE2} '. + {EchoTime2: $TE2val}' ${fname} > ${tmp} && mv "$tmp" ${fname} # add TE2; argjson for number
+  jq 'del(.EchoTime)' ${fname} > ${tmp} && mv "$tmp" ${fname}
+  #jq '. + {"EchoTime2": .EchoTime} | del(.EchoTime)' ${fname} > ${tmp} && mv "$tmp" ${fname} #change TE to TE2, remove TE
 
-  #EPIs - add TaskName, edit TR?
+  #EPIs - add TaskName, edit TR?-no
   dir=${subDir}/func
   fname=`ls ${dir}/*memsamp*.json 2> /dev/null`
   for iFile in ${fname}; do
@@ -46,6 +53,9 @@ for iSub in {01..33}; do
     sed -e 's/"PatientSex": ""/"PatientSex": ""/' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #this removes a control character from this "^P"
     jq --arg TaskName memsamp '. + {TaskName: $TaskName}' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #works
     jq '.RepetitionTime = 2.8' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #
+    #calculate EffectiveEchoSpacing: Effective Echo Spacing (s) = 1/(BandwidthPerPixelPhaseEncode * MatrixSizePhase). in
+    #"PhaseEncodingSteps": 64,"PixelBandwidth": 260 - #any of the fmap images have this info; 1/(64*260)
+    jq --argjson EES 0.00006009615385 '. + {EffectiveEchoSpacing: $EES}' ${iFile} > ${tmp} && mv "$tmp" ${iFile}
   done
   fname=`ls ${dir}/*motionLoc*.json 2> /dev/null`
   for iFile in ${fname}; do
@@ -53,6 +63,8 @@ for iSub in {01..33}; do
     sed -e 's/"PatientSex": ""/"PatientSex": ""/' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #this removes a control character from this "^P"
     jq --arg TaskName motionLocaliser '. + {TaskName: $TaskName}' ${iFile} > ${tmp} && mv "$tmp" ${iFile}
     jq '.RepetitionTime = 2.8' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #
+    jq --argjson EES 0.00006009615385 '. + {EffectiveEchoSpacing: $EES}' ${iFile} > ${tmp} && mv "$tmp" ${iFile}
+
   done
   fname=`ls ${dir}/*exemplarLoc*.json 2> /dev/null`
   for iFile in ${fname}; do
@@ -60,6 +72,7 @@ for iSub in {01..33}; do
     sed -e 's/"PatientSex": ""/"PatientSex": ""/' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #this removes a control character from this "^P"
     jq --arg TaskName exemplarLocaliser '. + {TaskName: $TaskName}' ${iFile} > ${tmp} && mv "$tmp" ${iFile}
     jq '.RepetitionTime = 2.8' ${iFile} > ${tmp} && mv "$tmp" ${iFile} #
+    jq --argjson EES 0.00006009615385 '. + {EffectiveEchoSpacing: $EES}' ${iFile} > ${tmp} && mv "$tmp" ${iFile}
   done
 
   let subCounter=subCounter+1
