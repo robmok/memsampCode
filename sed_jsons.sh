@@ -45,6 +45,26 @@ for iSub in {01..33}; do
   jq 'del(.EchoTime)' ${fname} > ${tmp} && mv "$tmp" ${fname}
   #jq '. + {"EchoTime2": .EchoTime} | del(.EchoTime)' ${fname} > ${tmp} && mv "$tmp" ${fname} #change TE to TE2, remove TE
 
+  # add field - 'IntendedFor' with the epi files (.nii.gz) - get names of .nii.gz files from the epi, then insert
+  dir=${subDir}/fmap
+  fname=`ls ${dir}/*.json 2> /dev/null`
+  for iFile in ${fname}; do
+    #insert 'IntendedFor' into each fieldmap json in iFile
+    epiDir=${subDir}/func
+    epiFnames=`ls ${epiDir}/*.nii.gz 2> /dev/null`
+    i=1
+    for iEpi in ${epiFnames}; do
+      tmp=$(mktemp)
+      if (($i==1)); then
+        jq --arg epi ${iEpi} '. + {IntendedFor: [$epi]}' ${iFile} > ${tmp} && mv "$tmp" ${iFile} # add the field first
+      else
+        jq --arg epi ${iEpi} '.IntendedFor += [$epi]' ${iFile} > ${tmp} && mv "$tmp" ${iFile} # add other fnames to the field
+      fi
+      (( i++ ))
+    done
+  done
+
+
   #EPIs - add TaskName, edit TR?-no
   dir=${subDir}/func
   fname=`ls ${dir}/*memsamp*.json 2> /dev/null`
