@@ -51,14 +51,14 @@ for iSub in {01..33}; do
   for iFile in ${fname}; do
     #insert 'IntendedFor' into each fieldmap json in iFile
     epiDir=${subDir}/func
-    epiFnames=`ls ${epiDir}/*.nii.gz 2> /dev/null`
+    epiFnames=`ls ${epiDir}/*.nii.gz | xargs -n 1 basename` #must not have whole path, just from /func
     i=1
     for iEpi in ${epiFnames}; do
       tmp=$(mktemp)
       if (($i==1)); then
-        jq --arg epi ${iEpi} '. + {IntendedFor: [$epi]}' ${iFile} > ${tmp} && mv "$tmp" ${iFile} # add the field first
+        jq --arg epi func/${iEpi} '. + {IntendedFor: [$epi]}' ${iFile} > ${tmp} && mv "$tmp" ${iFile} # add the field first
       else
-        jq --arg epi ${iEpi} '.IntendedFor += [$epi]' ${iFile} > ${tmp} && mv "$tmp" ${iFile} # add other fnames to the field
+        jq --arg epi func/${iEpi} '.IntendedFor += [$epi]' ${iFile} > ${tmp} && mv "$tmp" ${iFile} # add other fnames to the field
       fi
       (( i++ ))
     done
