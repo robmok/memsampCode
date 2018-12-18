@@ -16,6 +16,7 @@ eventsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/orig_events'
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/feat_timing'
 os.chdir(bidsDir)
 
+#%%
 subs = range(1,34) #33 subs - range doesn't include last number
 for iSub in subs:
     print(f'{iSub:02d}')
@@ -90,15 +91,14 @@ for iSub in subs:
         
         #********
         #feedback - based on category presented (need to figure this out) - separate GLM
-        
-        
-        
+               
         
 
     #Localisers
     #motion loc
     fnameLoc = os.path.join(bidsDir, "sub-" + subNum, 'func', "*motionLoc*." + 'tsv')
     iFileLoc = glob.glob(fnameLoc)
+    dat=pd.read_csv(iFileLoc[0], sep="\t")
     trials=dat[['cuetime', 'direction']] #'rt', 'correct' - # empty rts sometime, bids doesnt like empty tsv cells
     trials.insert(1, 'duration', 1) #stim duration
     trials.columns = trials.columns.str.replace('cuetime', 'onset')
@@ -106,20 +106,42 @@ for iSub in subs:
     os.rename(iFileLoc[0],  os.path.join(eventsDir, os.path.basename(iFileLoc[0])))                               
     #save as iFile
     trials.to_csv(iFileLoc[0],sep='\t', header=True, index=False)
+    #for FSL timing file
+    conds=trials["direction"].sort_values().unique() #gets direction conditions
+    for iCond in conds:
+        # cue direction
+        tmp=trials.loc[(trials['direction'] == iCond)]
+        cuetiming=tmp[['onset','duration']]
+        cuetiming.insert(2, 'value', 1) #stim value
+        fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFileLoc[0]))[0] + "_" + str(int(iCond)) + ".txt")
+        cuetiming.to_csv(fname1,sep='\t', header=False, index=False)
+
 
     #exemplar loc
     fnameLoc = os.path.join(bidsDir, "sub-" + subNum, 'func', "*exemplarLoc*." + 'tsv')
     iFileLoc = glob.glob(fnameLoc)
+    dat=pd.read_csv(iFileLoc[0], sep="\t")
     trials=dat[['cuetime', 'category']] #'rt', 'correct'
     trials.insert(1, 'duration', 1) #stim duration
     trials.columns = trials.columns.str.replace('cuetime', 'onset')
-
     #mv original tsv file out
     os.rename(iFileLoc[0],  os.path.join(eventsDir, os.path.basename(iFileLoc[0])))                               
     #save as iFile
     trials.to_csv(iFileLoc[0],sep='\t', header=True, index=False)
-        
-        
+    #for FSL timing file
+    conds=trials["category"].sort_values().unique() #gets direction conditions
+    for iCond in conds:
+        # cue direction
+        tmp=trials.loc[(trials['category'] == iCond)]
+        cuetiming=tmp[['onset','duration']]
+        cuetiming.insert(2, 'value', 1) #stim value
+        fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFileLoc[0]))[0] + "_" + str(int(iCond)) + ".txt")
+        cuetiming.to_csv(fname1,sep='\t', header=False, index=False)
+
+
+
+    
+    
         
         
         
