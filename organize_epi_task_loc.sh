@@ -66,6 +66,10 @@ while read iSub; do
         # scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii
         # scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.json
         scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_events.tsv
+        #edit TR time in header
+        #fslhd -x ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii.gz > ${bidsDir}/myhdr.txt
+        #sed "s:dt = '0.07':dt = '2.8':g" < ${bidsDir}/myhdr.txt > ${bidsDir}/myhdr2.txt
+        #fslcreatehd ${bidsDir}/myhdr2.txt ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii.gz
         let runCounter=runCounter+1 #only for main task, with more than 1 run
         runCounter=`printf "%.2d" ${runCounter}`
       elif ((${#firstline} == 179)); then
@@ -74,6 +78,10 @@ while read iSub; do
         # scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii
         # scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.json
         scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_events.tsv
+        #edit TR time in header
+        #fslhd -x ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii.gz > ${bidsDir}/myhdr.txt
+        #sed "s:dt = '0.07':dt = '2.8':g" < ${bidsDir}/myhdr.txt > ${bidsDir}/myhdr2.txt
+        #fslcreatehd ${bidsDir}/myhdr2.txt ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii.gz
       fi
     fi
   done
@@ -91,6 +99,8 @@ done # for iDir
 # gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
 # gzip ${bidsDir}/sub-${subCounterP}/func/*.nii
 # gzip ${bidsDir}/sub-${subCounterP}/anat/*.nii
+
+rm ${bidsDir}/myhdr.txt ${bidsDir}/myhdr2.txt
 #subject counter
 let subCounter=subCounter+1
 done < ${wd}/subNames.txt #while read
