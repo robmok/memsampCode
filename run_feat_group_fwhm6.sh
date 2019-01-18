@@ -7,19 +7,25 @@ dataDir=${wd}/fmriprep_output/fmriprep
 
 cd ${wd}
 
-standardScript='memsamp_exemplarLocaliser_fwhm6'
+standardScript='memsamp_run-01_block_fwhm6'
 
 while read subject; do
 
-  epi_file="${dataDir}/${subject}/func/${subject}_task-exemplarLocaliser_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
+for iRun in {1..3}; do
+
+  epi_file="${dataDir}/${subject}/func/${subject}_task-memsamp_run-01_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
   vols=`fslnvols ${epi_file}`
   voxels=`fslstats ${epi_file} -v | awk '{print $1}'`
   #substitute sub-01 to curr sub, #substitute sub-01 volumes to curr sub - atm same since in standard space
   sed -e s:sub-01:${subject}:g \
+    -e s:run-01:run-0${iRun}:g \
   	-e s:"set fmri(npts) 262":"set fmri(npts) ${vols}":g \
   	-e s:"set fmri(totalVoxels) 85235150":"set fmri(totalVoxels) ${voxels}":g \
-    <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_${standardScript}_${subject}.fsf
+    <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm6_${subject}.fsf
 
-  feat ${fsfDir}/run_${standardScript}_${subject}.fsf
-
+  feat ${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm6_${subject}.fsf
+done #for iRun
 done < ${fsfDir}/subject_list.txt
+
+
+#check which subjects more runs

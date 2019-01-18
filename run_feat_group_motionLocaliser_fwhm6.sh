@@ -2,7 +2,7 @@
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
-dataDir=${wd}/participant/fmriprep
+dataDir=${wd}/fmriprep_output/fmriprep
 #codeDir=${wd}/memsampCode
 
 cd ${wd}
