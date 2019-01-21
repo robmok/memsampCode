@@ -1,7 +1,9 @@
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampData'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
-#codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+
+source activate py36
 
 cd ${wd}
 
@@ -29,6 +31,7 @@ while read iSub; do
   runCounter=1 #for task epi - set here so it increases in the iDir loop
   runCounter=`printf "%.2d" ${runCounter}`
   # rm ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}*bold*tsv
+ #rm ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}*bold*gz
 
   #dirs=`ls -d *`
   dirs=`find . -regex '.*/[0-9]*' | sort -V` #only dirs with numbers; sorts in ascending order even without zeropadding
@@ -63,25 +66,17 @@ while read iSub; do
       firstline=`head -n 1 ${iDir}/trials.tsv`
       if ((${#firstline} == 218)); then
         #"main" - move to func - but also need to rename - sub-01_task, also depending on how many RUNS, _run01..
-        # scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii
+        #scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii
         # scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.json
-        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_events.tsv
-        #edit TR time in header
-        #fslhd -x ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii.gz > ${bidsDir}/myhdr.txt
-        #sed "s:dt = '0.07':dt = '2.8':g" < ${bidsDir}/myhdr.txt > ${bidsDir}/myhdr2.txt
-        #fslcreatehd ${bidsDir}/myhdr2.txt ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_bold.nii.gz
+        #scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-memsamp_run-${runCounter}_events.tsv
         let runCounter=runCounter+1 #only for main task, with more than 1 run
         runCounter=`printf "%.2d" ${runCounter}`
       elif ((${#firstline} == 179)); then
         # motion or exemplar/category localiser
         locTask=`awk 'NR==5 {print $(NF-2)}' ${iDir}/trials.tsv`;#this outputs 'motion' or 'exemplar'
-        # scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii
+        #scp ${iFile} ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii
         # scp ${iFile:0:${#iFile}-4}.json ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.json
-        scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_events.tsv
-        #edit TR time in header
-        #fslhd -x ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii.gz > ${bidsDir}/myhdr.txt
-        #sed "s:dt = '0.07':dt = '2.8':g" < ${bidsDir}/myhdr.txt > ${bidsDir}/myhdr2.txt
-        #fslcreatehd ${bidsDir}/myhdr2.txt ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_bold.nii.gz
+        #scp ${iDir}/trials.tsv ${bidsDir}/sub-${subCounterP}/func/sub-${subCounterP}_task-${locTask}Localiser_events.tsv
       fi
     fi
   done
@@ -95,12 +90,17 @@ while read iSub; do
  #    fi
  #  done
 done # for iDir
-#zip
-# gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
-# gzip ${bidsDir}/sub-${subCounterP}/func/*.nii
-# gzip ${bidsDir}/sub-${subCounterP}/anat/*.nii
 
-rm ${bidsDir}/myhdr.txt ${bidsDir}/myhdr2.txt
+
+#zip
+#gzip ${bidsDir}/sub-${subCounterP}/fmap/*.nii
+#gzip ${bidsDir}/sub-${subCounterP}/func/*.nii
+#gzip ${bidsDir}/sub-${subCounterP}/anat/*.nii
+
+#rm ${bidsDir}/myhdr.txt ${bidsDir}/myhdr2.txt
 #subject counter
 let subCounter=subCounter+1
 done < ${wd}/subNames.txt #while read
+
+#edit TR info from 0.07 to 2.8
+python ${codeDir}/edit_epi_hdr_TR.py
