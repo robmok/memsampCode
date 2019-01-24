@@ -18,8 +18,8 @@ subs = range(3,34) #33 subs - range doesn't include last number
 for iSub in subs:
     subNum=f'{iSub:02d}'
     print('Running sub-%02d' % iSub)
-    #fnames    = os.path.join(bidsDir, "sub-" + subNum, 'func', "*." + 'nii')
-    fnames    = os.path.join(bidsDir, "sub-" + subNum, 'func', "*." + 'nii.gz')
+    fnames    = os.path.join(bidsDir, "sub-" + subNum, 'func', "*." + 'nii')
+    #fnames    = os.path.join(bidsDir, "sub-" + subNum, 'func', "*." + 'nii.gz')
     datafiles = glob.glob(fnames)
     
     for iFile in datafiles:
