@@ -4,11 +4,13 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 #codeDir=${wd}/memsampCode
-
-cd ${wd}
-
 standardScript='memsamp_motionLocaliser_fwhm6'
 
+#no fieldmaps
+#dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
+#standardScript='memsamp_run-01_block_fwhm6_nofmaps'
+
+cd ${wd}
 while read subject; do
 
   epi_file="${dataDir}/${subject}/func/${subject}_task-motionLocaliser_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
