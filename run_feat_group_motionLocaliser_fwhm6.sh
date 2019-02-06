@@ -7,8 +7,8 @@ dataDir=${wd}/fmriprep_output/fmriprep
 standardScript='memsamp_motionLocaliser_fwhm6'
 
 #no fieldmaps
-#dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
-#standardScript='memsamp_run-01_block_fwhm6_nofmaps'
+dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
+standardScript='memsamp_motionLocaliser_fwhm6_nofmaps'
 
 cd ${wd}
 while read subject; do
