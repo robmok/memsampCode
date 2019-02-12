@@ -6,13 +6,13 @@ dataDir=${wd}/fmriprep_output/fmriprep
 #codeDir=${wd}/memsampCode
 
 fwhm=8 #6/8
-standardScript='memsamp_exemplarLocaliser_fwhm${fwhm}'
+standardScript="memsamp_exemplarLocaliser_fwhm${fwhm}"
 
-standardScript='memsamp_exemplarLocaliser_fwhm${fwhm}_noTD'
+standardScript="memsamp_exemplarLocaliser_fwhm${fwhm}_noTD"
 
 #no fieldmaps
 #dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
-#standardScript='memsamp_exemplarLocaliser_fwhm6_nofmaps'
+#standardScript="memsamp_exemplarLocaliser_fwhm6_nofmaps"
 
 cd ${wd}
 while read subject; do

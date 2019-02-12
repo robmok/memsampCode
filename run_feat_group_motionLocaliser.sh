@@ -4,15 +4,17 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 #codeDir=${wd}/memsampCode
-standardScript='memsamp_motionLocaliser_fwhm6'
+
+fwhm=8 #6/8
+standardScript="memsamp_motionLocaliser_fwhm${fwhm}"
+standardScript="memsamp_motionLocaliser_fwhm${fwhm}_noTD"
 
 #no fieldmaps
-dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
-standardScript='memsamp_motionLocaliser_fwhm6_nofmaps'
+#dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
+#standardScript='memsamp_motionLocaliser_fwhm${fwhm}_nofmaps'
 
 cd ${wd}
 while read subject; do
-
   epi_file="${dataDir}/${subject}/func/${subject}_task-motionLocaliser_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
   vols=`fslnvols ${epi_file}`
   voxels=`fslstats ${epi_file} -v | awk '{print $1}'`
@@ -23,5 +25,4 @@ while read subject; do
     <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_${standardScript}_${subject}.fsf
 
   feat ${fsfDir}/run_${standardScript}_${subject}.fsf
-
 done < ${fsfDir}/subject_list.txt
