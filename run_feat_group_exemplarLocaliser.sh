@@ -4,11 +4,15 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 #codeDir=${wd}/memsampCode
-standardScript='memsamp_exemplarLocaliser_fwhm6'
+
+fwhm=8 #6/8
+standardScript='memsamp_exemplarLocaliser_fwhm${fwhm}'
+
+standardScript='memsamp_exemplarLocaliser_fwhm${fwhm}_noTD'
 
 #no fieldmaps
-dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
-standardScript='memsamp_exemplarLocaliser_fwhm6_nofmaps'
+#dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
+#standardScript='memsamp_exemplarLocaliser_fwhm6_nofmaps'
 
 cd ${wd}
 while read subject; do
