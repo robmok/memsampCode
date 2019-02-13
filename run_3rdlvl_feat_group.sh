@@ -1,3 +1,4 @@
+#! /bin/bash
 wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 
