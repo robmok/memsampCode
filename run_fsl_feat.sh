@@ -27,10 +27,9 @@ while read subject; do
   #extra runs
   if [ "$subject" = "sub-09" ] || [ "$subject" = "sub-12" ] || [ "$subject" = "sub-16" ] || [ "$subject" = "sub-26" ]; then
     iRun=4
-    epi_file="${bidsDir}/${subject}/func/${subject}_task-memsamp_run-0${iRun}_space-T1w_desc-preproc_bold"
+    epi_file="${bidsDir}/${subject}/func/${subject}_task-memsamp_run-0${iRun}_bold"
     vols=`fslnvols ${epi_file}`
     voxels=`fslstats ${epi_file} -v | awk '{print $1}'`
-    #substitute sub-01 to curr sub, #substitute sub-01 volumes to curr sub - atm same since in standard space
     sed -e s:sub-01:${subject}:g \
       -e s:run-01:run-0${iRun}:g \
       -e s:"fwhm6":"fwhm${fwhm}":g \
@@ -40,4 +39,4 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_fsl_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_fsl_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list_4.txt #while read subject; do
+done < ${fsfDir}/subject_list_full.txt #while read subject; do
