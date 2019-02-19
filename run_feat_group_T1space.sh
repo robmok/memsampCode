@@ -5,12 +5,7 @@ fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 
 fwhm=2 #6/8
-standardScript="memsamp_run-01_block_fwhm6"
-#standardScript="memsamp_run-01_block_fwhm6_noTD"
-
-#no fieldmaps
-#dataDir=${wd}/fmriprep_output_nofmaps/fmriprep
-#standardScript='memsamp_run-01_block_fwhm6_nofmaps'
+#standardScript="memsamp_run-01_block_fwhm6"
 
 # T1 space
 standardScript="memsamp_run-01_block_fwhm2_T1"
