@@ -3,7 +3,6 @@
 wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
-#codeDir=${wd}/memsampCode
 
 fwhm=6 #6/8
 standardScript="memsamp_exemplarLocaliser_fwhm${fwhm}"
