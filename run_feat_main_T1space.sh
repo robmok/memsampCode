@@ -5,10 +5,8 @@ fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 
 fwhm=2 #6/8
-#standardScript="memsamp_run-01_block_fwhm6"
-
-# T1 space
 standardScript="memsamp_run-01_block_fwhm2_T1"
+#standardScript="memsamp_run-01_block_fwhm2_T1_brainmask" #very similar if not same
 
 #next: single trial in T1 space
 
@@ -25,8 +23,8 @@ while read subject; do
        -e s:"set fmri(smooth) 2.0":"set fmri(smooth) ${fwhm}":g \
      	-e s:"set fmri(npts) 262":"set fmri(npts) ${vols}":g \
      	-e s:"set fmri(totalVoxels) 85235150":"set fmri(totalVoxels) ${voxels}":g \
-       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
-     feat ${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
+       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
+     feat ${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
    done #for iRun
   #extra runs
   if [ "$subject" = "sub-09" ] || [ "$subject" = "sub-12" ] || [ "$subject" = "sub-16" ] || [ "$subject" = "sub-26" ]; then
@@ -41,7 +39,7 @@ while read subject; do
       -e s:"set fmri(smooth) 2.0":"set fmri(smooth) ${fwhm}":g \
       -e s:"set fmri(npts) 262":"set fmri(npts) ${vols}":g \
       -e s:"set fmri(totalVoxels) 85235150":"set fmri(totalVoxels) ${voxels}":g \
-      <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
-      feat ${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
+      <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
+      feat ${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
 done < ${fsfDir}/subject_list.txt #while read subject; do
