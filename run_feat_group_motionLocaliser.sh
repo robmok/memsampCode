@@ -20,4 +20,4 @@ while read subject; do
   	-e s:"set fmri(totalVoxels) 85235150":"set fmri(totalVoxels) ${voxels}":g \
     <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_motionLocaliser_fwhm${fwhm}_${subject}.fsf
   feat ${fsfDir}/run_memsamp_motionLocaliser_fwhm${fwhm}_${subject}.fsf
-done < ${fsfDir}/subject_list.txt
+done < ${fsfDir}/subject_list_2.txt

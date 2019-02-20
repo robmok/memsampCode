@@ -9,6 +9,10 @@ standardScript="memsamp_run-01_block_fwhm2_T1"
 #standardScript="memsamp_run-01_block_fwhm2_T1_brainmask" #very similar if not same
 
 #next: single trial in T1 space
+# - code for each trial as an EV - looks like 7 trials per run (even run 4)
+# - 12 conds * 7 trials = 84 EVs PLUS feedback.
+# - all 84 as contrasts, plus 1 for feedback
+     #(if check: count nunmber of trials for that subject - count lines of 'block' file?)
 
 cd ${wd}
 while read subject; do
@@ -42,4 +46,4 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list.txt #while read subject; do
+done < ${fsfDir}/subject_list_1.txt #while read subject; do
