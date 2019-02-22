@@ -40,4 +40,4 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list_1.txt #while read subject; do
+done < ${fsfDir}/subject_list.txt #while read subject; do

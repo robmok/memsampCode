@@ -14,7 +14,7 @@ standardScript="memsamp_run-01_trial_fwhm2_T1"
 
 cd ${wd}
 while read subject; do
-   for iRun in 1; do
+   for iRun in {1..3}; do
      epi_file="${dataDir}/${subject}/func/${subject}_task-memsamp_run-0${iRun}_space-T1w_desc-preproc_bold"
      vols=`fslnvols ${epi_file}`
      voxels=`fslstats ${epi_file} -v | awk '{print $1}'`
@@ -44,4 +44,4 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_trial_T1_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_run-0${iRun}_trial_T1_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list_4.txt #while read subject; do
+done < ${fsfDir}/subject_list.txt #while read subject; do
