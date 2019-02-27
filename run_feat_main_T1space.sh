@@ -4,7 +4,7 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 
-fwhm=2 #6/8
+fwhm=0 #0/2
 standardScript="memsamp_run-01_block_fwhm2_T1"
 #standardScript="memsamp_run-01_block_fwhm2_T1_brainmask" #very similar if not same
 
@@ -40,4 +40,4 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_run-0${iRun}_block_T1_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list.txt #while read subject; do
+done < ${fsfDir}/subject_list_2.txt #while read subject; do

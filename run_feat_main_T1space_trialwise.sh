@@ -4,7 +4,7 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 fsfDir=${wd}/feat_design_files
 dataDir=${wd}/fmriprep_output/fmriprep
 
-fwhm=2
+fwhm=0 #0/2
 standardScript="memsamp_run-01_trial_fwhm2_T1"
 
 # single trial in T1 space
