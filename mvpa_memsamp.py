@@ -50,7 +50,7 @@ dfCond = dfCond[dfCond['trial_type']=='cue'] #remove feedback trials
 
 #add run number
 iRun=1
-dfCond=pd.Series(np.ones(len(dfCond))*iRun),'run') #len correct?
+dfCond=pd.Series(np.ones((len(dfCond),1))*iRun),'run') #len correct?
 
 # add path to match cue condition and trial number - cope1:7 is dir0, trial1:7
 # /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/sub-01_run-01_trial_T1_fwhm0.feat/stats/cope1.nii.gz
