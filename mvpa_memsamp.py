@@ -60,15 +60,19 @@ dfCond['run']=pd.Series(np.ones((len(dfCond)))*iRun,index=dfCond.index)
 # /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/sub-01_run-01_trial_T1_fwhm0.feat/stats/cope1.nii.gz
 
 conds=dfCond.direction.unique
+iCope=1
 for iCond in conds:
     for iTrial in range(1,8): #calculate cope number
-
-        iCope = iTrial
+        #make a list and append to it
         imPath=os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat','stats','cope' + (str(iCope)) + '.nii.gz')
 
 
+        iCope=iCope+1
 
 
+#how to load in runs into dfCond? can it be multidimensional df? or hardcode nRuns?
+        
+        
 #%%
 
 subs=range(1,34)
