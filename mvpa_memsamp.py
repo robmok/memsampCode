@@ -60,8 +60,8 @@ dfCond['run']=pd.Series(np.ones((len(dfCond)))*iRun,index=dfCond.index)
 # /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/sub-01_run-01_trial_T1_fwhm0.feat/stats/cope1.nii.gz
 
 conds=dfCond.direction.unique
-for iCond in conds
-    for iTrial in range(1,8) #calculate cope number
+for iCond in conds:
+    for iTrial in range(1,8): #calculate cope number
 
         iCope = iTrial
         imPath=os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat','stats','cope' + (str(iCope)) + '.nii.gz')
