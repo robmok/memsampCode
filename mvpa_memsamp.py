@@ -45,12 +45,16 @@ subNum=f'{iSub:02d}'
 iRun=1
 
 condPath=os.path.join(bidsDir, 'sub-' + subNum, 'func','sub-' + subNum + '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
+
+#temp path for laptop
+condPath='/Users/robertmok/Documents/Postdoc_ucl/sub-01_task-memsamp_run-01_events.tsv'
 dfCond=pd.read_csv(condPath, sep='\t')
 dfCond = dfCond[dfCond['trial_type']=='cue'] #remove feedback trials
 
 #add run number
 iRun=1
-dfCond=pd.Series(np.ones((len(dfCond),1))*iRun),'run') #len correct?
+dfCond['run']=pd.Series(np.ones((len(dfCond)))*iRun,index=dfCond.index)
+#dfCond.loc[:,'run2']=pd.Series(np.ones((len(dfCond)))*iRun,index=dfCond.index)
 
 # add path to match cue condition and trial number - cope1:7 is dir0, trial1:7
 # /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/sub-01_run-01_trial_T1_fwhm0.feat/stats/cope1.nii.gz
