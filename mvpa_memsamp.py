@@ -8,20 +8,21 @@ Created on Mon Feb 25 22:48:06 2019
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
-import glob
+#import glob
 import numpy as np
 #np.set_printoptions(precision=2, suppress=True) # Set numpy to print only 2 decimal digits for neatness
 #from nilearn import image # Import image processing tool
-#import clarte as cl
+import clarte.clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
 import matplotlib.pyplot as plt
-#import nilearn.plotting as nip
-#import nibabel as nib
+import nilearn.plotting as nip
+import nibabel as nib
 
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
-
+fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
+roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 #%% load in trial log and append image paths
@@ -32,7 +33,7 @@ os.chdir(featDir)
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-for iSub in range(1,34):
+for iSub in range(1,2):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -68,17 +69,66 @@ for iSub in range(1,34):
         dfCond = dfCond.append(df) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
-        
-#%%
+    #start
+#    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
+    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
+    dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path) 
+    
+#    #from kurt demo
+#    print('type(dat)',type(dat))
+#    print('dat.dat.shape:',dat.dat.shape)
+#    print('dat affine:\n',dat.volInfo['affine'])
+#    print('')
+#    nip.plot_stat_map(dat.mask['niimg'],title='T1 mask',cut_coords=(0,40,41),
+#                 bg_img=T1_path,colorbar=True)
+#    print('unique mask values:',np.unique(dat.masker(dat.mask['niimg'])))
+#    print('nVoxels in mask:',np.sum(dat.masker(dat.mask['niimg'])))
+#    
+#    #plot a volume
+#    im1 = dat.unmasker(dat.dat[1,:]) # first row of the data matrix
+#    print('im1 shape:',im1.shape)
+#    nip.plot_stat_map(im1,title='im1: the first volume', colorbar=True, 
+#                  bg_img=T1_path, 
+#                  threshold=.0, cut_coords=(0,40,41))
 
+    #searchlight
+    # first we give the dat object info about the sessions:
+    dat.sessions = dfCond['run'].values
+    
+    #demean
+    #voxels2check = [1000,5000,10000]
+    #print('mean and std of each voxel before preproc:\n',
+    #        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+    #        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
+    #dat.cleaner(standardizeVox=True)
+#    print('\nmean and std of each voxel after preproc:\n',
+#        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+#        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
 
+#    from sklearn.cross_validation import LeaveOneLabelOut
+    
+    from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
+    from sklearn.svm import LinearSVC
+    
+    groups=dat.sessions
+    cv  = LeaveOneGroupOut()
+    cv.get_n_splits([],[],groups)
+    cv.get_n_splits(groups=groups)
+    
+    cv = LeaveOneGroupOut().split(X, y, groups)
+    
+    clf = LinearSVC(C=.1)
+    
+    # the pipeline function - function defining the computation performed in each sphere
+    def pipeline(X,y):
+        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()    
 
-
-
-
-
-
-
-
-
+    dat.pipeline = pipeline
+    dat.y  = dfCond['direction'].values #conditions / stimulus
+    
+    
+    
+    # let's run the searchlight with sphere radius=5mm using 1 core:
+    im = cl.searchlightSphere(dat,5,n_jobs=1)
 
