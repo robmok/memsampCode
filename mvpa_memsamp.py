@@ -112,11 +112,13 @@ for iSub in range(1,2):
     from sklearn.svm import LinearSVC
     
     groups=dat.sessions
-    cv  = LeaveOneGroupOut()
-    cv.get_n_splits([],[],groups)
-    cv.get_n_splits(groups=groups)
+#    cv  = LeaveOneGroupOut()
+#    cv.get_n_splits([],[],groups)
+#    cv.get_n_splits(groups=groups)
+
+    dat.y  = dfCond['direction'].values #conditions / stimulus
     
-    cv = LeaveOneGroupOut().split(X, y, groups)
+    cv = LeaveOneGroupOut().split(dat.dat, dat.y, groups)
     
     clf = LinearSVC(C=.1)
     
@@ -125,8 +127,6 @@ for iSub in range(1,2):
         return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()    
 
     dat.pipeline = pipeline
-    dat.y  = dfCond['direction'].values #conditions / stimulus
-    
     
     
     # let's run the searchlight with sphere radius=5mm using 1 core:
