@@ -12,7 +12,7 @@ import os
 import numpy as np
 #np.set_printoptions(precision=2, suppress=True) # Set numpy to print only 2 decimal digits for neatness
 #from nilearn import image # Import image processing tool
-import clarte.clarte as cl # on love06 - normally just clarte is fine
+import clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
 import matplotlib.pyplot as plt
 import nilearn.plotting as nip
@@ -72,7 +72,7 @@ for iSub in range(1,2):
         dfCond = dfCond.append(df) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
-    #start
+    #start setting up brain data
     T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
  #   T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
@@ -120,13 +120,22 @@ for iSub in range(1,2):
     # - add demean / normalize variance within sphere?
     def pipeline(X,y):
         return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,groups)).mean()    
+        
+    
+        #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
+        # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
+        
+        #for distance measures, just get in the data and write a function to compute the distance between conditions,
+        # and cross validate with an index with the splits. maybe can use above splitter function
+        
+    #%%
 
     dat.pipeline = pipeline
     
     # searchlight with sphere radius=5mm using 1 core:
-    im = cl.searchlightSphere(dat,5,n_jobs=6) #n_jobs - cores
+    im = cl.searchlightSphere(dat,5,n_jobs=1) #n_jobs - cores
 
-    #%%
+    #%% plot
     chance   = 1./12
     imVec    = dat.masker(im)
     imVec    = imVec - chance 
@@ -140,3 +149,39 @@ for iSub in range(1,2):
     view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
                                       title='Accuracy > Chance (+arbitrary threshold)')
     view.open_in_browser()     
+    
+    
+#%% roi
+    
+    #define X to be the roi data extracted from dat.dat. y is the same
+    #then use below function as usual
+    from nilearn.input_data import NiftiMasker
+    mask_filename = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lh.nii.gz')
+#    fmri_filename = dfCond['imPath'].iloc[0] #need to loop this?
+    fmri_filename = dfCond['imPath'] 
+    
+    masker = NiftiMasker(mask_img=mask_filename, standardize=False)        
+    fmri_masked = masker.fit_transform(fmri_filename) #this gets the data properly now 
+    
+    #- but why so big? dat.dat is (252, 59024), fmri_masked is (252, 40533), even though masked
+    # just lh, (252, 19294)
+    #looks ok - so why dat.dat so small?
+    
+    #try to plot this?
+    
+    
+    
+    
+    
+    
+    
+    # cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,groups)).mean()  
+    
+
+
+    
+    
+    
+    
+    
+    
