@@ -18,7 +18,10 @@ import matplotlib.pyplot as plt
 import nilearn.plotting as nip
 import nibabel as nib
 
-#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
+#mvpa, searchlight
+from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
+from sklearn.svm import LinearSVC
+    
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
@@ -70,10 +73,10 @@ for iSub in range(1,2):
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
     #start
-#    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
-    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
+ #   T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
-    dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path) 
+    dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=1)  #optional smoothing param: fwhm=1 
     
 #    #from kurt demo
 #    print('type(dat)',type(dat))
@@ -92,43 +95,48 @@ for iSub in range(1,2):
 #                  bg_img=T1_path, 
 #                  threshold=.0, cut_coords=(0,40,41))
 
-    #searchlight
+    #run searchlight
     # first we give the dat object info about the sessions:
     dat.sessions = dfCond['run'].values
     
-    #demean
-    #voxels2check = [1000,5000,10000]
-    #print('mean and std of each voxel before preproc:\n',
-    #        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-    #        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
-    #dat.cleaner(standardizeVox=True)
-#    print('\nmean and std of each voxel after preproc:\n',
-#        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-#        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
+    #demean - across conditions; try to do only within sphere? also try demean only or demean + norm variance
+    voxels2check = [0, 500, 1000]#[1000,5000,10000]
+    print('mean and std of each voxel before preproc:\n',
+            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
+    dat.cleaner(standardizeVox=True)
+    print('\nmean and std of each voxel after preproc:\n',
+        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
+    
 
-#    from sklearn.cross_validation import LeaveOneLabelOut
-    
-    from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
-    from sklearn.svm import LinearSVC
-    
     groups=dat.sessions
-#    cv  = LeaveOneGroupOut()
-#    cv.get_n_splits([],[],groups)
-#    cv.get_n_splits(groups=groups)
-
     dat.y  = dfCond['direction'].values #conditions / stimulus
-    
-    cv = LeaveOneGroupOut().split(dat.dat, dat.y, groups)
-    
+    cv     = LeaveOneGroupOut()
+    cv.get_n_splits(dat.dat, dat.y,groups)
     clf = LinearSVC(C=.1)
     
     # the pipeline function - function defining the computation performed in each sphere
+    # - add demean / normalize variance within sphere?
     def pipeline(X,y):
-        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()    
+        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,groups)).mean()    
 
     dat.pipeline = pipeline
     
-    
-    # let's run the searchlight with sphere radius=5mm using 1 core:
-    im = cl.searchlightSphere(dat,5,n_jobs=1)
+    # searchlight with sphere radius=5mm using 1 core:
+    im = cl.searchlightSphere(dat,5,n_jobs=6) #n_jobs - cores
 
+    #%%
+    chance   = 1./12
+    imVec    = dat.masker(im)
+    imVec    = imVec - chance 
+    imThresh = dat.unmasker(imVec)
+    
+    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+                                      title='Accuracy > Chance (+arbitrary threshold)')
+#    plt.show()
+
+    #interactive -  open the plot in a web browser:
+    view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+                                      title='Accuracy > Chance (+arbitrary threshold)')
+    view.open_in_browser()     
