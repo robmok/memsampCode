@@ -11,7 +11,7 @@ import os
 #import glob
 import numpy as np
 #np.set_printoptions(precision=2, suppress=True) # Set numpy to print only 2 decimal digits for neatness
-#from nilearn import image # Import image processing tool
+from nilearn import image as nli # Import image processing tool
 import clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -155,28 +155,54 @@ for iSub in range(1,2):
     
     #define X to be the roi data extracted from dat.dat. y is the same
     #then use below function as usual
-    from nilearn.input_data import NiftiMasker
-    mask_filename = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lh.nii.gz')
+#    from nilearn.input_data import NiftiMasker
+#    mask_filename = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz')
 #    fmri_filename = dfCond['imPath'].iloc[0] #need to loop this?
-    fmri_filename = dfCond['imPath'] 
-    
-    masker = NiftiMasker(mask_img=mask_filename, standardize=False)        
-    fmri_masked = masker.fit_transform(fmri_filename) #this gets the data properly now 
+##    fmri_filename = dfCond['imPath'].values
+#    
+#    maskerN = NiftiMasker(mask_img=mask_filename, standardize=False)        
+#    fmri_masked = maskerN.fit_transform(fmri_filename) #this gets the data properly now 
     
     #- but why so big? dat.dat is (252, 59024), fmri_masked is (252, 40533), even though masked
     # just lh, (252, 19294)
     #looks ok - so why dat.dat so small?
+    #loading in data with full T1 mask - (252, 1593001)) - much bigger
     
-    #try to plot this?
+    # it looks like nifimasker calculates a bg mask itself, or another one, but you can feed in your own..!
+
+
+
+    #correct now
+
+    from nilearn.masking import apply_mask
+
+    #turns out epi diff affine to mask. **CHECK** if this is because mask is like T1 in dimensions
+    maskROI = nib.load(mask_filename)
+    imgs = nib.concat_images(dfCond['imPath'].values) #load in to check affine match with mask
+    #resample mask to match epi
+    if np.any(imgs.affine!=maskROI.affine):
+        maskROI = nli.resample_img(maskROI,
+                target_affine=imgs.affine,
+                target_shape=imgs.shape[:3],
+                interpolation='nearest')
+
+    fmri_masked = apply_mask(dfCond['imPath'].values,maskROI)
     
     
     
+    #normalise my self
+#    fmri_masked-fmri_masked.mean(axis=1)
+    
+    # mean and std
+    from nilearn.signal import clean
+    fmri_masked_cleaned = clean(fmri_masked, sessions=dat.sessions, detrend=False, standardize=True)
+    
+    cv     = LeaveOneGroupOut()
+    cv.get_n_splits(fmri_masked_cleaned, dat.y,groups)
+    cross_val_score(clf,fmri_masked_cleaned,y=dat.y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,dat.y,groups)).mean() 
     
     
-    
-    
-    # cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,groups)).mean()  
-    
+    #why problem with convergence still? nVoxels? but even less with searchlight
 
 
     
