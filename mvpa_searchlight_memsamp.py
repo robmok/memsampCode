@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Wed Mar  6 12:36:19 2019
+
+@author: robert.mok
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Feb 25 22:48:06 2019
 
 @author: robert.mok
@@ -28,11 +36,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-#%%
-
-# =============================================================================
-# # load in trial log and append image paths
-# =============================================================================
+#%% load in trial log and append image paths
 
 # - first try the LOO one with 'trials'. then load in blocks
     # - load in sub-01_task-memsamp_run-01_events.tsv #in bidsdi
@@ -74,62 +78,68 @@ for iSub in range(1,2):
         dfCond = dfCond.append(df) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
+    #start setting up brain data
+    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
+ #   T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz') 
+    
+    dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=1)  #optional smoothing param: fwhm=1 
+    dat.sessions = dfCond['run'].values # info about the sessions
+    dat.y  = dfCond['direction'].values # conditions / stimulus
 
-# =============================================================================
-#     #set up brain data
-# =============================================================================
+    # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
+    voxels2check = [0, 500, 1000]#[1000,5000,10000]
+    print('mean and std of each voxel before preproc:\n',
+            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
+    dat.cleaner(standardizeVox=True)
+    print('\nmean and std of each voxel after preproc:\n',
+        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
 
-    dat = dfCond['imPath'].values #img paths - keeping same variables as searchlight
-    y   = dfCond['direction'].values #conditions / stimulus
-    groups  = dfCond['run'].values # info about the sessions   
-    
-    #define ROI 
-    mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz')
-
-    #maybe plot the roi on the brain? optionally
-#    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
-
-
-
-
-    #turns out epi diff affine to mask. **DOUBLE CHECK** if this is because mask is like T1 in dimensions
-    
-    
-    
-
-    
-    from nilearn.masking import apply_mask    
-    #resample mask to match epi
-    imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
-    maskROI = nib.load(mask_path)
-    maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
-                                target_shape=imgs.shape[:3], interpolation='nearest')
-    fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=1)  #optional fwhm=1
-
-    #normalise myself
-#    fmri_masked-fmri_masked.mean(axis=1)
-    
-    
-
-    
-    
-    
-    # normalise mean and std using nilearn
-    from nilearn.signal import clean
-    fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
-    
-# =============================================================================
-#     #set up splits and run cv
-# =============================================================================
+    #set up cv
     cv     = LeaveOneGroupOut()
-    cv.get_n_splits(fmri_masked_cleaned, y, groups)
-    clf   = LinearSVC(C=.1)
-    cvAcc = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
-    print('cvAcc = %0.3f' % (cvAcc*100))
-    print('cvAcc-chance = %0.3f' % ((cvAcc-(1/12))*100))
+    cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
+    clf = LinearSVC(C=.1)
     
-    #why problem with convergence still? nVoxels? but even less with searchlight
+    # the pipeline function - function defining the computation performed in each sphere
+    # - add demean / normalize variance within sphere?
+    def pipeline(X,y):
+        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()    
+    
+        #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
+        # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
+        
+        #for distance measures, just get in the data and write a function to compute the distance between conditions,
+        # and cross validate with an index with the splits. maybe can use above splitter function
+    
 
 
 
 
+
+    dat.pipeline = pipeline
+
+    #%% run  searchlight with sphere radius=5mm using 1 core:
+    im = cl.searchlightSphere(dat,5,n_jobs=1) #n_jobs - cores
+
+    #%% plot
+    chance   = 1./12
+    imVec    = dat.masker(im)
+    imVec    = imVec - chance 
+    imThresh = dat.unmasker(imVec)
+    
+    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+                                      title='Accuracy > Chance (+arbitrary threshold)')
+
+    #interactive -  open the plot in a web browser:
+    view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+                                      title='Accuracy > Chance (+arbitrary threshold)')
+    view.open_in_browser()     
+    
+
+    
+    
+    
+    
+    
