@@ -30,6 +30,7 @@ import nibabel as nib
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
     
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
@@ -44,7 +45,7 @@ os.chdir(featDir)
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-for iSub in range(1,2):
+for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -88,14 +89,14 @@ for iSub in range(1,2):
     dat.y  = dfCond['direction'].values # conditions / stimulus
 
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
-#    voxels2check = [0, 500, 1000]#[1000,5000,10000]
-#    print('mean and std of each voxel before preproc:\n',
-#            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-#            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
-#    dat.cleaner(standardizeVox=True)
-#    print('\nmean and std of each voxel after preproc:\n',
-#        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-#        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
+    voxels2check = [0, 500, 1000]#[1000,5000,10000]
+    print('mean and std of each voxel before preproc:\n',
+            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
+    dat.cleaner(standardizeVox=True)
+    print('\nmean and std of each voxel after preproc:\n',
+        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
 
     #set up cv
     cv     = LeaveOneGroupOut()
@@ -116,31 +117,30 @@ for iSub in range(1,2):
 
 
 
-
-
     dat.pipeline = pipeline
 
 #%% run  searchlight with sphere radius=5mm using 1 core:
-    im = cl.searchlightSphere(dat,5,n_jobs=6) #n_jobs - cores
-
-
+    im = cl.searchlightSphere(dat,5,n_jobs=5) #n_jobs - cores
     #save each subject's image then load up later
-#    nib.save(img, os.path.join('build','test4d.nii.gz'))
-
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sub-' + subNum + '_dirDecoding_trials_niNormalised_fwhm1.nii.gz'))
+#    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sub-' + subNum + '_dirDecoding_trials_demeaned_fwhm1.nii.gz'))
+#    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sub-' + subNum + '_dirDecoding_trials_noNorm_fwhm1.nii.gz'))
+    del im
+    
 
     #%% plot
-    chance   = 1./12
-    imVec    = dat.masker(im)
-    imVec    = imVec - chance 
-    imThresh = dat.unmasker(imVec)
-    
-    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
-                                      title='Accuracy > Chance (+arbitrary threshold)')
-
-    #interactive -  open the plot in a web browser:
-    view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
-                                      title='Accuracy > Chance (+arbitrary threshold)')
-    view.open_in_browser()     
+#    chance   = 1./12
+#    imVec    = dat.masker(im)
+#    imVec    = imVec - chance 
+#    imThresh = dat.unmasker(imVec)
+#    
+#    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+#                                      title='Accuracy > Chance (+arbitrary threshold)')
+#
+#    #interactive -  open the plot in a web browser:
+#    view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+#                                      title='Accuracy > Chance (+arbitrary threshold)')
+#    view.open_in_browser()     
     
 
     

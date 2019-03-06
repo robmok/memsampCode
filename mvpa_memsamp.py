@@ -41,7 +41,7 @@ os.chdir(featDir)
     # - load in all 3 runs then merge the 3 dfs
 
 cvAcc=np.empty(33)
-for iSub in range(12,34):
+for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -102,7 +102,7 @@ for iSub in range(12,34):
     fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=1)  #optional fwhm=1, or None
 
     #no normalisation
-#    fmri_masked_cleaned = fmri_masked
+    fmri_masked_cleaned = fmri_masked
 
     #demean normalise myself (by roi mean and/or std) - maybe should do by session?
 #    fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
@@ -128,8 +128,8 @@ for iSub in range(12,34):
 
     
     
-import scipy.stats
-stats.ttest_1samp(cvAcc)
-
+import scipy.stats as stats
+tval=stats.ttest_1samp(cvAcc,1/12)
+print(tval)
 
 
