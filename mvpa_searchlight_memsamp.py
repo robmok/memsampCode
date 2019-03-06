@@ -80,7 +80,7 @@ for iSub in range(1,2):
     
     #start setting up brain data
     T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
- #   T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+#    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz') 
     
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=1)  #optional smoothing param: fwhm=1 
@@ -88,14 +88,14 @@ for iSub in range(1,2):
     dat.y  = dfCond['direction'].values # conditions / stimulus
 
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
-    voxels2check = [0, 500, 1000]#[1000,5000,10000]
-    print('mean and std of each voxel before preproc:\n',
-            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
-    dat.cleaner(standardizeVox=True)
-    print('\nmean and std of each voxel after preproc:\n',
-        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
+#    voxels2check = [0, 500, 1000]#[1000,5000,10000]
+#    print('mean and std of each voxel before preproc:\n',
+#            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+#            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
+#    dat.cleaner(standardizeVox=True)
+#    print('\nmean and std of each voxel after preproc:\n',
+#        ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
+#        ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
 
     #set up cv
     cv     = LeaveOneGroupOut()
@@ -120,8 +120,8 @@ for iSub in range(1,2):
 
     dat.pipeline = pipeline
 
-    #%% run  searchlight with sphere radius=5mm using 1 core:
-    im = cl.searchlightSphere(dat,5,n_jobs=1) #n_jobs - cores
+#%% run  searchlight with sphere radius=5mm using 1 core:
+    im = cl.searchlightSphere(dat,5,n_jobs=6) #n_jobs - cores
 
     #%% plot
     chance   = 1./12

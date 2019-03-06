@@ -104,7 +104,7 @@ for iSub in range(1,2):
     maskROI = nib.load(mask_path)
     maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
                                 target_shape=imgs.shape[:3], interpolation='nearest')
-    fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=1)  #optional fwhm=1
+    fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=1)  #optional fwhm=1, or None
 
     #normalise myself
 #    fmri_masked-fmri_masked.mean(axis=1)
@@ -117,7 +117,6 @@ for iSub in range(1,2):
     # normalise mean and std using nilearn
     from nilearn.signal import clean
     fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
-    
 # =============================================================================
 #     #set up splits and run cv
 # =============================================================================
