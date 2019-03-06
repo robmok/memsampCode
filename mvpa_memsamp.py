@@ -12,10 +12,10 @@ import os
 import numpy as np
 #np.set_printoptions(precision=2, suppress=True) # Set numpy to print only 2 decimal digits for neatness
 from nilearn import image as nli # Import image processing tool
-import clarte as cl # on love06 - normally just clarte is fine
+#import clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
 import matplotlib.pyplot as plt
-import nilearn.plotting as nip
+#import nilearn.plotting as nip
 import nibabel as nib
 
 #mvpa, searchlight
@@ -40,7 +40,8 @@ os.chdir(featDir)
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-for iSub in range(1,2):
+cvAcc=np.empty(33)
+for iSub in range(12,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -85,18 +86,12 @@ for iSub in range(1,2):
     
     #define ROI 
     mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz')
+    #mask_path = os.path.join(roiDir, 'sub-' + subNum + '_ipsRois_lrh.nii.gz') # IPS no stim decoding
+    #mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_ipsRois_lrh.nii.gz') # bad for all except self demean and std norm...!?
+
 
     #maybe plot the roi on the brain? optionally
 #    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
-
-
-
-
-    #turns out epi diff affine to mask. **DOUBLE CHECK** if this is because mask is like T1 in dimensions
-    
-    
-    
-
     
     from nilearn.masking import apply_mask    
     #resample mask to match epi
@@ -106,29 +101,35 @@ for iSub in range(1,2):
                                 target_shape=imgs.shape[:3], interpolation='nearest')
     fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=1)  #optional fwhm=1, or None
 
-    #normalise myself
-#    fmri_masked-fmri_masked.mean(axis=1)
-    
-    
+    #no normalisation
+#    fmri_masked_cleaned = fmri_masked
 
+    #demean normalise myself (by roi mean and/or std) - maybe should do by session?
+#    fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
+#    fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=1)
+#    fmri_masked_cleaned=fmri_masked_cleaned.transpose()
     
-    
-    
-    # normalise mean and std using nilearn
+    # normalise mean and std using nilearn - check how this does it exactly
     from nilearn.signal import clean
     fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
+
+#%%
 # =============================================================================
 #     #set up splits and run cv
 # =============================================================================
     cv     = LeaveOneGroupOut()
     cv.get_n_splits(fmri_masked_cleaned, y, groups)
     clf   = LinearSVC(C=.1)
-    cvAcc = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
-    print('cvAcc = %0.3f' % (cvAcc*100))
-    print('cvAcc-chance = %0.3f' % ((cvAcc-(1/12))*100))
+    cvAcc[iSub-1] = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
+    print('Sub-%s cvAcc = %0.3f' % (subNum, (cvAcc[iSub-1]*100)))
+    print('Sub-%s cvAcc-chance = %0.3f' % (subNum, (cvAcc[iSub-1]-(1/12))*100))
     
     #why problem with convergence still? nVoxels? but even less with searchlight
 
+    
+    
+import scipy.stats
+stats.ttest_1samp(cvAcc)
 
 
 

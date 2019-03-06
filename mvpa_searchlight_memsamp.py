@@ -123,6 +123,11 @@ for iSub in range(1,2):
 #%% run  searchlight with sphere radius=5mm using 1 core:
     im = cl.searchlightSphere(dat,5,n_jobs=6) #n_jobs - cores
 
+
+    #save each subject's image then load up later
+#    nib.save(img, os.path.join('build','test4d.nii.gz'))
+
+
     #%% plot
     chance   = 1./12
     imVec    = dat.masker(im)

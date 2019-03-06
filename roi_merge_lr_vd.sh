@@ -4,7 +4,7 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 roiDir=${wd}/rois
 fsfDir=${wd}/feat_design_files
 
-echo "Running roi_merge_kr.vs.sh"
+echo "Running roi_merge_lr_vd.sh"
 
 while read subject; do
   echo "Running ${subject}"
@@ -47,5 +47,10 @@ while read subject; do
   roiList=`cat ${roiDir}/ips_rois_rh.txt`
   fslmaths ${roiList} ${roiDir}/${subject}_ipsRois_rh.nii.gz
   fslmaths ${roiDir}/${subject}_ipsRois_lh.nii.gz -add ${roiDir}/${subject}_ipsRois_rh.nii.gz ${roiDir}/${subject}_ipsRois_lrh.nii.gz
+
+  #merge vis and ips rois
+  fslmaths ${roiDir}/${subject}_ipsRois_lh.nii.gz -add ${roiDir}/${subject}_visRois_lh.nii.gz ${roiDir}/${subject}_visRois_ipsRois_lh.nii.gz
+  fslmaths ${roiDir}/${subject}_ipsRois_rh.nii.gz -add ${roiDir}/${subject}_visRois_rh.nii.gz ${roiDir}/${subject}_visRois_ipsRois_rh.nii.gz
+  fslmaths ${roiDir}/${subject}_ipsRois_lrh.nii.gz -add ${roiDir}/${subject}_visRois_lrh.nii.gz ${roiDir}/${subject}_visRois_ipsRois_lrh.nii.gz
 
 done < ${fsfDir}/subject_list_full.txt
