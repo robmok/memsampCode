@@ -124,7 +124,14 @@ for iSub in range(1,34):
     print('Sub-%s cvAcc = %0.3f' % (subNum, (cvAcc[iSub-1]*100)))
     print('Sub-%s cvAcc-chance = %0.3f' % (subNum, (cvAcc[iSub-1]-(1/12))*100))
     
-    #why problem with convergence still? nVoxels? but even less with searchlight
+
+
+
+#﻿x={'blah': np.array((1,2,3)), 'bleh': np.array((2,3,4))} - with blah and bleh as the ROI name. 
+#So for iROI in … 
+
+
+
 
     
     

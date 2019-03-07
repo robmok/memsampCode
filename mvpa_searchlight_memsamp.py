@@ -37,11 +37,11 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-
+nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 #%% load in trial log and append image paths
 
 # - first try the LOO one with 'trials'. then load in blocks
@@ -128,7 +128,7 @@ for iSub in range(1,34):
     dat.pipeline = pipeline
 
 #%% run  searchlight with sphere radius=5mm using 1 core:
-    im = cl.searchlightSphere(dat,5,n_jobs=5) #n_jobs - cores
+    im = cl.searchlightSphere(dat,5,n_jobs=nCores) #n_jobs - cores
     #save each subject's image then load up later
     nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sub-' + subNum + 
                               '_dirDecoding_' + trainSetMeth + '_' + normMeth + 
