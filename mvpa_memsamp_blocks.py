@@ -28,9 +28,9 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'trials' # 'trials' or 'block'
+trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = 1 # optional smoothing param - 1, or None
 
 #%%
@@ -70,7 +70,6 @@ for iSub in range(1,nSubs+1):
         runs = range(1,5) #4 runs
     else:
         runs = range(1,4) #3 runs
-    
     for iRun in runs:
         condPath=os.path.join(bidsDir, 'sub-' + subNum, 'func','sub-' + subNum + 
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
@@ -109,9 +108,6 @@ for iSub in range(1,nSubs+1):
         #define ROI  mask
         mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') #ipsRois no stim decoding; visRois_ipsRois bad for all except self demean and std norm...!?
     
-        #maybe plot the roi on the brain? optionally
-    #    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
-           
         #resample mask to match epi
         imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
         maskROI = nib.load(mask_path)
