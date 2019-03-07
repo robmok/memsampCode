@@ -10,28 +10,38 @@ sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
 #import glob
 import numpy as np
-#np.set_printoptions(precision=2, suppress=True) # Set numpy to print only 2 decimal digits for neatness
 from nilearn import image as nli # Import image processing tool
-#import clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #import nilearn.plotting as nip
 import nibabel as nib
-
-#mvpa, searchlight
+from nilearn.masking import apply_mask 
+from nilearn.signal import clean 
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
-    
+import scipy.stats as stats
+
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+trainSetMeth = 'trials' # 'trials' or 'block'
+fwhm = 1 # optional smoothing param - 1, or None
+
 #%%
+# =============================================================================
+# Set up decoding accuracy dataframe 
+# =============================================================================
+rois = ['V1','V2','V3','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
+        'IPS3','IPS4','IPS5','SPL1', 'visRois', 'ipsRois', 'visRois_ipsRois'] # 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+dfDecode = pd.DataFrame(columns=rois, index=range(0,34))
 
 # =============================================================================
-# # load in trial log and append image paths
+# load in trial log and append image paths
 # =============================================================================
 
 # - first try the LOO one with 'trials'. then load in blocks
@@ -40,7 +50,6 @@ os.chdir(featDir)
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-cvAcc=np.empty(33)
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
@@ -74,69 +83,66 @@ for iSub in range(1,34):
         df['imPath']=pd.Series(imPath,index=df.index)
         dfCond = dfCond.append(df) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
-    
-
-# =============================================================================
-#     #set up brain data
-# =============================================================================
+        
+    # =============================================================================
+    # set up brain data
+    # =============================================================================
 
     dat = dfCond['imPath'].values #img paths - keeping same variables as searchlight
     y   = dfCond['direction'].values #conditions / stimulus
     groups  = dfCond['run'].values # info about the sessions   
     
-    #define ROI 
-    mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz')
-    #mask_path = os.path.join(roiDir, 'sub-' + subNum + '_ipsRois_lrh.nii.gz') # IPS no stim decoding
-    #mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_ipsRois_lrh.nii.gz') # bad for all except self demean and std norm...!?
-
-
-    #maybe plot the roi on the brain? optionally
-#    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
+    for roi in rois:
+        #define ROI  mask
+        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') #ipsRois no stim decoding; visRois_ipsRois bad for all except self demean and std norm...!?
     
-    from nilearn.masking import apply_mask    
-    #resample mask to match epi
-    imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
-    maskROI = nib.load(mask_path)
-    maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
-                                target_shape=imgs.shape[:3], interpolation='nearest')
-    fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=1)  #optional fwhm=1, or None
-
-    #no normalisation
-    fmri_masked_cleaned = fmri_masked
-
-    #demean normalise myself (by roi mean and/or std) - maybe should do by session?
-#    fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
-#    fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=1)
-#    fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+        #maybe plot the roi on the brain? optionally
+    #    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
+           
+        #resample mask to match epi
+        imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
+        maskROI = nib.load(mask_path)
+        maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
+                                    target_shape=imgs.shape[:3], interpolation='nearest')
+        fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
+        
+        # CHECK normalise mean and std using nilearn - how this does it exactly
+        if normMeth == 'niNormalised':
+            fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
+        elif normMeth == 'demeaned':
+            fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+        elif normMeth == 'demeaned_stdNorm':
+            fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+        elif normMeth == 'noNorm':
+            fmri_masked_cleaned = fmri_masked                    
+        
+    #%%
+    # =============================================================================
+    #     #set up splits and run cv
+    # =============================================================================
+        cv     = LeaveOneGroupOut()
+        cv.get_n_splits(fmri_masked_cleaned, y, groups)
+        clf   = LinearSVC(C=.1)
+        cvAcc = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
+        print('Sub-%s cvAcc = %0.3f' % (subNum, (cvAcc*100)))
+        print('Sub-%s cvAcc-chance = %0.3f' % (subNum, (cvAcc-(1/12))*100))
+        dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
     
-    # normalise mean and std using nilearn - check how this does it exactly
-    from nilearn.signal import clean
-    fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
-
-#%%
 # =============================================================================
-#     #set up splits and run cv
+# save
 # =============================================================================
-    cv     = LeaveOneGroupOut()
-    cv.get_n_splits(fmri_masked_cleaned, y, groups)
-    clf   = LinearSVC(C=.1)
-    cvAcc[iSub-1] = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
-    print('Sub-%s cvAcc = %0.3f' % (subNum, (cvAcc[iSub-1]*100)))
-    print('Sub-%s cvAcc-chance = %0.3f' % (subNum, (cvAcc[iSub-1]-(1/12))*100))
-    
+
+#save tval to df
+#tval=stats.ttest_1samp(cvAcc,1/12)
+
+#save df
+dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' 
+                                + distMeth + '_' + normMeth + '_'  +trainSetMeth + 
+                                '_fwhm' + str(fwhm) + '_sub-' + subNum + '.pkl') 
 
 
-
-#﻿x={'blah': np.array((1,2,3)), 'bleh': np.array((2,3,4))} - with blah and bleh as the ROI name. 
-#So for iROI in … 
-
-
-
-
-    
-    
-import scipy.stats as stats
-tval=stats.ttest_1samp(cvAcc,1/12)
-print(tval)
 
 
