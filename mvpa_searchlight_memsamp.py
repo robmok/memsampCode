@@ -18,15 +18,12 @@ sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
 #import glob
 import numpy as np
-#np.set_printoptions(precision=2, suppress=True) # Set numpy to print only 2 decimal digits for neatness
-from nilearn import image as nli # Import image processing tool
+#from nilearn import image as nli # Import image processing tool
 import clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
-import matplotlib.pyplot as plt
-import nilearn.plotting as nip
+#import matplotlib.pyplot as plt
+#import nilearn.plotting as nip
 import nibabel as nib
-
-#mvpa, searchlight
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
     
@@ -50,7 +47,7 @@ nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-for iSub in range(1,34):
+for iSub in range(21,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -130,19 +127,10 @@ for iSub in range(1,34):
 #%% run  searchlight with sphere radius=5mm using 1 core:
     im = cl.searchlightSphere(dat,5,n_jobs=nCores) #n_jobs - cores
     #save each subject's image then load up later
-    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sub-' + subNum + 
-                              '_dirDecoding_' + trainSetMeth + '_' + normMeth + 
-                              '_fwhm' + str(fwhm) + '.nii.gz'))
-
-    #new better name
-#    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'dirDecoding_' + 
-#                              distMeth + '_' + normMeth + '_'  +trainSetMeth + 
-#                              '_fwhm' + str(fwhm) + '_sub-' + subNum + '.nii.gz'))
-
-
-
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl_dirDecoding_' + 
+                              distMeth + '_' + normMeth + '_'  +trainSetMeth + 
+                              '_fwhm' + str(fwhm) + '_sub-' + subNum + '.nii.gz'))
     del im
-    
 
     #%% plot
 #    chance   = 1./12

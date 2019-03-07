@@ -21,13 +21,14 @@ from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 import scipy.stats as stats
 
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # optional smoothing param - 1, or None
@@ -36,9 +37,20 @@ fwhm = 1 # optional smoothing param - 1, or None
 # =============================================================================
 # Set up decoding accuracy dataframe 
 # =============================================================================
-rois = ['V1','V2','V3','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-        'IPS3','IPS4','IPS5','SPL1', 'visRois', 'ipsRois', 'visRois_ipsRois'] # 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
-dfDecode = pd.DataFrame(columns=rois, index=range(0,34))
+nSubs=33
+rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
+        'IPS3','IPS4','IPS5','SPL1', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+
+# MST - mask empty for first 3 subs
+# IPS5 - empty for sub-01, but fine for sub 2 and 3...
+
+
+#taking out MST and IPS5 for now
+rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','hMT','IPS0','IPS1','IPS2',
+        'IPS3','IPS4', 'SPL1', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+
+dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
+dfDecode.rename(index={nSubs:'tstat,pval'}, inplace=True)
 
 # =============================================================================
 # load in trial log and append image paths
@@ -50,7 +62,7 @@ dfDecode = pd.DataFrame(columns=rois, index=range(0,34))
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-for iSub in range(1,34):
+for iSub in range(1,nSubs+1):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -127,22 +139,15 @@ for iSub in range(1,34):
         cv.get_n_splits(fmri_masked_cleaned, y, groups)
         clf   = LinearSVC(C=.1)
         cvAcc = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
-        print('Sub-%s cvAcc = %0.3f' % (subNum, (cvAcc*100)))
-        print('Sub-%s cvAcc-chance = %0.3f' % (subNum, (cvAcc-(1/12))*100))
+        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc*100)))
+        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc-(1/12))*100))
         dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
-    
-# =============================================================================
-# save
-# =============================================================================
 
-#save tval to df
-#tval=stats.ttest_1samp(cvAcc,1/12)
+#compute t-test, append to df
+for roi in rois:
+    dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi],1/12) #compute t-test, append to df
 
 #save df
 dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' 
                                 + distMeth + '_' + normMeth + '_'  +trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_sub-' + subNum + '.pkl') 
-
-
-
-
+                                '_fwhm' + str(fwhm) + '.pkl'))
