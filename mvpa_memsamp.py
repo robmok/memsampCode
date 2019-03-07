@@ -28,7 +28,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # optional smoothing param - 1, or None
@@ -44,10 +44,11 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
 # MST - mask empty for first 3 subs
 # IPS5 - empty for sub-01, but fine for sub 2 and 3...
 
+#SPL1 - empty for sub 23
 
-#taking out MST and IPS5 for now
+#taking out MST and IPS5 for now, and SPL1
 rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','hMT','IPS0','IPS1','IPS2',
-        'IPS3','IPS4', 'SPL1', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+        'IPS3','IPS4', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'tstat,pval'}, inplace=True)
@@ -145,7 +146,7 @@ for iSub in range(1,nSubs+1):
 
 #compute t-test, append to df
 for roi in rois:
-    dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi],1/12) #compute t-test, append to df
+    dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
 
 #save df
 dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' 
