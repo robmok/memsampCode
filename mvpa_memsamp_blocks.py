@@ -57,12 +57,6 @@ dfDecode.rename(index={nSubs:'tstat,pval'}, inplace=True)
 # load in trial log and append image paths
 # =============================================================================
 
-# - first try the LOO one with 'trials'. then load in blocks
-    # - load in sub-01_task-memsamp_run-01_events.tsv #in bidsdi
-    # - append run number
-    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
-    # - load in all 3 runs then merge the 3 dfs
-
 for iSub in range(1,nSubs+1):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs

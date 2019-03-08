@@ -133,8 +133,8 @@ for iSub in range(1,34):
     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #n_jobs - cores
     #save each subject's image then load up later
     nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
-                              distMeth + '_' + normMeth + '_'  +trainSetMeth + 
-                              '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
+                              distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
+                              str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     del im
 
     #%% plot
