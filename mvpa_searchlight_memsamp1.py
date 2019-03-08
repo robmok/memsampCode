@@ -29,7 +29,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 imDat   = 'tstat' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'noNorm' # 'noNorm', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -124,7 +124,7 @@ for iSub in range(1,nSubs+1):
         fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
         
         # CHECK normalise mean and std using nilearn - how this does it exactly
-        if normMeth == 'niNormalised':
+        if normMeth == 'noNorm':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
             fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)

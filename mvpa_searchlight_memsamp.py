@@ -34,13 +34,13 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'cope' # cope or tstat images
+imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 5 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 #%% load in trial log and append image paths
 
 # - first try the LOO one with 'trials'. then load in blocks
