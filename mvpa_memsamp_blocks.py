@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 25 22:48:06 2019
+Created on Fri Mar  8 15:32:19 2019
 
 @author: robert.mok
 """
@@ -28,9 +28,10 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
+imDat   = 'cope' # cope or tstat images
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'trials' # 'trials' or 'block' 
+trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
 #%%
@@ -43,7 +44,6 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
 
 # MST - mask empty for first 3 subs
 # IPS5 - empty for sub-01, but fine for sub 2 and 3...
-
 #SPL1 - empty for sub 23
 
 #taking out MST and IPS5 for now, and SPL1
@@ -90,7 +90,7 @@ for iSub in range(1,nSubs+1):
                 #make a list and append to it
                 imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats','cope' + (str(copeNum)) + '.nii.gz'))
+                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
         df['imPath']=pd.Series(imPath,index=df.index)
         dfCond = dfCond.append(df) #append to main df
@@ -108,6 +108,9 @@ for iSub in range(1,nSubs+1):
         #define ROI  mask
         mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') #ipsRois no stim decoding; visRois_ipsRois bad for all except self demean and std norm...!?
     
+        #maybe plot the roi on the brain? optionally
+    #    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
+           
         #resample mask to match epi
         imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
         maskROI = nib.load(mask_path)
@@ -119,12 +122,10 @@ for iSub in range(1,nSubs+1):
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
-            fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
-            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
         elif normMeth == 'demeaned_stdNorm':
-            fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
-            fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=1)
-            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
+            fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=0)
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
         
@@ -145,6 +146,6 @@ for roi in rois:
     dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
 
 #save df
-dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' 
-                                + distMeth + '_' + normMeth + '_'  +trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '.pkl'))
+dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
+                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
