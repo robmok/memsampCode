@@ -34,7 +34,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
@@ -56,20 +56,23 @@ for iSub in range(1,34):
         runs = range(1,5) #4 runs
     else:
         runs = range(1,4) #3 runs
-    
     for iRun in runs:
-        condPath=os.path.join(bidsDir, 'sub-' + subNum, 'func','sub-' + subNum + 
+        condPath=os.path.join(mainDir, 'orig_events','sub-' + subNum + 
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
         
         # df to load in and organise run-wise data
         df = pd.read_csv(condPath, sep='\t')
-        df = df[df['trial_type']=='cue'] #remove feedback trials
         df['run'] = pd.Series(np.ones((len(df)))*iRun,index=df.index) #add run number
         #df.loc[:,'run2']=pd.Series(np.ones((len(df)))*iRun,index=df.index) #alt way - better/worse?
         
         # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7   
         conds=df.direction.unique()
         conds.sort()
+        #sort - arrange df so it matches cope1:84 image structure
+        df2=pd.DataFrame() 
+        for iCond in conds:
+            df2 = df2.append(df[df['direction']==iCond])
+        
         copeNum=1 #counter
         imPath=[]
         for iCond in conds:
@@ -77,10 +80,10 @@ for iSub in range(1,34):
                 #make a list and append to it
                 imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats', imDat + (str(copeNum)) + '.nii.gz'))
+                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
-        df['imPath']=pd.Series(imPath,index=df.index)
-        dfCond = dfCond.append(df) #append to main df
+        df2['imPath']=pd.Series(imPath,index=df2.index)
+        dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
     #start setting up brain data

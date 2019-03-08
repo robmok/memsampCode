@@ -71,18 +71,22 @@ for iSub in range(1,nSubs+1):
     else:
         runs = range(1,4) #3 runs
     for iRun in runs:
-        condPath=os.path.join(bidsDir, 'sub-' + subNum, 'func','sub-' + subNum + 
+        condPath=os.path.join(mainDir, 'orig_events','sub-' + subNum + 
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
         
         # df to load in and organise run-wise data
         df = pd.read_csv(condPath, sep='\t')
-        df = df[df['trial_type']=='cue'] #remove feedback trials
         df['run'] = pd.Series(np.ones((len(df)))*iRun,index=df.index) #add run number
         #df.loc[:,'run2']=pd.Series(np.ones((len(df)))*iRun,index=df.index) #alt way - better/worse?
         
         # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7   
         conds=df.direction.unique()
         conds.sort()
+        #sort - arrange df so it matches cope1:84 image structure
+        df2=pd.DataFrame() 
+        for iCond in conds:
+            df2 = df2.append(df[df['direction']==iCond])
+        
         copeNum=1 #counter
         imPath=[]
         for iCond in conds:
@@ -92,55 +96,79 @@ for iSub in range(1,nSubs+1):
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
                                            'stats',imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
-        df['imPath']=pd.Series(imPath,index=df.index)
-        dfCond = dfCond.append(df) #append to main df
+        df2['imPath']=pd.Series(imPath,index=df2.index)
+        dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
         
     # =============================================================================
     # set up brain data
     # =============================================================================
-
-    dat = dfCond['imPath'].values #img paths - keeping same variables as searchlight
-    y   = dfCond['direction'].values #conditions / stimulus
-    groups  = dfCond['run'].values # info about the sessions   
+    
     
     for roi in rois:
         #define ROI  mask
         mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') #ipsRois no stim decoding; visRois_ipsRois bad for all except self demean and std norm...!?
     
-        #maybe plot the roi on the brain? optionally
-    #    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
-           
-        #resample mask to match epi
-        imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
-        maskROI = nib.load(mask_path)
-        maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
-                                    target_shape=imgs.shape[:3], interpolation='nearest')
-        fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
+        #set up block-wise
+        if iSub in {9,12,16,26}:
+            blocks = np.array((1,2,3,4))
+        else:
+            blocks = np.array((1,2,3))
         
-        # CHECK normalise mean and std using nilearn - how this does it exactly
-        if normMeth == 'niNormalised':
-            fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
-        elif normMeth == 'demeaned':
-            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
-        elif normMeth == 'demeaned_stdNorm':
-            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
-            fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=0)
-        elif normMeth == 'noNorm':
-            fmri_masked_cleaned = fmri_masked                    
+        cvAcc = np.zeros((blocks[-1]))
+        for iRun in runs:
+            dfCondRuns=dfCond[dfCond['run']==iRun] #get test set
+            
+            imPath=[]
+            for iBlk in blocks[blocks!=iRun]:       
+                copeNum=1 #counter
+                for iCond in conds:
+                    tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
+                    dfRun = tmp.iloc[0]
+                    dfRun['run']=iBlk
+                    dfRun['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
+                    dfCondRuns = dfCondRuns.append(dfRun)
+                    copeNum=copeNum+1
+    
+            dat = dfCondRuns['imPath'].values #img paths - keeping same variables as searchlight
+            y   = dfCondRuns['direction'].values #conditions / stimulus
+            groups  = dfCondRuns['run'].values # info about the sessions   
         
-    #%%
-    # =============================================================================
-    #     #set up splits and run cv
-    # =============================================================================
-        cv     = LeaveOneGroupOut()
-        cv.get_n_splits(fmri_masked_cleaned, y, groups)
-        clf   = LinearSVC(C=.1)
-        cvAcc = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
-        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc*100)))
-        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc-(1/12))*100))
-        dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
-
+            #resample mask to match epi - moved roi loop up to compute cv means within an roi, moved this here to clean by session
+            imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
+            maskROI = nib.load(mask_path)
+            maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
+                                        target_shape=imgs.shape[:3], interpolation='nearest')
+            fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
+            
+            # CHECK normalise mean and std using nilearn - how this does it exactly
+            if normMeth == 'niNormalised':
+                fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
+            elif normMeth == 'demeaned':
+                fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
+            elif normMeth == 'demeaned_stdNorm':
+                fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
+                fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=0)
+            elif normMeth == 'noNorm':
+                fmri_masked_cleaned = fmri_masked    
+               
+            
+            #%%
+            # =============================================================================
+            #     #set up splits and run cv
+            # =============================================================================
+            cv     = LeaveOneGroupOut()
+            cv.get_n_splits(fmri_masked_cleaned, y, groups)
+            clf   = LinearSVC(C=.1)
+            cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups))
+            
+            #get relevant cvAcc measure - is this the right one? (test set?)
+            cvAcc[iRun-1] = cvAccTmp[iRun-1] 
+            
+        dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #store to main df
+        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc.mean()*100)))
+        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc.mean()-(1/12))*100))
+        
 #compute t-test, append to df
 for roi in rois:
     dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
