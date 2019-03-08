@@ -34,6 +34,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
+slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
@@ -125,9 +126,9 @@ for iSub in range(21,34):
     dat.pipeline = pipeline
 
 #%% run  searchlight with sphere radius=5mm using 1 core:
-    im = cl.searchlightSphere(dat,5,n_jobs=nCores) #n_jobs - cores
+    im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #n_jobs - cores
     #save each subject's image then load up later
-    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl_dirDecoding_' + 
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
                               distMeth + '_' + normMeth + '_'  +trainSetMeth + 
                               '_fwhm' + str(fwhm) + '_sub-' + subNum + '.nii.gz'))
     del im

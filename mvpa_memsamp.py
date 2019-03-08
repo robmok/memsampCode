@@ -30,7 +30,7 @@ os.chdir(featDir)
 
 normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'trials' # 'trials' or 'block'
+trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
 #%%
@@ -70,7 +70,6 @@ for iSub in range(1,nSubs+1):
         runs = range(1,5) #4 runs
     else:
         runs = range(1,4) #3 runs
-    
     for iRun in runs:
         condPath=os.path.join(bidsDir, 'sub-' + subNum, 'func','sub-' + subNum + 
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
@@ -123,12 +122,10 @@ for iSub in range(1,nSubs+1):
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
-            fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
-            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+            fmri_masked_cleaned=fmri_masked-fmri_masked.mean(axis=0)
         elif normMeth == 'demeaned_stdNorm':
-            fmri_masked_cleaned=fmri_masked.transpose()-fmri_masked.mean(axis=1)
-            fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=1)
-            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+            fmri_masked_cleaned=fmri_masked-fmri_masked.mean(axis=0)
+            fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=0)
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
         
