@@ -28,7 +28,8 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm'
+imDat   = 'tstat' # cope or tstat images
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -90,7 +91,7 @@ for iSub in range(1,nSubs+1):
                 #make a list and append to it
                 imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats','cope' + (str(copeNum)) + '.nii.gz'))
+                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
         df['imPath']=pd.Series(imPath,index=df.index)
         dfCond = dfCond.append(df) #append to main df
@@ -122,10 +123,10 @@ for iSub in range(1,nSubs+1):
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
-            fmri_masked_cleaned=fmri_masked-fmri_masked.mean(axis=0)
+            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
         elif normMeth == 'demeaned_stdNorm':
-            fmri_masked_cleaned=fmri_masked-fmri_masked.mean(axis=0)
-            fmri_masked_cleaned=fmri_masked_cleaned/fmri_masked.std(axis=0)
+            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
+            fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=0)
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
         
@@ -146,6 +147,6 @@ for roi in rois:
     dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
 
 #save df
-dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' 
-                                + distMeth + '_' + normMeth + '_'  +trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '.pkl'))
+dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
+                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))

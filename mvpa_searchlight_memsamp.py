@@ -34,8 +34,9 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
+imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
-normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
@@ -48,7 +49,7 @@ nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
     # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
-for iSub in range(21,34):
+for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -76,7 +77,7 @@ for iSub in range(21,34):
                 #make a list and append to it
                 imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats','cope' + (str(copeNum)) + '.nii.gz'))
+                                           'stats', imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
         df['imPath']=pd.Series(imPath,index=df.index)
         dfCond = dfCond.append(df) #append to main df
@@ -130,7 +131,7 @@ for iSub in range(21,34):
     #save each subject's image then load up later
     nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
                               distMeth + '_' + normMeth + '_'  +trainSetMeth + 
-                              '_fwhm' + str(fwhm) + '_sub-' + subNum + '.nii.gz'))
+                              '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     del im
 
     #%% plot
