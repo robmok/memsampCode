@@ -28,7 +28,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or cope images
 normMeth = 'noNorm' # 'noNorm', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
@@ -52,7 +52,7 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','hMT','IPS0','IPS1','IPS2',
         'IPS3','IPS4', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
-dfDecode.rename(index={nSubs:'tstat,pval'}, inplace=True)
+dfDecode.rename(index={nSubs:'cope,pval'}, inplace=True)
 
 # =============================================================================
 # load in trial log and append image paths

@@ -29,7 +29,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 imDat   = 'cope' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'demeaned' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -139,13 +139,11 @@ for iSub in range(1,nSubs+1):
             if normMeth == 'niNormalised':
                 fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
             elif normMeth == 'demeaned':
-                fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
-                fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+                fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
             elif normMeth == 'demeaned_stdNorm':
-                fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
-                fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
-                fmri_masked_cleaned=fmri_masked_cleaned.transpose()
-            elif normMeth == 'noNorm':
+                fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
+                fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=0)
+            elif normMeth == 'demeaned':
                 fmri_masked_cleaned = fmri_masked    
                
             

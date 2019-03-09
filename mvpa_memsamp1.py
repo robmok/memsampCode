@@ -28,8 +28,8 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'blah' # cope or blah images
-normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'demeaned' # demeaned_stdNorm - dividing by std does work atm
+imDat   = 'cope' # cope or cope images
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -52,7 +52,7 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','hMT','IPS0','IPS1','IPS2',
         'IPS3','IPS4', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
-dfDecode.rename(index={nSubs:'blah,pval'}, inplace=True)
+dfDecode.rename(index={nSubs:'cope,pval'}, inplace=True)
 
 # =============================================================================
 # load in trial log and append image paths
@@ -127,11 +127,13 @@ for iSub in range(1,nSubs+1):
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
-            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
+            fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
         elif normMeth == 'demeaned_stdNorm':
-            fmri_masked_cleaned=fmri_masked-np.nanmean(fmri_masked,axis=0)
-            fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=0)
-        elif normMeth == 'demeaned':
+            fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+        elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
         
     #%%

@@ -26,7 +26,7 @@ import pandas as pd
 import nibabel as nib
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
-    
+
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
@@ -40,7 +40,7 @@ normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # s
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 5 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 4 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 #%% load in trial log and append image paths
 
 # - first try the LOO one with 'trials'. then load in blocks
@@ -57,22 +57,22 @@ for iSub in range(1,34):
     else:
         runs = range(1,4) #3 runs
     for iRun in runs:
-        condPath=os.path.join(mainDir, 'orig_events','sub-' + subNum + 
+        condPath=os.path.join(mainDir, 'orig_events','sub-' + subNum +
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
-        
+
         # df to load in and organise run-wise data
         df = pd.read_csv(condPath, sep='\t')
         df['run'] = pd.Series(np.ones((len(df)))*iRun,index=df.index) #add run number
         #df.loc[:,'run2']=pd.Series(np.ones((len(df)))*iRun,index=df.index) #alt way - better/worse?
-        
-        # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7   
+
+        # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7
         conds=df.direction.unique()
         conds.sort()
         #sort - arrange df so it matches cope1:84 image structure
-        df2=pd.DataFrame() 
+        df2=pd.DataFrame()
         for iCond in conds:
             df2 = df2.append(df[df['direction']==iCond])
-        
+
         copeNum=1 #counter
         imPath=[]
         for iCond in conds:
@@ -85,23 +85,23 @@ for iSub in range(1,34):
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
-    
+
     #start setting up brain data
     T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
 #    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
-    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz') 
-    
-    dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1 
+    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
+
+    dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
 
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
-  
+
     if normMeth == 'niNormalised':
         voxels2check = [0, 500, 1000]#[1000,5000,10000]
         print('mean and std of each voxel before preproc:\n',
                 ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-                ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
+                ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
         dat.cleaner(standardizeVox=True)
         print('\nmean and std of each voxel after preproc:\n',
             ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
@@ -111,18 +111,18 @@ for iSub in range(1,34):
     cv     = LeaveOneGroupOut()
     cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
     clf = LinearSVC(C=.1)
-    
+
     # the pipeline function - function defining the computation performed in each sphere
     # - add demean / normalize variance within sphere?
     def pipeline(X,y):
-        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()    
-    
+        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
+
         #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
         # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
-        
+
         #for distance measures, just get in the data and write a function to compute the distance between conditions,
         # and cross validate with an index with the splits. maybe can use above splitter function
-    
+
         #if normMeth in {'slNorm','slDemeaned'}:
 
 
@@ -132,28 +132,21 @@ for iSub in range(1,34):
 #%% run  searchlight with sphere radius=5mm using 1 core:
     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #n_jobs - cores
     #save each subject's image then load up later
-    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
-                              distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' +
+                              distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' +
                               str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     del im
 
     #%% plot
 #    chance   = 1./12
 #    imVec    = dat.masker(im)
-#    imVec    = imVec - chance 
+#    imVec    = imVec - chance
 #    imThresh = dat.unmasker(imVec)
-#    
+#
 #    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
 #                                      title='Accuracy > Chance (+arbitrary threshold)')
 #
 #    #interactive -  open the plot in a web browser:
 #    view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
 #                                      title='Accuracy > Chance (+arbitrary threshold)')
-#    view.open_in_browser()     
-    
-
-    
-    
-    
-    
-    
+#    view.open_in_browser()
