@@ -32,7 +32,7 @@ os.chdir(featDir)
 reRun = True 
 
 imDat   = 'tstat' # tstat or tstat images
-normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'demeaned' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -150,7 +150,7 @@ for iSub in range(1,nSubs+1):
                 fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
                 fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
                 fmri_masked_cleaned=fmri_masked_cleaned.transpose()
-            elif normMeth == 'demeaned':
+            elif normMeth == 'noNorm':
                 fmri_masked_cleaned = fmri_masked    
                
             
