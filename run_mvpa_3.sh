@@ -1,18 +1,16 @@
 #! /bin/bash
 
 codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+# Rois
 
-# Searchlight (4-5 cores) - tstat_niNorm, cope_noNorm, tstat_noNorm
+# tstat_demeaned
+# sed -e s:'noNorm':'demeaned':g \
+#   -e s:'cope':'tstat':g \
+#   < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
+# python mvpa_memsamp1.py
+
 #tstat_niNorm
-python mvpa_searchlight_memsamp.py
-
-#tstat_noNorm
-sed -e s:'niNormalised':'noNorm':g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
-
-#cope_noNorm
-sed -e s:'niNormalised':'noNorm':g \
-  -e s:'tstat':'cope':g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
+sed -e s:'noNorm':'niNormalised':g \
+-e s:'cope':'tstat':g \
+  < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
+python mvpa_memsamp1.py

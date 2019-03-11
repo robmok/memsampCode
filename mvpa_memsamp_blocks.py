@@ -28,6 +28,9 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
+#set to true if rerunning only a few rois, appending it to old df
+reRun = True 
+
 imDat   = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
@@ -49,6 +52,8 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
 #taking out MST and IPS5 for now, and SPL1
 rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','hMT','IPS0','IPS1','IPS2',
         'IPS3','IPS4', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+
+rois = ['visRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'tstat,pval'}, inplace=True)
@@ -169,6 +174,15 @@ for iSub in range(1,nSubs+1):
 for roi in rois:
     dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
 
+# if re-running / adding, load in first, append new dat to df, then save
+if reRun == True:
+    dfTmp=pd.read_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
+                                    distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                                    '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+    for roi in rois:
+        dfTmp[roi]=dfDecode[roi]
+    dfDecode=dfTmp
+    
 #save df
 dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 

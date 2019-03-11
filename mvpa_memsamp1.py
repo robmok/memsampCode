@@ -28,8 +28,11 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'cope' # cope or cope images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+#set to true if rerunning only a few rois, appending it to old df
+reRun = True 
+
+imDat   = 'tstat' # tstat or tstat images
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'niNormalised' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -51,8 +54,10 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
 rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','hMT','IPS0','IPS1','IPS2',
         'IPS3','IPS4', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
 
+rois = ['visRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
-dfDecode.rename(index={nSubs:'cope,pval'}, inplace=True)
+dfDecode.rename(index={nSubs:'tstat,pval'}, inplace=True)
 
 # =============================================================================
 # load in trial log and append image paths
@@ -61,7 +66,7 @@ dfDecode.rename(index={nSubs:'cope,pval'}, inplace=True)
 # - first try the LOO one with 'trials'. then load in blocks
     # - load in sub-01_task-memsamp_run-01_events.tsv #in bidsdi
     # - append run number
-    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
+    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. tstat number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
 for iSub in range(1,nSubs+1):
@@ -80,23 +85,23 @@ for iSub in range(1,nSubs+1):
         df['run'] = pd.Series(np.ones((len(df)))*iRun,index=df.index) #add run number
         #df.loc[:,'run2']=pd.Series(np.ones((len(df)))*iRun,index=df.index) #alt way - better/worse?
         
-        # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7   
+        # add path to match cue condition and trial number - tstat1:7 is dir0 trial1:7   
         conds=df.direction.unique()
         conds.sort()
-        #sort - arrange df so it matches cope1:84 image structure
+        #sort - arrange df so it matches tstat1:84 image structure
         df2=pd.DataFrame() 
         for iCond in conds:
             df2 = df2.append(df[df['direction']==iCond])
         
-        copeNum=1 #counter
+        tstatNum=1 #counter
         imPath=[]
         for iCond in conds:
-            for iTrial in range(1,8): #calculate cope number
+            for iTrial in range(1,8): #calculate tstat number
                 #make a list and append to it
                 imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
-                copeNum=copeNum+1
+                                           'stats',imDat + (str(tstatNum)) + '.nii.gz'))
+                tstatNum=tstatNum+1
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
@@ -133,7 +138,7 @@ for iSub in range(1,nSubs+1):
             fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned.transpose()
-        elif normMeth == 'noNorm':
+        elif normMeth == 'niNormalised':
             fmri_masked_cleaned = fmri_masked                    
         
     #%%
@@ -151,6 +156,15 @@ for iSub in range(1,nSubs+1):
 #compute t-test, append to df
 for roi in rois:
     dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
+
+# if re-running / adding, load in first, append new dat to df, then save
+if reRun == True:
+    dfTmp=pd.read_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
+                                    distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                                    '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+    for roi in rois:
+        dfTmp[roi]=dfDecode[roi]
+    dfDecode=dfTmp
 
 #save df
 dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
