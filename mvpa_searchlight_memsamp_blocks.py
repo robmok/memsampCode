@@ -11,7 +11,7 @@ sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
 #import glob
 import numpy as np
-#from nilearn import image as nli # Import image processing tool
+from nilearn import image as nli # Import image processing tool
 import clarte as cl # on love06 - normally just clarte is fine
 import pandas as pd
 #import matplotlib.pyplot as plt
@@ -33,7 +33,7 @@ normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # s
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 5 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 #%% load in trial log and append image paths
 
 for iSub in range(1,34):
@@ -75,7 +75,7 @@ for iSub in range(1,34):
         
     #start setting up brain data
     T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
-#    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+    #T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_V1vd_lrh.nii.gz') 
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz') 
     
     #set up block-wise
@@ -84,7 +84,7 @@ for iSub in range(1,34):
     else:
         blocks = np.array((1,2,3))
     
-    cvAcc = np.zeros((blocks[-1]))
+    tmpPath = []
     for iRun in runs:
         dfCondRuns=dfCond[dfCond['run']==iRun] #get test set
         
@@ -105,14 +105,7 @@ for iSub in range(1,34):
     
         # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
         if normMeth == 'niNormalised':
-            voxels2check = [0, 500, 1000]#[1000,5000,10000]
-            print('mean and std of each voxel before preproc:\n',
-                    ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-                    ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])    
             dat.cleaner(standardizeVox=True)
-            print('\nmean and std of each voxel after preproc:\n',
-                ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-                ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
     
         #set up cv
         cv     = LeaveOneGroupOut()
@@ -122,28 +115,25 @@ for iSub in range(1,34):
         # the pipeline function - function defining the computation performed in each sphere
         # - add demean / normalize variance within sphere?
         def pipeline(X,y):
-#            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()    
-            cvAccTmp =  cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()    
-            return cvAccTmp[iRun-1] 
+            cvAcc =  cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)) #no mean here
+            return cvAcc[iRun-1] #return only the relevant test block
 
         dat.pipeline = pipeline
     
     #%% run  searchlight with sphere radius=5mm using 1 core:
         im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #n_jobs - cores
+        # save block-wise image
+        tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_block_run-0' + str(iRun) + '.nii.gz'))
+        nib.save(im, tmpPath[iRun-1])
+        del im
+            
+    #average image over blocks
+    im = nli.mean_img(tmpPath)        
         
-        #check size of im, could i make it im[iRun], then average over it then save?
-        
-        
-        
-        
-        
-        
-        #save each subject's image then load up later
-        nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
+    #save each subject's image then load up later
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
                                   distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
                                   str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
-        del im
 
-    
-    
-    
+    del im
+   

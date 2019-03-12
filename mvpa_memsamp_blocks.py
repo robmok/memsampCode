@@ -29,7 +29,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = True 
+reRun = False 
 
 imDat   = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm

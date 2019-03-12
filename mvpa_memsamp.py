@@ -29,10 +29,10 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = True 
+reRun = False 
 
 imDat   = 'cope' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'demeaned_stdNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None

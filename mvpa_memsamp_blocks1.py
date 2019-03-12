@@ -29,10 +29,10 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = True 
+reRun = False 
 
 imDat   = 'tstat' # tstat or tstat images
-normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'demeaned' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'demeaned_stdNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'demeaned_stdNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -54,7 +54,7 @@ dfDecode.rename(index={nSubs:'stats'}, inplace=True)
 # load in trial log and append image paths
 # =============================================================================
 
-for iSub in range(1,nSubs+1):
+for iSub in range(3,nSubs+1):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -142,7 +142,7 @@ for iSub in range(1,nSubs+1):
                 fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
                 fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
                 fmri_masked_cleaned=fmri_masked_cleaned.transpose()
-            elif normMeth == 'demeaned':
+            elif normMeth == 'demeaned_stdNorm':
                 fmri_masked_cleaned = fmri_masked    
                
             
@@ -176,6 +176,6 @@ if reRun == True:
     dfDecode=dfTmp
     
 #save df
-dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
-                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+#dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
+#                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+#                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))

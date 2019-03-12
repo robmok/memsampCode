@@ -29,10 +29,10 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = True 
+reRun = False 
 
 imDat   = 'tstat' # tstat or tstat images
-normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'niNormalised' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'demeaned' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
@@ -129,7 +129,7 @@ for iSub in range(1,nSubs+1):
             fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned.transpose()
-        elif normMeth == 'niNormalised':
+        elif normMeth == 'demeaned':
             fmri_masked_cleaned = fmri_masked                    
         
     #%%
