@@ -31,7 +31,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or cope images
 slSiz=5 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'

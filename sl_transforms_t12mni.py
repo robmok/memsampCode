@@ -13,7 +13,7 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep/'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'cope' # cope or tstat images
+imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
