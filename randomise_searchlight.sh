@@ -9,31 +9,32 @@ slSiz=5 #searchlight size
 distMeth='svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 fwhm=1 # smoothing - set to None if no smoothing
 
-## merge images into one 4D image - just run once
+## merge images into one 4D image - just run once. M
+# Note: fslmerge -t outputImage.nii.gz inputIm.nii.gz
 
 # imDat='cope' # cope or tstat images
 # normMeth='niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni1.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
 #
 # imDat='tstat' # cope or tstat images
 # normMeth='niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni1.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
 #
 # imDat='cope' # cope or tstat images
 # normMeth='noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni1.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
 #
 # imDat='tstat' # cope or tstat images
 # normMeth='noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni1.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+# fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
 
 # randomise -x: voxelwise, -c: cluster size, -C: cluster mass, -T: tfce
 #one sample t-test, no need design matrix
 
 
-trainSetMeth='trials'
-imDat='cope'
-normMeth='niNormalised'
+# trainSetMeth='trials'
+# imDat='cope'
+# normMeth='niNormalised'
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
 # randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
@@ -41,11 +42,12 @@ normMeth='niNormalised'
 # threshMeth='tfce'
 # randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 # -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -T
-threshMeth='cSize'
-randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -c ${tThresh}
-randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -C ${tThresh}
+# threshMeth='cSize'
+# randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -c ${tThresh}
+# threshMeth='cMass'
+# randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -C ${tThresh}
 
 trainSetMeth='trials'
 imDat='cope'
