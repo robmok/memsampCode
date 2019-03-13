@@ -31,9 +31,9 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 os.chdir(featDir)
 
-imDat   = 'cope' # cope or cope images
+imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
-normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+normMeth = 'noNorm' # 'noNorm', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
@@ -108,7 +108,7 @@ for iSub in range(1,34):
         dat.y  = dfCondRuns['direction'].values # conditions / stimulus
     
         # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
-        if normMeth == 'niNormalised':
+        if normMeth == 'noNorm':
             dat.cleaner(standardizeVox=True)
     
         #set up cv
