@@ -34,19 +34,16 @@ def crossEuclid(x,y,cv):
         cv.get_n_splits(fmri_masked_cleaned, y, groups)
         cv = cv.split(fmri_data,y,groups)
     """
-
-    #list the cv splits to access as indices
-    cv_iter = list(cv)
-    conds=np.unique(y)
     
+    cv_iter = list(cv) # list the cv splits to access as indices
+    conds=np.unique(y) # two conds to compare
     dist = np.empty((len(cv_iter)))
     for iRun in range(0,len(cv_iter)): #n-folds
-        trainIndA = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[0]))
-        trainIndB = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[1]))
-        testIndA = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[0]))
-        testIndB = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[1]))        
-        trainDat = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
-        testDat = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
+        trainIndA  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[0])) #first 0 indexes train set, second 0/1 is the condition
+        trainIndB  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[1]))
+        testIndA   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[0])) # first 1 indexes test set, second 0/1 is the condition
+        testIndB   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[1]))  
+        trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
+        testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
         dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
-
     return dist

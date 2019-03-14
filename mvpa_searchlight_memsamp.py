@@ -41,6 +41,9 @@ distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 nCores = 4 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+
+decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+
 #%% load in trial log and append image paths
 
 # - first try the LOO one with 'trials'. then load in blocks
