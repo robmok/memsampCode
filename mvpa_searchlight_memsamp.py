@@ -131,18 +131,22 @@ for iSub in range(1,34):
 
 #%% run  searchlight with sphere radius=5mm using 1 core:
     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #n_jobs - cores
+
+    #%% normalise by chance
+    chance   = 1./12
+    imVec    = dat.masker(im)
+    imVec    = imVec - chance
+    im       = dat.unmasker(imVec)
+    
     #save each subject's image then load up later
     nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' +
                               distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' +
                               str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     del im
 
-    #%% plot
-#    chance   = 1./12
-#    imVec    = dat.masker(im)
-#    imVec    = imVec - chance
-#    imThresh = dat.unmasker(imVec)
-#
+
+
+#plot
 #    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
 #                                      title='Accuracy > Chance (+arbitrary threshold)')
 #

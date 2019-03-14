@@ -134,10 +134,14 @@ for iSub in range(1,34):
     #average image over blocks
     im = nli.mean_img(tmpPath)        
         
+    #%% normalise by chance
+    chance   = 1./12
+    imVec    = dat.masker(im)
+    imVec    = imVec - chance
+    im       = dat.unmasker(imVec)
+    
     #save each subject's image then load up later
-    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
-                                  distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
-                                  str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
-
-    del im
-   
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' +
+                              distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' +
+                              str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
+    del im   

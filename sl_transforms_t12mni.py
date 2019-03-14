@@ -17,7 +17,7 @@ imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'trials' # 'trials' or 'block'
+trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 
 for iSub in range(1,34):

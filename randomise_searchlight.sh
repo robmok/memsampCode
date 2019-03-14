@@ -9,6 +9,10 @@ slSiz=5 #searchlight size
 distMeth='svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 fwhm=1 # smoothing - set to None if no smoothing
 
+trainSetMeth='trials'
+trainSetMeth='blocks'
+
+
 ## merge images into one 4D image - just run once. M
 # Note: fslmerge -t outputImage.nii.gz inputIm.nii.gz
 
@@ -29,27 +33,26 @@ fwhm=1 # smoothing - set to None if no smoothing
 # fslmerge -t ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
 
 # randomise -x: voxelwise, -c: cluster size, -C: cluster mass, -T: tfce
-#one sample t-test, no need design matrix
+# one sample t-test, no need design matrix
 
+trainSetMeth='blocks'
+imDat='cope'
+normMeth='niNormalised'
 
-# trainSetMeth='trials'
-# imDat='cope'
-# normMeth='niNormalised'
+threshMeth='vox' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -x
+threshMeth='tfce'
+randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -T
+threshMeth='cSize'
+randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -c ${tThresh}
+threshMeth='cMass'
+randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -C ${tThresh}
 
-# threshMeth='vox' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -x
-# threshMeth='tfce'
-# randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -T
-# threshMeth='cSize'
-# randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -c ${tThresh}
-# threshMeth='cMass'
-# randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -C ${tThresh}
-
-trainSetMeth='trials'
+trainSetMeth='blocks'
 imDat='cope'
 normMeth='noNorm'
 
@@ -66,7 +69,7 @@ threshMeth='cMass'
 randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -C ${tThresh}
 
-trainSetMeth='trials'
+trainSetMeth='blocks'
 imDat='tstat'
 normMeth='niNormalised'
 
@@ -83,7 +86,7 @@ threshMeth='cMass'
 randomise -i ${slDir}/sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_dirDecoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz -1 -C ${tThresh}
 
-trainSetMeth='trials'
+trainSetMeth='blocks'
 imDat='tstat'
 normMeth='noNorm'
 
