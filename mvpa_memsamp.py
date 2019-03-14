@@ -7,6 +7,7 @@ Created on Mon Feb 25 22:48:06 2019
 """
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
+sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memampCode')
 import os
 #import glob
 import numpy as np
@@ -20,6 +21,7 @@ from nilearn.signal import clean
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 import scipy.stats as stats
+from memsamp_RM import crossEuclid
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
@@ -32,8 +34,8 @@ os.chdir(featDir)
 reRun = False 
 
 imDat   = 'cope' # cope or tstat images
-normMeth = 'demeaned_stdNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+distMeth = 'crossEuclid' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
@@ -139,18 +141,43 @@ for iSub in range(1,nSubs+1):
     #%%
     # =============================================================================
     #     #set up splits and run cv
-    # =============================================================================
-        cv     = LeaveOneGroupOut()
-        cv.get_n_splits(fmri_masked_cleaned, y, groups)
-        clf   = LinearSVC(C=.1)
-        cvAcc = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups)).mean() 
-        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc*100)))
-        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc-(1/12))*100))
-        dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
+    # ============================================================================
+    
+        #set up the conditions you want to classify. if 12-way, leave as is without condInd        
+        conds2Comp = np.array(([0,180], [30,210], [60,240], [90,270],[120,300],[150,330]))
+#        conds2Comp = np.array(([0,180]))
+        cvAccTmp = np.empty(len(conds2Comp))
+        for iPair in range(0,len(conds2Comp)):
+            condInd=np.append(np.where(y==conds2Comp[iPair][0]), np.where(y==conds2Comp[iPair][1]))
+        
+            fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
+            y_indexed = y[condInd]
+            groups_indexed = groups[condInd]
+    
+            cv    = LeaveOneGroupOut()
+            cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
+            cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
+            if distMeth == 'svm':
+                clf   = LinearSVC(C=.1)
+                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y,scoring='accuracy',cv=cv).mean() 
+                print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
+                print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/12))*100))
+            elif distMeth == 'crossEuclid':
+                cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean()
+                
+            cvAcc = cvAccTmp.mean()
+            dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
+                
+
 
 #compute t-test, append to df
+if distMeth == 'svm':
+    chance = 1/len(np.unique(y))
+else: 
+    chance = 0 #for crossvalidated distances
+    
 for roi in rois:
-    dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
+    dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
 
 # if re-running / adding, load in first, append new dat to df, then save
 if reRun == True:

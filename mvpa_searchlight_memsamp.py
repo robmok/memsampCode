@@ -98,24 +98,18 @@ for iSub in range(1,34):
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
 
     if normMeth == 'niNormalised':
-        voxels2check = [0, 500, 1000]#[1000,5000,10000]
-        print('mean and std of each voxel before preproc:\n',
-                ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-                ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
         dat.cleaner(standardizeVox=True)
-        print('\nmean and std of each voxel after preproc:\n',
-            ['%.3f'%np.mean(dat.dat[:,i]) for i in voxels2check],
-            ['%.3f'%np.std(dat.dat[:,i]) for i in voxels2check])
 
     #set up cv
-    cv     = LeaveOneGroupOut()
+    cv  = LeaveOneGroupOut()
     cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
+    cv  = cv.split(dat.dat,dat.y,dat.sessions)
     clf = LinearSVC(C=.1)
 
     # the pipeline function - function defining the computation performed in each sphere
     # - add demean / normalize variance within sphere?
     def pipeline(X,y):
-        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
+        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()
 
         #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
         # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
