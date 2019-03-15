@@ -40,12 +40,12 @@ from memsamp_RM import crossEuclid
 imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossEuclid' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 #%% load in trial log and append image paths
 
@@ -164,7 +164,6 @@ for iSub in range(1,34):
                     return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
-                chance   = 1/np.unique(dat.y)
                 imVec    = dat.masker(im)
                 imVec    = imVec - chance
                 im       = dat.unmasker(imVec)
