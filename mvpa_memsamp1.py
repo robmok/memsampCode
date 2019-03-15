@@ -34,13 +34,13 @@ from memsamp_RM import crossEuclid
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
 
-imDat    = 'tstat' # tstat or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+imDat    = 'cope' # cope or tstat images
+normMeth = 'demeaned' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 
@@ -66,7 +66,7 @@ dfDecode.rename(index={nSubs:'stats'}, inplace=True)
 # - first try the LOO one with 'trials'. then load in blocks
     # - load in sub-01_task-memsamp_run-01_events.tsv #in bidsdi
     # - append run number
-    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. tstat number is not the same for trialwise! 7 trials)
+    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
     # - load in all 3 runs then merge the 3 dfs
 
 for iSub in range(1,nSubs+1):
@@ -85,23 +85,23 @@ for iSub in range(1,nSubs+1):
         df['run'] = pd.Series(np.ones((len(df)))*iRun,index=df.index) #add run number
         #df.loc[:,'run2']=pd.Series(np.ones((len(df)))*iRun,index=df.index) #alt way - better/worse?
         
-        # add path to match cue condition and trial number - tstat1:7 is dir0 trial1:7   
+        # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7   
         conds=df.direction.unique()
         conds.sort()
-        #sort - arrange df so it matches tstat1:84 image structure
+        #sort - arrange df so it matches cope1:84 image structure
         df2=pd.DataFrame() 
         for iCond in conds:
             df2 = df2.append(df[df['direction']==iCond])
         
-        tstatNum=1 #counter
+        copeNum=1 #counter
         imPath=[]
         for iCond in conds:
-            for iTrial in range(1,8): #calculate tstat number
+            for iTrial in range(1,8): #calculate cope number
                 #make a list and append to it
                 imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
                                            + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats',imDat + (str(tstatNum)) + '.nii.gz'))
-                tstatNum=tstatNum+1
+                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
+                copeNum=copeNum+1
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
@@ -153,7 +153,9 @@ for iSub in range(1,nSubs+1):
             conds2Comp = [[0,90], [0,270], [30,120], [30,300], [60,150], [60,300], [90,180], [120,210],[150,240],[180,270],[210,300],[240,330]]
         elif decodeFeature == "12-way-all":
             allDirs = np.arange(0,330,30)
-            conds2Comp = [[0,np.setxor1d(0,allDirs)],[30,np.setxor1d(0,allDirs)]]
+            conds2Comp = [[0,np.setxor1d(0,allDirs)],  [30,np.setxor1d(0,allDirs)], [60,np.setxor1d(0,allDirs)], [90,np.setxor1d(0,allDirs)],
+                          [120,np.setxor1d(0,allDirs)],[150,np.setxor1d(0,allDirs)],[180,np.setxor1d(0,allDirs)],[210,np.setxor1d(0,allDirs)],
+                          [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
         
         #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all

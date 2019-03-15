@@ -4,7 +4,7 @@ codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
 # Searchlight (4-5 cores) -
 
 #tstat_noNorm
-python mvpa_searchlight_memsamp_blocks.py
+# python mvpa_searchlight_memsamp_blocks.py
 
 #cope_noNorm
 sed -e s:'tstat':'cope':g \
