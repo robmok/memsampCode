@@ -36,7 +36,7 @@ reRun = False
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossEuclid' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
@@ -154,6 +154,7 @@ for iSub in range(1,nSubs+1):
         elif decodeFeature == "ori":
             conds2Comp = np.array(([0,90], [0,270], [30,120], [30,300], [60,150], [60,300], [90,180], [120,210],[150,240],[180,270],[210,300],[240,330]))
         
+        #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all
             cv   = LeaveOneGroupOut()
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
@@ -187,7 +188,7 @@ for iSub in range(1,nSubs+1):
                 
 #compute t-test, append to df
 if distMeth == 'svm':
-    chance = 1/len(np.unique(y))
+    chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances
     
