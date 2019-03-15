@@ -20,22 +20,17 @@ sed -e s:'tstat':'cope':g \
 python mvpa_searchlight_memsamp1.py
 
 
-# Euclid dir/ori, cope/stat, noNorm/niNorm
+# SVM/Euclid dir, cope (stat for svm only), noNorm/niNorm
 
-# distMeth = 'svm'
-# decodeFeature = '12-way' -> dir/ori
+#SVM - pairwise - dir
 
-#tstat_noNorm
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossEuclid'":g \
+#tstat_noNorm_svm
+sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
 python mvpa_searchlight_memsamp1.py
 
-#cope_noNorm
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossEuclid'":g \
+#cope_noNorm_svm
+sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
     -e s:'tstat':'cope':g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
 python mvpa_searchlight_memsamp1.py
-
-
-
-# niNorm

@@ -3,21 +3,18 @@
 codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
 # Rois
 
-# svm, trials
+# 12-way - svm/euclid trials, cope/tstat (cope only for euclid), noNorm/niNorm
 
-#dir
+#next: ori, blocks...
+
+
+#SVM
 
 #cope_noNorm
 python mvpa_memsamp.py
 
-#cope_demeaned
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned'":g \
-  < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
-python mvpa_memsamp1.py
-
-# dir
-#cope_demeaned_stdNorm
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+#cope_niNorm
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
 python mvpa_memsamp1.py
 
@@ -26,15 +23,29 @@ sed -e s:'cope':'tstat':g \
   < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
 python mvpa_memsamp1.py
 
-# ori
+#tstat_niNorm
+sed -e s:'cope':'tstat':g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
+python mvpa_memsamp1.py
+
+
+
+#euclid
 
 #cope_noNorm
-sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
+sed -e s:"distMeth = 'svm'":"distMeth = 'crossEuclid'":g \
   < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
 python mvpa_memsamp1.py
 
-#cope_demeaned
-sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned'":g \
+#cope_niNorm
+sed -e s:"distMeth = 'svm'":"distMeth = 'crossEuclid'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_memsamp.py > ${codeDir}/mvpa_memsamp1.py
 python mvpa_memsamp1.py
+
+
+
+
+
+
