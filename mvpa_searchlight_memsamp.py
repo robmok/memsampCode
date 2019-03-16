@@ -99,8 +99,10 @@ for iSub in range(1,34):
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
-    y      = dfCond['direction'].values #does not change
-    
+    #permanent, since the dat object needs to be edited to put into the pipeline
+    datPerm    = dat.dat
+    yPerm      = dat.y
+    sessPerm   = dat.sessions
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
     if normMeth == 'niNormalised':
         dat.cleaner(standardizeVox=True)
@@ -134,7 +136,7 @@ for iSub in range(1,34):
         im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
 
         # normalise by chance
-        chance   = 1/np.unique(y)
+        chance   = 1/np.unique(dat.y)
         imVec    = dat.masker(im)
         imVec    = imVec - chance
         im       = dat.unmasker(imVec)        
@@ -142,18 +144,18 @@ for iSub in range(1,34):
 #        cvAccTmp = np.empty(len(conds2Comp))
         tmpPath = []
         for iPair in range(0,len(conds2Comp)):
-            ytmp=y.copy()
+            ytmp=yPerm.copy()
             if not decodeFeature == "12-way-all": 
-                condInd=np.append(np.where(y==conds2Comp[iPair][0]), np.where(y==conds2Comp[iPair][1]))   
+                condInd=np.append(np.where(yPerm==conds2Comp[iPair][0]), np.where(yPerm==conds2Comp[iPair][1]))   
             else: # append multiple conditions in a cell of the array
                 condInd=np.where(dat.y==conds2Comp[iPair][0])
                 for iVal in conds2Comp[iPair][1]:
-                    condInd=np.append(condInd, np.where(y==iVal))
-                ytmp[y!=conds2Comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    condInd=np.append(condInd, np.where(yPerm==iVal))
+                ytmp[yPerm!=conds2Comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
         
-            dat.dat = dat.dat[condInd,]
+            dat.dat = datPerm[condInd,]
             dat.y = ytmp[condInd]
-            dat.sessions = dat.sessions[condInd]
+            dat.sessions = sessPerm[condInd]
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
             
@@ -164,7 +166,7 @@ for iSub in range(1,34):
                     return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
-                chance   = 1/np.unique(y)
+                chance   = 1/np.unique(dat.y)
                 imVec    = dat.masker(im)
                 imVec    = imVec - chance
                 im       = dat.unmasker(imVec)
