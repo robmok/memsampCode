@@ -26,7 +26,10 @@ featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
 bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
-os.chdir(featDir)
+codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+os.chdir(codeDir)
+
+from memsamp_RM import crossEuclid
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
@@ -36,6 +39,8 @@ normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' #
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = 1 # optional smoothing param - 1, or None
+
+decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 #%%
 # =============================================================================
@@ -146,17 +151,59 @@ for iSub in range(1,nSubs+1):
                 fmri_masked_cleaned=fmri_masked_cleaned.transpose()
             elif normMeth == 'noNorm':
                 fmri_masked_cleaned = fmri_masked    
-               
             
-            #%%
             # =============================================================================
             #     #set up splits and run cv
-            # =============================================================================
-            cv     = LeaveOneGroupOut()
-            cv.get_n_splits(fmri_masked_cleaned, y, groups)
-            clf   = LinearSVC(C=.1)
-            cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv.split(fmri_masked_cleaned,y,groups))
+            # ====================================================================
             
+            #set up the conditions you want to classify. if 12-way, leave as is without condInd        
+            if decodeFeature == "dir":
+                conds2Comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
+            elif decodeFeature == "ori":
+                conds2Comp = [[0,90], [0,270], [30,120], [30,300], [60,150], [60,300], [90,180], [120,210],[150,240],[180,270],[210,300],[240,330]]
+            elif decodeFeature == "12-way-all":
+                allDirs = np.arange(0,330,30)
+                conds2Comp = [[0,np.setxor1d(0,allDirs)],  [30,np.setxor1d(0,allDirs)], [60,np.setxor1d(0,allDirs)], [90,np.setxor1d(0,allDirs)],
+                              [120,np.setxor1d(0,allDirs)],[150,np.setxor1d(0,allDirs)],[180,np.setxor1d(0,allDirs)],[210,np.setxor1d(0,allDirs)],
+                              [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
+                
+            #run cv
+            if decodeFeature == "12-way": # no need conds2comp, just compare all
+                iPair=0
+                cv   = LeaveOneGroupOut()
+                cv.get_n_splits(fmri_masked_cleaned, y, groups)
+                cv   = cv.split(fmri_masked_cleaned,y,groups)   
+                clf  = LinearSVC(C=.1)
+                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
+                print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
+                print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/12))*100))
+            else: #all condition-wise comparisons
+                cvAccTmp = np.empty(len(conds2Comp))
+                for iPair in range(0,len(conds2Comp)):
+                    ytmp=y.copy()
+                    if not decodeFeature == "12-way-all": 
+                        condInd=np.append(np.where(y==conds2Comp[iPair][0]), np.where(y==conds2Comp[iPair][1]))   
+                    else:
+                        condInd=np.where(y==conds2Comp[iPair][0])
+                        for iVal in conds2Comp[iPair][1]:
+                            condInd=np.append(condInd, np.where(y==iVal))
+                        ytmp[y!=conds2Comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                
+                    fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
+                    y_indexed = ytmp[condInd]
+                    groups_indexed = groups[condInd]
+            
+                    cv    = LeaveOneGroupOut()
+                    cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
+                    cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
+                    if distMeth == 'svm':
+                        clf   = LinearSVC(C=.1)
+                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp[iPair]*100)))
+                        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                    elif distMeth == 'crossEuclid':
+                        cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+
             #get relevant cvAcc measure - is this the right one? (test set?)
             cvAcc[iRun-1] = cvAccTmp[iRun-1] 
             
@@ -164,20 +211,25 @@ for iSub in range(1,nSubs+1):
         print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc.mean()*100)))
         print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc.mean()-(1/12))*100))
         
-#compute t-test, append to df
-for roi in rois:
-    dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],1/12) #compute t-test, append to df
+if distMeth == 'svm':
+    chance = 1/len(np.unique(y_indexed))
+else: 
+    chance = 0 #for crossvalidated distances
+
+if not decodeFeature == "12-way-all": #stores several values in each cell, so can't do t-test here
+    for roi in rois:
+        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
 
 # if re-running / adding, load in first, append new dat to df, then save
 if reRun == True:
-    dfTmp=pd.read_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
-                                    distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                    '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+    dfTmp=pd.read_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
+                                      distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                                      '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
     for roi in rois:
         dfTmp[roi]=dfDecode[roi]
     dfDecode=dfTmp
-    
+
 #save df
-dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_dirDecoding_' +
+dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))

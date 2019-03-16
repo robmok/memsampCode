@@ -164,6 +164,7 @@ for iSub in range(1,34):
                     return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
+                chance   = 1/np.unique(y)
                 imVec    = dat.masker(im)
                 imVec    = imVec - chance
                 im       = dat.unmasker(imVec)

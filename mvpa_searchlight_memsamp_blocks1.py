@@ -33,7 +33,7 @@ os.chdir(featDir)
 
 imDat   = 'cope' # cope or cope images
 slSiz=5 #searchlight size
-normMeth = 'noNorm' # 'noNorm', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
@@ -108,7 +108,7 @@ for iSub in range(1,34):
         dat.y  = dfCondRuns['direction'].values # conditions / stimulus
     
         # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
-        if normMeth == 'noNorm':
+        if normMeth == 'niNormalised':
             dat.cleaner(standardizeVox=True)
     
         #set up cv
@@ -130,14 +130,20 @@ for iSub in range(1,34):
         tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_block_run-0' + str(iRun) + '.nii.gz'))
         nib.save(im, tmpPath[iRun-1])
         del im
+        for tmpImg in tmpPath: 
+            os.remove(tmpImg) #remove temp files
             
     #average image over blocks
     im = nli.mean_img(tmpPath)        
         
+    #%% normalise by chance
+    chance   = 1./12
+    imVec    = dat.masker(im)
+    imVec    = imVec - chance
+    im       = dat.unmasker(imVec)
+    
     #save each subject's image then load up later
-    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' + 
-                                  distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
-                                  str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
-
-    del im
-   
+    nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_dirDecoding_' +
+                              distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' +
+                              str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
+    del im   
