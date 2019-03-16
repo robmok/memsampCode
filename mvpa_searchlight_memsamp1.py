@@ -40,7 +40,7 @@ from memsamp_RM import crossEuclid
 imDat   = 'cope' # cope or cope images
 slSiz=5 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'crossEuclid' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
