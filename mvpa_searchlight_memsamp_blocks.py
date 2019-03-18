@@ -130,8 +130,8 @@ for iSub in range(1,34):
         tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_block_run-0' + str(iRun) + '.nii.gz'))
         nib.save(im, tmpPath[iRun-1])
         del im
-        for tmpImg in tmpPath: 
-            os.remove(tmpImg) #remove temp files
+#        for tmpImg in tmpPath: 
+#            os.remove(tmpImg) #remove temp files
             
     #average image over blocks
     im = nli.mean_img(tmpPath)        

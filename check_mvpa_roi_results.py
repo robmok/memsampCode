@@ -6,14 +6,18 @@ Created on Fri Mar 15 12:10:41 2019
 @author: robert.mok
 """
 #%%
+import os
+import pandas as pd
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
+
 
 imDat    = 'cope' # cope or tstat images
-normMeth = 'demeaned_stdNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossEuclid' # 'svm', 'crossEuclid', 'crossNobis'
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
-decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 

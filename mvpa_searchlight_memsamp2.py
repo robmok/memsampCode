@@ -100,9 +100,9 @@ for iSub in range(1,34):
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
     #permanent, since the dat object needs to be edited to put into the pipeline
-    datPerm    = dat.dat
-    yPerm      = dat.y
-    sessPerm   = dat.sessions
+    datPerm    = dat.dat.copy()
+    yPerm      = dat.y.copy()
+    sessPerm   = dat.sessions.copy()
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
     if normMeth == 'niNormalised':
         dat.cleaner(standardizeVox=True)
@@ -141,10 +141,9 @@ for iSub in range(1,34):
         imVec    = imVec - chance
         im       = dat.unmasker(imVec)        
     else: #all condition-wise comparisons
-#        cvAccTmp = np.empty(len(conds2Comp))
         tmpPath = []
         for iPair in range(0,len(conds2Comp)):
-            ytmp=yPerm.copy()
+            ytmp=yPerm.copy() #need to copy this for 12-way-all since will edit ytmp (which will change yPerm if not copy since it's referring to the same object)
             if not decodeFeature == "12-way-all": 
                 condInd=np.append(np.where(yPerm==conds2Comp[iPair][0]), np.where(yPerm==conds2Comp[iPair][1]))   
             else: # append multiple conditions in a cell of the array
