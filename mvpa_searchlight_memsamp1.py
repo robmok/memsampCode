@@ -16,23 +16,20 @@ Created on Mon Feb 25 22:48:06 2019
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
-#import glob
 import numpy as np
 from nilearn import image as nli # Import image processing tool
-import clarte as cl # on love06 - normally just clarte is fine
+import clarte as cl
 import pandas as pd
-#import matplotlib.pyplot as plt
-#import nilearn.plotting as nip
 import nibabel as nib
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 
-mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
-featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
-bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
-fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
-codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
+#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+
+featDir=os.path.join(mainDir,'memsampFeat')
+roiDir=os.path.join(mainDir,'rois')
+codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
 from memsamp_RM import crossEuclid
@@ -45,15 +42,9 @@ trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 #%% load in trial log and append image paths
-
-# - first try the LOO one with 'trials'. then load in blocks
-    # - load in sub-01_task-memsamp_run-01_events.tsv #in bidsdi
-    # - append run number
-    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
-    # - load in all 3 runs then merge the 3 dfs
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
@@ -99,15 +90,15 @@ for iSub in range(1,34):
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
-    #permanent, since the dat object needs to be edited to put into the pipeline
-    datPerm    = dat.dat
-    yPerm      = dat.y
-    sessPerm   = dat.sessions
+    #make permanent copies, since the dat object needs to be edited to put into the pipeline
+    datPerm    = dat.dat.copy()
+    yPerm      = dat.y.copy()
+    sessPerm   = dat.sessions.copy()
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
     if normMeth == 'niNormalised':
         dat.cleaner(standardizeVox=True)
     
-    #set up the conditions you want to classify. if 12-way, leave as is without condInd        
+    #set up the conditions you want to classify. if 12-way, no need condInd      
     if decodeFeature == "dir":
         conds2Comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
     elif decodeFeature == "ori":
@@ -141,10 +132,9 @@ for iSub in range(1,34):
         imVec    = imVec - chance
         im       = dat.unmasker(imVec)        
     else: #all condition-wise comparisons
-#        cvAccTmp = np.empty(len(conds2Comp))
         tmpPath = []
         for iPair in range(0,len(conds2Comp)):
-            ytmp=yPerm.copy()
+            ytmp=yPerm.copy() #need to copy this for 12-way-all since will edit ytmp (which will change yPerm if not copy since it's referring to the same object)
             if not decodeFeature == "12-way-all": 
                 condInd=np.append(np.where(yPerm==conds2Comp[iPair][0]), np.where(yPerm==conds2Comp[iPair][1]))   
             else: # append multiple conditions in a cell of the array

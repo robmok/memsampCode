@@ -117,7 +117,13 @@ for iSub in range(1,nSubs+1):
         maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
                                     target_shape=imgs.shape[:3], interpolation='nearest')
         fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
-        
+        if distMeth == 'crossNobis': #get variance to compute covar matrix below
+            var_masked_tmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-01_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),maskROI) #get nTimepoints
+            var = np.empty((len(var_masked_tmp),len(fmri_masked.transpose()),len(runs))) #nTimepoints x voxels x runs
+            for iRun in runs:
+                varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
+                var[:,:,iRun-1] = apply_mask(varPath,maskROI)  #optional fwhm param
+            
         # CHECK normalise mean and std using nilearn - how this does it exactly
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
@@ -182,6 +188,9 @@ for iSub in range(1,nSubs+1):
                     print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
                 elif distMeth == 'crossEuclid':
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                    
+                elif distMeth == 'crossNobis':
+                    cvAccTmp[iPair] = crossNobis(fmri_masked_cleaned_indexed,y_indexed,cv,var).mean() # mean over crossval folds        
         
         if not decodeFeature == "12-way-all": 
             cvAcc = cvAccTmp.mean() #mean over pairs
