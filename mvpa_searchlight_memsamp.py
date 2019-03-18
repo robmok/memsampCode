@@ -49,12 +49,6 @@ decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs)
 
 #%% load in trial log and append image paths
 
-# - first try the LOO one with 'trials'. then load in blocks
-    # - load in sub-01_task-memsamp_run-01_events.tsv #in bidsdi
-    # - append run number
-    # - append path to image - match 0:30:270 degrees to condition 1:12, trialwise (N.B. cope number is not the same for trialwise! 7 trials)
-    # - load in all 3 runs then merge the 3 dfs
-
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
@@ -99,7 +93,7 @@ for iSub in range(1,34):
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
-    #permanent, since the dat object needs to be edited to put into the pipeline
+    #make permanent copies, since the dat object needs to be edited to put into the pipeline
     datPerm    = dat.dat.copy()
     yPerm      = dat.y.copy()
     sessPerm   = dat.sessions.copy()
@@ -107,7 +101,7 @@ for iSub in range(1,34):
     if normMeth == 'niNormalised':
         dat.cleaner(standardizeVox=True)
     
-    #set up the conditions you want to classify. if 12-way, leave as is without condInd        
+    #set up the conditions you want to classify. if 12-way, no need condInd      
     if decodeFeature == "dir":
         conds2Comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
     elif decodeFeature == "ori":
