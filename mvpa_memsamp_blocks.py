@@ -8,12 +8,9 @@ Created on Fri Mar  8 15:32:19 2019
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
-#import glob
 import numpy as np
 from nilearn import image as nli # Import image processing tool
 import pandas as pd
-#import matplotlib.pyplot as plt
-#import nilearn.plotting as nip
 import nibabel as nib
 from nilearn.masking import apply_mask 
 from nilearn.signal import clean 
@@ -21,12 +18,12 @@ from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 import scipy.stats as stats
 
-mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
-featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
-bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
-fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
-codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
+#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+
+featDir=os.path.join(mainDir,'memsampFeat')
+roiDir=os.path.join(mainDir,'rois')
+codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
 from memsamp_RM import crossEuclid
