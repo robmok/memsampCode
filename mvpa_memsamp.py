@@ -26,7 +26,7 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid
+from memsamp_RM import *
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
@@ -119,7 +119,7 @@ for iSub in range(1,nSubs+1):
         fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
         if distMeth == 'crossNobis': #get variance to compute covar matrix below
             var_masked_tmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-01_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),maskROI) #get nTimepoints
-            var = np.empty((len(var_masked_tmp),len(fmri_masked.transpose()),len(runs))) #nTimepoints x voxels x runs
+            var = np.empty((len(var_masked_tmp),np.size(fmri_masked,axis=1),len(runs))) #nTimepoints x voxels x runs
             for iRun in runs:
                 varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
                 var[:,:,iRun-1] = apply_mask(varPath,maskROI)  #optional fwhm param
@@ -188,7 +188,6 @@ for iSub in range(1,nSubs+1):
                     print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
                 elif distMeth == 'crossEuclid':
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
-                    
                 elif distMeth == 'crossNobis':
                     cvAccTmp[iPair] = crossNobis(fmri_masked_cleaned_indexed,y_indexed,cv,var).mean() # mean over crossval folds        
         

@@ -9,6 +9,7 @@ memsamp functions
 import numpy as np
 from sklearn.covariance import LedoitWolf
 
+
 def crossEuclid(x,y,cv):
     """ 
 
@@ -70,36 +71,34 @@ def crossNobis(x,y,cv,var):
         testIndA   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[0])) # first 1 indexes test set, second 0/1 is the condition
         testIndB   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[1]))  
         
-        #compute covariance matrix
-        ind = np.where(runs!=iRun)
+        #compute covariance matrix from training runs
+        ind = np.where(runs!=iRun) #better way? next line is a bit annoying...
         ind = ind[0]
-        nVox = var.shape
-        covMat = np.empty((nVox[1],nVox[1],len(runs)-1))
+        nVox = np.size(var,axis=1)
+        covMat = np.empty((nVox,nVox,len(runs)-1))
         for i in range(0,len(ind)):
             cov = LedoitWolf().fit(var[:,:,ind[i]])
             covMat[:,:,i] = cov.covariance_
         covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
         
+        covTest = np.linalg.inv(LedoitWolf().fit(var[:,:,iRun]))
 
-      #
         
         trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
         testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
-        dist[iRun] = np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covMatAv)) #first dim volumes (trials), second dim voxels    
+        dist[iRun] = np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covTest)) #first dim volumes (trials), second dim voxels    
         
-        #testing
-        np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covMatAv))
-        np.dot(np.dot(trainDat,covMatAv),testDat) #quite diff
-        
-        #double check if np.dot does inner product properly for cov mat
-        
-        #also - same as first one above
-        trainDat   = np.dot(x[trainIndA,].mean(axis=0),covMatAv)-np.dot(x[trainIndB,].mean(axis=0),covMatAv)
-        testDat    = np.dot(x[testIndA,].mean(axis=0),covMatAv)-np.dot(x[testIndB,].mean(axis=0),covMatAv)
-        dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
-        
-        
-        
+#        #testing
+#        covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
+#        trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
+#        testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
+#        distTmp    = np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covMatAv))
+                
+        # same as first one above
+#        trainDat   = np.dot(x[trainIndA,].mean(axis=0),covMatAv)-np.dot(x[trainIndB,].mean(axis=0),covMatAv)
+#        testDat    = np.dot(x[testIndA,].mean(axis=0),covMatAv)-np.dot(x[testIndB,].mean(axis=0),covMatAv)
+#        dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
+
     return dist
 
 
