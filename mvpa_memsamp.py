@@ -26,7 +26,7 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import *
+from memsamp_RM import crossEuclid, crossNobis
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
@@ -40,6 +40,8 @@ fwhm = 1 # optional smoothing param - 1, or None
 decodeFeature = '12-way-all' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
+#distMeth = 'crossNobis' 
+#decodeFeature = 'dir' 
 #%%
 # =============================================================================
 # Set up decoding accuracy dataframe 
@@ -184,20 +186,19 @@ for iSub in range(1,nSubs+1):
                 if distMeth == 'svm':
                     clf   = LinearSVC(C=.1)
                     cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                    print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp[iPair]*100)))
-                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+#                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
                 elif distMeth == 'crossEuclid':
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
                 elif distMeth == 'crossNobis':
-                    cvAccTmp[iPair] = crossNobis(fmri_masked_cleaned_indexed,y_indexed,cv,var).mean() # mean over crossval folds        
+                    cvAccTmp[iPair] = crossNobis(fmri_masked_cleaned_indexed,y_indexed,cv,var).mean() # mean over crossval folds
         
         if not decodeFeature == "12-way-all": 
             cvAcc = cvAccTmp.mean() #mean over pairs
         else:
             cvAcc = cvAccTmp
-            
+        
         dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
-                
+        print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
 #compute t-test, append to df
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))

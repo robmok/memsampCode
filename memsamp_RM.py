@@ -80,24 +80,14 @@ def crossNobis(x,y,cv,var):
             cov = LedoitWolf().fit(var[:,:,ind[i]])
             covMat[:,:,i] = cov.covariance_
         covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
+        
+        #use testSet cov for pre-whitening test set?
         covTestTmp = LedoitWolf().fit(var[:,:,iRun])
-        covTest = np.linalg.inv(covTestTmp.covariance_) #use testSet cov for pre-whitening test set?
+        covTest = np.linalg.inv(covTestTmp.covariance_)
         
         trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
         testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
         dist[iRun] = np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covTest)) #first dim volumes (trials), second dim voxels    
-        
-#        #testing
-#        covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
-#        trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
-#        testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
-#        distTmp    = np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covMatAv))
-                
-        # same as first one above
-#        trainDat   = np.dot(x[trainIndA,].mean(axis=0),covMatAv)-np.dot(x[trainIndB,].mean(axis=0),covMatAv)
-#        testDat    = np.dot(x[testIndA,].mean(axis=0),covMatAv)-np.dot(x[testIndB,].mean(axis=0),covMatAv)
-#        dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
-
     return dist
 
 
