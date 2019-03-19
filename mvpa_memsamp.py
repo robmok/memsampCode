@@ -167,7 +167,7 @@ for iSub in range(1,nSubs+1):
             clf  = LinearSVC(C=.1)
             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
             print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
-            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/12))*100))
+            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y_indexed))))*100))
         else: #all condition-wise comparisons
             cvAccTmp = np.empty(len(conds2Comp))
             for iPair in range(0,len(conds2Comp)):

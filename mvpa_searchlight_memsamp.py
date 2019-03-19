@@ -105,7 +105,7 @@ for iSub in range(1,34):
         for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
             varPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
         varTmp = cl.fmri_data(varPath,T1_mask_path) #load in with clarte function
-        #doing this to make it work with my current function, but maybe could adapt to clarte's structure? (runs x .. )
+        #changing 'var's structure to make it work with the crossnobis function, but maybe could adapt to clarte's structure? (runs x vox x time)
         var = []
         for iRun in runs:
             var.append(varTmp.dat[iRun-1,:,:])
@@ -139,7 +139,7 @@ for iSub in range(1,34):
         im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
 
         # normalise by chance
-        chance   = 1/np.unique(dat.y)
+        chance   = 1/len(np.unique(dat.y))
         imVec    = dat.masker(im)
         imVec    = imVec - chance
         im       = dat.unmasker(imVec)        
@@ -168,7 +168,7 @@ for iSub in range(1,34):
                     return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
-                chance   = 1/np.unique(dat.y)
+                chance   = 1/len(np.unique(dat.y))
                 imVec    = dat.masker(im)
                 imVec    = imVec - chance
                 im       = dat.unmasker(imVec)
