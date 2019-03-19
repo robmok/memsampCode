@@ -33,21 +33,19 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid, crossNobis, compCovMat
+from memsamp_RM import crossEuclid, crossNobis
 
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 5 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 
-#distMeth = 'crossNobis' 
-#decodeFeature = 'ori' 
 #%% load in trial log and append image paths
 
 for iSub in range(1,34):
