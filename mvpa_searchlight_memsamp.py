@@ -25,7 +25,7 @@ from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 featDir=os.path.join(mainDir,'memsampFeat')
 fmriprepDir=os.path.join(mainDir,'fmriprep_output/fmriprep')
@@ -41,7 +41,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 5 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 10 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 

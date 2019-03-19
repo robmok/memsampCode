@@ -8,12 +8,9 @@ Created on Mon Feb 25 22:48:06 2019
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
-#import glob
 import numpy as np
 from nilearn import image as nli # Import image processing tool
 import pandas as pd
-#import matplotlib.pyplot as plt
-#import nilearn.plotting as nip
 import nibabel as nib
 from nilearn.masking import apply_mask 
 from nilearn.signal import clean 
@@ -21,26 +18,26 @@ from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 import scipy.stats as stats
 
-mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
-featDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat'
-bidsDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampBids'
-fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep'
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
-codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
+#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+
+featDir=os.path.join(mainDir,'memsampFeat')
+roiDir=os.path.join(mainDir,'rois')
+codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid
+from memsamp_RM import crossEuclid, compCovMat
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
 
 imDat    = 'cope' # cope or tstat images
-normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossEuclid' # 'svm', 'crossEuclid', 'crossNobis'
+normMeth = 'demeaned_stdNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
-decodeFeature = '12-way-all' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 #%%
@@ -120,7 +117,7 @@ for iSub in range(1,nSubs+1):
         maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
                                     target_shape=imgs.shape[:3], interpolation='nearest')
         fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
-        
+            
         # CHECK normalise mean and std using nilearn - how this does it exactly
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
@@ -133,8 +130,19 @@ for iSub in range(1,nSubs+1):
             fmri_masked_cleaned=fmri_masked_cleaned.transpose()
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
-        
-    #%%
+
+        if distMeth == 'crossNobis': #get variance to compute covar matrix below
+            # compute each run's covariance matrix here, then apply it to fmri_masked_cleaned, then euclid below
+            covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
+            for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
+                varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
+                covMat[:,:,iRun-1] = compCovMat(apply_mask(varPath,maskROI))
+            for iRun in runs:
+                trlInd = np.where(groups==iRun)
+                trlInd = trlInd[0]
+                for iTrl in trlInd:
+                    fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun-1])
+            
     # =============================================================================
     #     #set up splits and run cv
     # ============================================================================
@@ -159,7 +167,7 @@ for iSub in range(1,nSubs+1):
             clf  = LinearSVC(C=.1)
             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
             print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
-            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/12))*100))
+            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y_indexed))))*100))
         else: #all condition-wise comparisons
             cvAccTmp = np.empty(len(conds2Comp))
             for iPair in range(0,len(conds2Comp)):
@@ -182,18 +190,19 @@ for iSub in range(1,nSubs+1):
                 if distMeth == 'svm':
                     clf   = LinearSVC(C=.1)
                     cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                    print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp[iPair]*100)))
-                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
-                elif distMeth == 'crossEuclid':
+#                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                elif distMeth in {'crossEuclid','crossNobis'}:
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+#                elif distMeth == 'crossNobis':
+#                    cvAccTmp[iPair] = crossNobis(fmri_masked_cleaned_indexed,y_indexed,cv,var).mean() # mean over crossval folds
         
         if not decodeFeature == "12-way-all": 
             cvAcc = cvAccTmp.mean() #mean over pairs
         else:
             cvAcc = cvAccTmp
-            
+        
         dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
-                
+        print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
 #compute t-test, append to df
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))
