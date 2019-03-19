@@ -120,11 +120,13 @@ for iSub in range(1,nSubs+1):
                                     target_shape=imgs.shape[:3], interpolation='nearest')
         fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
         if distMeth == 'crossNobis': #get variance to compute covar matrix below
-            var_masked_tmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-01_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),maskROI) #get nTimepoints
-            var = np.empty((len(var_masked_tmp),np.size(fmri_masked,axis=1),len(runs))) #nTimepoints x voxels x runs
-            for iRun in runs:
+#            var_masked_tmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-01_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),maskROI) #get nTimepoints
+#            var = np.empty((len(var_masked_tmp),np.size(fmri_masked,axis=1),len(runs))) #nTimepoints x voxels x runs
+#            var = np.empty((len(var_masked_tmp),np.size(fmri_masked,axis=1)) #nTimepoints x voxels x runs
+            var = []
+            for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
                 varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
-                var[:,:,iRun-1] = apply_mask(varPath,maskROI)  #optional fwhm param
+                var.append(apply_mask(varPath,maskROI))
             
         # CHECK normalise mean and std using nilearn - how this does it exactly
         if normMeth == 'niNormalised':

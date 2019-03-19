@@ -74,15 +74,15 @@ def crossNobis(x,y,cv,var):
         #compute covariance matrix from training runs
         ind = np.where(runs!=iRun) #better way? next line is a bit annoying...
         ind = ind[0]
-        nVox = np.size(var,axis=1)
+        nVox = np.size(var,axis=2)
         covMat = np.empty((nVox,nVox,len(runs)-1))
         for i in range(0,len(ind)):
-            cov = LedoitWolf().fit(var[:,:,ind[i]])
+            cov = LedoitWolf().fit(var[ind[i]])
             covMat[:,:,i] = cov.covariance_
         covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
         
         #use testSet cov for pre-whitening test set?
-        covTestTmp = LedoitWolf().fit(var[:,:,iRun])
+        covTestTmp = LedoitWolf().fit(var[iRun])
         covTest = np.linalg.inv(covTestTmp.covariance_)
         
         trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
