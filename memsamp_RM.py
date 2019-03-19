@@ -92,7 +92,10 @@ def crossNobis(x,y,cv,var):
 
 
 
-
+def compCovMat(var):
+    covTmp = LedoitWolf().fit(var)
+    covMat = np.linalg.inv(covTmp.covariance_)
+    return covMat
 
 
 
