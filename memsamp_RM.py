@@ -80,9 +80,8 @@ def crossNobis(x,y,cv,var):
             cov = LedoitWolf().fit(var[:,:,ind[i]])
             covMat[:,:,i] = cov.covariance_
         covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
-        
-        covTest = np.linalg.inv(LedoitWolf().fit(var[:,:,iRun]))
-
+        covTestTmp = LedoitWolf().fit(var[:,:,iRun])
+        covTest = np.linalg.inv(covTestTmp.covariance_) #use testSet cov for pre-whitening test set?
         
         trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
         testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
