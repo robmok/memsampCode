@@ -12,7 +12,7 @@ fwhm=1 # smoothing - set to None if no smoothing
 
 decodeFeature='12-way'
 
-trainSetMeth='block'
+trainSetMeth='blocks'
 imDat='cope'
 normMeth='noNorm'
 
