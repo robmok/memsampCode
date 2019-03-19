@@ -33,7 +33,7 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid
+from memsamp_RM import crossEuclid, crossNobis, compCovMat
 
 imDat   = 'tstat' # cope or tstat images
 slSiz=5 #searchlight size
@@ -45,6 +45,9 @@ nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
+
+#distMeth = 'crossNobis' 
+#decodeFeature = 'ori' 
 #%% load in trial log and append image paths
 
 for iSub in range(1,34):
@@ -98,7 +101,17 @@ for iSub in range(1,34):
     # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
     if normMeth == 'niNormalised':
         dat.cleaner(standardizeVox=True)
-    
+
+    if distMeth == 'crossNobis': #get variance to compute covar matrix below
+        varPath = []
+        for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
+            varPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
+        varTmp = cl.fmri_data(varPath,T1_mask_path) #load in with clarte function
+        #doing this to make it work with my current function, but maybe could adapt to clarte's structure? (runs x .. )
+        var = []
+        for iRun in runs:
+            var.append(varTmp.dat[iRun-1,:,:])
+
     #set up the conditions you want to classify. if 12-way, no need condInd      
     if decodeFeature == "dir":
         conds2Comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
@@ -172,9 +185,14 @@ for iSub in range(1,34):
                           'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                           '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + str(iPair) + '.nii.gz'))
                 del im
-            elif distMeth == 'crossEuclid':
-                def pipeline(X,y):
-                    return crossEuclid(dat.dat,dat.y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+            elif distMeth in {'crossEuclid', 'crossNobis'}:                
+                if distMeth == 'crossNobis': #get variance to compute covar matrix below
+                    def pipeline(X,y):
+                        return crossNobis(dat.dat,dat.y,cv.split(dat.dat,dat.y,dat.sessions),var).mean()
+                elif distMeth == 'crossEuclid':
+                    def pipeline(X,y):
+                        return crossEuclid(dat.dat,dat.y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
     

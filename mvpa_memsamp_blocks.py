@@ -26,7 +26,7 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid
+from memsamp_RM import crossEuclid, crossNobis, compCovMat
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 

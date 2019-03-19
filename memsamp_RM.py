@@ -54,17 +54,15 @@ def crossEuclid(x,y,cv):
 def crossNobis(x,y,cv,var):
     """ 
     Compute cross-validated Mahalanobis distance score over crossvalidation folds
-    Using np.dot rather than np.inner - quick check shows its a bit faster
     
     var : array-like
     voxel x time variance matrix from feat output
     
     """
-
     cv_iter = list(cv) # list the cv splits to access as indices
     conds=np.unique(y) # two conds to compare
     dist = np.empty((len(cv_iter)))
-    runs = np.array((0,1,2))
+    runs = np.array((0,1,2)) #note this changed from runs=1,2,3, in main script
     for iRun in range(0,len(cv_iter)): #n-folds
         trainIndA  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[0])) #first 0 indexes train set, second 0/1 is the condition
         trainIndB  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[1]))
@@ -81,7 +79,7 @@ def crossNobis(x,y,cv,var):
             covMat[:,:,i] = cov.covariance_
         covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
         
-        #use testSet cov for pre-whitening test set?
+        #use testSet cov for pre-whitening test set
         covTestTmp = LedoitWolf().fit(var[iRun])
         covTest = np.linalg.inv(covTestTmp.covariance_)
         
@@ -96,6 +94,9 @@ def compCovMat(var):
     covTmp = LedoitWolf().fit(var)
     covMat = np.linalg.inv(covTmp.covariance_)
     return covMat
+
+
+
 
 
 
