@@ -15,12 +15,12 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
-normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+distMeth = 'crossEuclid' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = '12-way' #'dir', 'ori', ...
+decodeFeature = 'dir' #'dir', 'ori', ...
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
@@ -45,3 +45,5 @@ for iSub in range(1,34):
     at.inputs.invert_transform_flags = [False]
     runCmd='/Users/robert.mok/bin/ants/bin/' + at.cmdline
     call(runCmd,shell=True) # run in cmd line via python. to check output, use subprocess.check_output: from subprocess import check_output
+
+

@@ -1,35 +1,42 @@
 
 codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+codeDir='/home/robmok/Documents/memsamp_fMRI/memsampCode' #love01
 
-#tstat_niNorm_svm
-sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
+
+# Ori, svm, niNorm, cope
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
 python mvpa_searchlight_memsamp1.py
 
-#cope_niNorm_svm
-sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
+# Ori, svm, niNorm, tstat
+sed -e s:'cope':'tstat':g \
+    -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    -e s:'tstat':'cope':g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
 python mvpa_searchlight_memsamp1.py
 
 
-
-#euclid - no stat
-
-#cope_noNorm
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossEuclid'":g \
-    -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
-    -e s:'tstat':'cope':g \
+# 12-way, svm, noNorm, cope
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
 python mvpa_searchlight_memsamp1.py
 
+# 12-way, svm, noNorm tstat
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+    -e s:'cope':'tstat':g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
+python mvpa_searchlight_memsamp1.py
 
-#cope_niNorm
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossEuclid'":g \
-    -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
-    -e s:'tstat':'cope':g \
+# 12-way, svm, niNorm, cope
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
+python mvpa_searchlight_memsamp1.py
+
+# 12-way, svm, niNorm, tstat
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+    -e s:'cope':'tstat':g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
 python mvpa_searchlight_memsamp1.py
