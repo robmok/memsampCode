@@ -20,7 +20,8 @@ import pandas as pd
 import nibabel as nib
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
-    
+from nilearn.masking import apply_mask 
+
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 #mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 

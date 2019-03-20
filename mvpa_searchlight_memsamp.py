@@ -23,6 +23,7 @@ import pandas as pd
 import nibabel as nib
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
+from nilearn.masking import apply_mask 
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 #mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
@@ -89,19 +90,7 @@ for iSub in range(1,34):
 #    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
 
-
-#    if distMeth == 'crossNobis': #append residual images to imPath
-#        imPaths=dfCond['imPath']
-#        imPathTmp=[]
-#        for iRun in runs:
-#            varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
-#            imPathTmp.append(varPath)
-#        dfImPath = pd.Series(imPathTmp)
-#        imPaths = imPaths.append(dfImPath)
-#        dat = cl.fmri_data(imPaths.values,T1_mask_path, fwhm=fwhm)
- 
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
-    
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
     #make permanent copies, since the dat object needs to be edited to put into the pipeline
@@ -113,18 +102,16 @@ for iSub in range(1,34):
         dat.cleaner(standardizeVox=True)
 
     if distMeth == 'crossNobis': #get variance to compute covar matrix below
-        varPath = []
+        varIm = np.empty([0,np.size(dat.dat,axis=1)]) #only works since i know nVox
+        varImSiz = np.empty((len(runs)),dtype='int')
+        imgs = nib.load(dfCond['imPath'].iloc[0])
+        T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
+                                              target_shape=imgs.shape[:3], interpolation='nearest')
         for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
-#            varPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
-#        varTmp = cl.fmri_data(varPath,T1_mask_path) #load in with clarte function
-        #changing 'var's structure to make it work with the crossnobis function, but maybe could adapt to clarte's structure? (runs x vox x time)
-#        var = []
-#        for iRun in runs:
-#            var.append(varTmp.dat[iRun-1,:,:])
-##        var = varTmp.dat
-            varPath = (os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
-            apply_mask(varPath,T1_mask_path)
-
+            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
+            varIm    = np.append(varIm,varImTmp,axis=0)
+            varImSiz[iRun-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
+#        dat.dat = np.append(dat.dat,varIm,axis=0)
     #set up the conditions you want to classify. if 12-way, doesn't use this
     conds2comp = getConds2comp(decodeFeature)
 
@@ -165,7 +152,6 @@ for iSub in range(1,34):
             dat.dat = datPerm[condInd,]
             dat.y = ytmp[condInd]
             dat.sessions = sessPerm[condInd]
-#            dat.var = var
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
             
@@ -193,8 +179,23 @@ for iSub in range(1,34):
                 del im
             elif distMeth in {'crossEuclid', 'crossNobis'}:                
                 if distMeth == 'crossNobis': #get variance to compute covar matrix below
+                    
+                    dat.dat = np.append(dat.dat,varIm,axis=0) #append residual images to compute covar matrix
+                    
+                    #use len(dat.y) for number of functional images. use varImSiz to index run-wise variance images (nTimepoints)
+                    
                     def pipeline(X,y):
-                        return crossNobis(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                        Xdat = X[range(0,len(dat.y)),:]
+                        varTmp = X[len(dat.y):,:] #get residual images
+                        if len(runs) == 3:
+                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
+                        else: #should work
+                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
+                                   varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
+                        
+                        return crossNobis(Xdat,y,cv.split(dat.dat,dat.y,dat.sessions),var).mean()
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
                         return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
