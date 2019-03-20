@@ -179,7 +179,7 @@ for iSub in range(1,34):
                     del im
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
-                        return crossEuclid(dat.dat,dat.y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                        return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
         

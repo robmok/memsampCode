@@ -25,7 +25,7 @@ from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 featDir=os.path.join(mainDir,'memsampFeat')
 fmriprepDir=os.path.join(mainDir,'fmriprep_output/fmriprep')
@@ -38,10 +38,10 @@ from memsamp_RM import crossEuclid, crossNobis, getConds2comp
 imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 10 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
@@ -89,7 +89,19 @@ for iSub in range(1,34):
 #    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
 
+
+#    if distMeth == 'crossNobis': #append residual images to imPath
+#        imPaths=dfCond['imPath']
+#        imPathTmp=[]
+#        for iRun in runs:
+#            varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
+#            imPathTmp.append(varPath)
+#        dfImPath = pd.Series(imPathTmp)
+#        imPaths = imPaths.append(dfImPath)
+#        dat = cl.fmri_data(imPaths.values,T1_mask_path, fwhm=fwhm)
+ 
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
+    
     dat.sessions = dfCond['run'].values # info about the sessions
     dat.y  = dfCond['direction'].values # conditions / stimulus
     #make permanent copies, since the dat object needs to be edited to put into the pipeline
@@ -103,12 +115,15 @@ for iSub in range(1,34):
     if distMeth == 'crossNobis': #get variance to compute covar matrix below
         varPath = []
         for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
-            varPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
-        varTmp = cl.fmri_data(varPath,T1_mask_path) #load in with clarte function
+#            varPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
+#        varTmp = cl.fmri_data(varPath,T1_mask_path) #load in with clarte function
         #changing 'var's structure to make it work with the crossnobis function, but maybe could adapt to clarte's structure? (runs x vox x time)
-        var = []
-        for iRun in runs:
-            var.append(varTmp.dat[iRun-1,:,:])
+#        var = []
+#        for iRun in runs:
+#            var.append(varTmp.dat[iRun-1,:,:])
+##        var = varTmp.dat
+            varPath = (os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'))
+            apply_mask(varPath,T1_mask_path)
 
     #set up the conditions you want to classify. if 12-way, doesn't use this
     conds2comp = getConds2comp(decodeFeature)
@@ -150,6 +165,7 @@ for iSub in range(1,34):
             dat.dat = datPerm[condInd,]
             dat.y = ytmp[condInd]
             dat.sessions = sessPerm[condInd]
+#            dat.var = var
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
             
@@ -178,10 +194,10 @@ for iSub in range(1,34):
             elif distMeth in {'crossEuclid', 'crossNobis'}:                
                 if distMeth == 'crossNobis': #get variance to compute covar matrix below
                     def pipeline(X,y):
-                        return crossNobis(dat.dat,dat.y,cv.split(dat.dat,dat.y,dat.sessions),var).mean()
+                        return crossNobis(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
-                        return crossEuclid(dat.dat,dat.y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                        return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
 
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight

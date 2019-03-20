@@ -65,7 +65,7 @@ def crossNobis(x,y,cv,var):
     Compute cross-validated Mahalanobis distance score over crossvalidation folds
     
     var : array-like
-    voxel x time variance matrix from feat output
+    [run x] voxel x time variance matrix from feat output
     
     """
     cv_iter = list(cv) # list the cv splits to access as indices
@@ -84,7 +84,8 @@ def crossNobis(x,y,cv,var):
         nVox = np.size(var,axis=2)
         covMat = np.empty((nVox,nVox,len(runs)-1))
         for i in range(0,len(ind)):
-            cov = LedoitWolf().fit(var[ind[i]])
+#            cov = LedoitWolf().fit(var[ind[i]])
+            cov = LedoitWolf().fit(var[ind[i],:,:]) #clarte fmri object structure
             covMat[:,:,i] = cov.covariance_
         covMatAv = np.linalg.inv(covMat.mean(axis=2)) #also compute the inv here
         
