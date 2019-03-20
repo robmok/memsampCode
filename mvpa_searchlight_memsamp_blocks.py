@@ -30,9 +30,9 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid
+from memsamp_RM import crossEuclid, getConds2comp
 
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
@@ -40,7 +40,7 @@ trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 #%% load in trial log and append image paths
 
 for iSub in range(1,34):
@@ -118,16 +118,8 @@ for iSub in range(1,34):
         if normMeth == 'niNormalised':
             dat.cleaner(standardizeVox=True)
     
-        #set up the conditions you want to classify. if 12-way, no need condInd      
-        if decodeFeature == "dir":
-            conds2Comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
-        elif decodeFeature == "ori":
-            conds2Comp = [[0,90], [0,270], [30,120], [30,300], [60,150], [60,300], [90,180], [120,210],[150,240],[180,270],[210,300],[240,330]]
-        elif decodeFeature == "12-way-all":
-            allDirs = np.arange(0,330,30)
-            conds2Comp = [[0,np.setxor1d(0,allDirs)],  [30,np.setxor1d(0,allDirs)], [60,np.setxor1d(0,allDirs)], [90,np.setxor1d(0,allDirs)],
-                          [120,np.setxor1d(0,allDirs)],[150,np.setxor1d(0,allDirs)],[180,np.setxor1d(0,allDirs)],[210,np.setxor1d(0,allDirs)],
-                          [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
+        #set up the conditions you want to classify. if 12-way, doesn't use this
+        conds2comp = getConds2comp(decodeFeature)
         
         #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all
@@ -148,15 +140,15 @@ for iSub in range(1,34):
             im       = dat.unmasker(imVec)        
         else: #all condition-wise comparisons
             tmpPath = []
-            for iPair in range(0,len(conds2Comp)):
+            for iPair in range(0,len(conds2comp)):
                 ytmp=yPerm.copy() #need to copy this for 12-way-all since will edit ytmp (which will change yPerm if not copy since it's referring to the same object)
                 if not decodeFeature == "12-way-all": 
-                    condInd=np.append(np.where(yPerm==conds2Comp[iPair][0]), np.where(yPerm==conds2Comp[iPair][1]))   
+                    condInd=np.append(np.where(yPerm==conds2comp[iPair][0]), np.where(yPerm==conds2comp[iPair][1]))   
                 else: # append multiple conditions in a cell of the array
-                    condInd=np.where(dat.y==conds2Comp[iPair][0])
-                    for iVal in conds2Comp[iPair][1]:
+                    condInd=np.where(dat.y==conds2comp[iPair][0])
+                    for iVal in conds2comp[iPair][1]:
                         condInd=np.append(condInd, np.where(yPerm==iVal))
-                    ytmp[yPerm!=conds2Comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    ytmp[yPerm!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
             
                 dat.dat = datPerm[condInd,]
                 dat.y = ytmp[condInd]

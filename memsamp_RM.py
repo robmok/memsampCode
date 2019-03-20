@@ -9,6 +9,19 @@ memsamp functions
 import numpy as np
 from sklearn.covariance import LedoitWolf
 
+def getConds2comp(decodeFeature):
+    if decodeFeature == "dir":
+        conds2comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
+    elif decodeFeature == "ori":
+        conds2comp = [[0,90], [0,270], [30,120], [30,300], [60,150], [60,300], [90,180], [120,210],[150,240],[180,270],[210,300],[240,330]]
+    elif decodeFeature == "12-way-all":
+        allDirs = np.arange(0,330,30)
+        conds2comp = [[0,np.setxor1d(0,allDirs)],  [30,np.setxor1d(0,allDirs)], [60,np.setxor1d(0,allDirs)], [90,np.setxor1d(0,allDirs)],
+                      [120,np.setxor1d(0,allDirs)],[150,np.setxor1d(0,allDirs)],[180,np.setxor1d(0,allDirs)],[210,np.setxor1d(0,allDirs)],
+                      [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
+        
+    return conds2comp
+
 
 def crossEuclid(x,y,cv):
     """ 
@@ -94,8 +107,6 @@ def compCovMat(var):
     covTmp = LedoitWolf().fit(var)
     covMat = np.linalg.inv(covTmp.covariance_)
     return covMat
-
-
 
 
 

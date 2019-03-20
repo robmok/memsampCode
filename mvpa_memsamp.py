@@ -26,7 +26,7 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid, compCovMat
+from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
@@ -46,11 +46,7 @@ decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), '12-way-all' 
 # =============================================================================
 nSubs=33
 rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-        'IPS3','IPS4','IPS5','SPL1', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
-
-#no SPL1
-rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois'] # MST - leaving out coz only a few voxels? ; 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01'
+        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois'] #  leaving out: 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01', SPL1
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
@@ -107,9 +103,6 @@ for iSub in range(1,nSubs+1):
     for roi in rois:
         #define ROI  mask
         mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') #ipsRois no stim decoding; visRois_ipsRois bad for all except self demean and std norm...!?
-    
-        #maybe plot the roi on the brain? optionally
-    #    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
            
         #resample mask to match epi
         imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
@@ -147,16 +140,8 @@ for iSub in range(1,nSubs+1):
     #     #set up splits and run cv
     # ============================================================================
     
-        #set up the conditions you want to classify. if 12-way, leave as is without condInd        
-        if decodeFeature == "dir":
-            conds2Comp = [[0,180], [30,210], [60,240], [90,270],[120,300],[150,330]]
-        elif decodeFeature == "ori":
-            conds2Comp = [[0,90], [0,270], [30,120], [30,300], [60,150], [60,300], [90,180], [120,210],[150,240],[180,270],[210,300],[240,330]]
-        elif decodeFeature == "12-way-all":
-            allDirs = np.arange(0,330,30)
-            conds2Comp = [[0,np.setxor1d(0,allDirs)],  [30,np.setxor1d(0,allDirs)], [60,np.setxor1d(0,allDirs)], [90,np.setxor1d(0,allDirs)],
-                          [120,np.setxor1d(0,allDirs)],[150,np.setxor1d(0,allDirs)],[180,np.setxor1d(0,allDirs)],[210,np.setxor1d(0,allDirs)],
-                          [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
+        #set up the conditions you want to classify. if 12-way, doesn't use this
+        conds2comp = getConds2comp(decodeFeature)
         
         #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all
@@ -167,18 +152,18 @@ for iSub in range(1,nSubs+1):
             clf  = LinearSVC(C=.1)
             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
             print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
-            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y_indexed))))*100))
+            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
         else: #all condition-wise comparisons
-            cvAccTmp = np.empty(len(conds2Comp))
-            for iPair in range(0,len(conds2Comp)):
+            cvAccTmp = np.empty(len(conds2comp))
+            for iPair in range(0,len(conds2comp)):
                 ytmp=y.copy()
                 if not decodeFeature == "12-way-all": 
-                    condInd=np.append(np.where(y==conds2Comp[iPair][0]), np.where(y==conds2Comp[iPair][1]))   
+                    condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
                 else:
-                    condInd=np.where(y==conds2Comp[iPair][0])
-                    for iVal in conds2Comp[iPair][1]:
+                    condInd=np.where(y==conds2comp[iPair][0])
+                    for iVal in conds2comp[iPair][1]:
                         condInd=np.append(condInd, np.where(y==iVal))
-                    ytmp[y!=conds2Comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
             
                 fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
                 y_indexed = ytmp[condInd]
@@ -193,8 +178,6 @@ for iSub in range(1,nSubs+1):
 #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
                 elif distMeth in {'crossEuclid','crossNobis'}:
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
-#                elif distMeth == 'crossNobis':
-#                    cvAccTmp[iPair] = crossNobis(fmri_masked_cleaned_indexed,y_indexed,cv,var).mean() # mean over crossval folds
         
         if not decodeFeature == "12-way-all": 
             cvAcc = cvAccTmp.mean() #mean over pairs
