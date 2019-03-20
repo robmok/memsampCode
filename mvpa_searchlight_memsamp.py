@@ -179,11 +179,8 @@ for iSub in range(1,34):
                 del im
             elif distMeth in {'crossEuclid', 'crossNobis'}:                
                 if distMeth == 'crossNobis': #get variance to compute covar matrix below
-                    
                     dat.dat = np.append(dat.dat,varIm,axis=0) #append residual images to compute covar matrix
-                    
                     #use len(dat.y) for number of functional images. use varImSiz to index run-wise variance images (nTimepoints)
-                    
                     def pipeline(X,y):
                         Xdat = X[range(0,len(dat.y)),:]
                         varTmp = X[len(dat.y):,:] #get residual images
@@ -193,7 +190,7 @@ for iSub in range(1,34):
                         else: #should work
                             var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
                                    varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
-                                   varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
+                                   varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
                         
                         return crossNobis(Xdat,y,cv.split(dat.dat,dat.y,dat.sessions),var).mean()
                 elif distMeth == 'crossEuclid':
