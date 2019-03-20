@@ -1,8 +1,11 @@
 
-codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode'
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 
 #love01
-codeDir='/home/robmok/Documents/memsamp_fMRI/memsampCode' #love01
+mainDir='/home/robmok/Documents/memsamp_fMRI'#love01
+
+codeDir=${mainDir}/'memsampCode'
+tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # Searchlight (5 cores) -
 
@@ -16,31 +19,31 @@ python mvpa_searchlight_memsamp.py
 
 # Dir, svm, noNorm tstat
 sed -e s:'cope':'tstat':g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 # Dir, svm, niNorm, cope
 
 sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 # Dir, svm, niNorm, tstat
 sed -e s:'cope':'tstat':g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 # Ori, svm, noNorm, cope
 sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 # Ori, svm, noNorm tstat
 sed -e s:'cope':'tstat':g \
     -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${codeDir}/mvpa_searchlight_memsamp1.py
-python mvpa_searchlight_memsamp1.py
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 
 # # crossnobis
