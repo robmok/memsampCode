@@ -34,10 +34,10 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid, crossNobis, getConds2comp
+from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
 imDat   = 'cope' # cope or tstat images
-slSiz=5 #searchlight size
+slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
@@ -120,11 +120,13 @@ for iSub in range(1,34):
         cv  = LeaveOneGroupOut()
         cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
         clf = LinearSVC(C=.1)
-    
+        cv.split(dat.dat,dat.y,dat.sessions)
+        cv = cv.split(dat.dat,dat.y,dat.sessions)
+        
         # the pipeline function - function defining the computation performed in each sphere
         # - add demean / normalize variance within sphere?
         def pipeline(X,y):
-            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
+            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()
             #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
             # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
             #if normMeth in {'slNorm','slDemeaned'}:        
@@ -154,12 +156,13 @@ for iSub in range(1,34):
             dat.sessions = sessPerm[condInd]
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
+            cv = cv.split(dat.dat,dat.y,dat.sessions)
             
             if distMeth == 'svm':
                 clf   = LinearSVC(C=.1)
 #                cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                 def pipeline(X,y):
-                    return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                    return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
                 chance   = 1/len(np.unique(dat.y))
@@ -182,20 +185,31 @@ for iSub in range(1,34):
                     dat.dat = np.append(dat.dat,varIm,axis=0) #append residual images to compute covar matrix
                     #use len(dat.y) for number of functional images. use varImSiz to index run-wise variance images (nTimepoints)
                     def pipeline(X,y):
-                        Xdat = X[range(0,len(dat.y)),:]
-                        varTmp = X[len(dat.y):,:] #get residual images
+                        Xdat_whitened = np.empty((len(y),np.size(X,axis=1)))
+                        cov = np.empty((np.size(X,axis=1),np.size(X,axis=1),len(runs)))
+                        Xdat = X[range(0,len(y)),:] #get fmri data
+                        varTmp = X[len(y):,:] #get residual images
+                        
                         if len(runs) == 3:
                             var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
                                    varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
-                        else: #should work
+                        else:
                             var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
                                    varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
                                    varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
                         
-                        return crossNobis(Xdat,y,cv.split(dat.dat,dat.y,dat.sessions),var).mean()
+                        for iRun in range(0,len(runs)):
+                            cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
+                            ind = dat.sessions == iRun+1
+                            indTrl= np.where(ind)
+                            indTrl=indTrl[0]
+                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
+                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
+                        return crossEuclid(Xdat_whitened,y,cv).mean()                        
+
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
-                        return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                        return crossEuclid(X,y,cv).mean()
 
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
