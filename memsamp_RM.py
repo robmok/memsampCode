@@ -32,9 +32,6 @@ def crossEuclid(x,y,cv):
 
     Parameters
     ----------
-    estimator : estimator object implementing 'fit'
-        The object to use to fit the data.
-
     X : array-like
         The data to fit. Can be for example a list, or an array.
 
@@ -43,8 +40,7 @@ def crossEuclid(x,y,cv):
         supervised learning.
         
     cv : int, cross-validation generator or an iterable, optional
-        Determines the cross-validation splitting strategy.
-        e.g.:
+        Determines the cross-validation splitting strategy. e.g.:
         cv = LeaveOneGroupOut()
         cv.get_n_splits(fmri_masked_cleaned, y, groups)
         cv = cv.split(fmri_data,y,groups)
