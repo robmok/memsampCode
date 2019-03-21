@@ -4,12 +4,16 @@
 
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 #love01
-slDir='/home/robmok/Documents/memsamp_fMRI/mvpa_searchlight'
+# slDir='/home/robmok/Documents/memsamp_fMRI/mvpa_searchlight'
 
 tThresh=2.4486 #  - DF = 33-1, one-tailed, p=0.010002
 slSiz=5 #searchlight size
 distMeth='svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 fwhm=1 # smoothing - set to None if no smoothing
+
+vSmooth=5
+trainSetMeth='trials'
+normMeth='noNorm'
 
 #ori
 decodeFeature='ori'
