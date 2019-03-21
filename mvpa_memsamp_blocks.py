@@ -37,7 +37,7 @@ distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = 1 # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 #%%
 # =============================================================================
