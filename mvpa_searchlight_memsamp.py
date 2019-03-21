@@ -37,19 +37,19 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
 imDat   = 'cope' # cope or tstat images
-slSiz=6 #searchlight size
+slSiz=8 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'ori' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 
 #%% load in trial log and append image paths
 
-for iSub in range(1,34):
+for iSub in range(1,4):#range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -86,8 +86,8 @@ for iSub in range(1,34):
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
 
     #start setting up brain data
-    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
-#    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+#    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
+    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
 
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
@@ -188,23 +188,39 @@ for iSub in range(1,34):
                         Xdat_whitened = np.empty((len(y),np.size(X,axis=1)))
                         cov = np.empty((np.size(X,axis=1),np.size(X,axis=1),len(runs)))
                         Xdat = X[range(0,len(y)),:] #get fmri data
-                        varTmp = X[len(y):,:] #get residual images
+
+                        #normalise each trial by its respective run's noise cov mat
+#                        varTmp = X[len(y):,:] #get residual images
+#                        if len(runs) == 3:
+#                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+#                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
+#                        else:
+#                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+#                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
+#                                   varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
                         
-                        if len(runs) == 3:
-                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
-                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
-                        else:
-                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
-                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
-                                   varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
+#                        for iRun in range(0,len(runs)):
+#                            cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
+#                            ind = dat.sessions == iRun+1
+#                            indTrl= np.where(ind)
+#                            indTrl=indTrl[0]
+#                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
+#                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
+#                        
+                        
+                        
+                        #compute cov mat over all runs
+                        var = X[len(y):,:] 
+                        cov = compCovMat(var)
                         
                         for iRun in range(0,len(runs)):
-                            cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
                             ind = dat.sessions == iRun+1
                             indTrl= np.where(ind)
                             indTrl=indTrl[0]
                             for iTrl in indTrl: #prewhiten each trial to make mahal dist
-                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
+                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
+                        
+                        
                         return crossEuclid(Xdat_whitened,y,cv).mean()                        
 
                 elif distMeth == 'crossEuclid':
@@ -233,10 +249,10 @@ for iSub in range(1,34):
     
 
 #plot
-#    nip.plot_stat_map(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
+#    import nilearn.plotting as nip
+#    nip.plot_stat_map(im,colorbar=True, threshold=0.00005,bg_img=T1_path,
 #                                      title='Accuracy > Chance (+arbitrary threshold)')
 #
 #    #interactive -  open the plot in a web browser:
-#    view = nip.view_img(imThresh,colorbar=True, threshold=0.05,bg_img=T1_path,
-#                                      title='Accuracy > Chance (+arbitrary threshold)')
+#    view = nip.view_img(im,colorbar=True, threshold=0.00005,bg_img=T1_path)
 #    view.open_in_browser()

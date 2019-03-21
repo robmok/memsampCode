@@ -8,6 +8,7 @@ memsamp functions
 """
 import numpy as np
 from sklearn.covariance import LedoitWolf
+#from scipy.linalg import fractional_matrix_power
 
 def getConds2comp(decodeFeature):
     if decodeFeature == "dir":
@@ -103,9 +104,8 @@ def crossNobis(x,y,cv,var):
 def compCovMat(var):
     covTmp = LedoitWolf().fit(var)
     covMat = np.linalg.inv(covTmp.covariance_)
+#    covMat = fractional_matrix_power(covTmp.covariance_,-0.5)
     return covMat
-
-
 
 
 
