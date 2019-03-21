@@ -57,18 +57,18 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #Blocks
 ########
 
-# 12-way, svm, niNorm, cope
-sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-# 12-way, svm, niNorm tstat
-sed -e s:'cope':'tstat':g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# # 12-way, svm, niNorm, cope
+# sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+#
+# # 12-way, svm, niNorm tstat
+# sed -e s:'cope':'tstat':g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#     -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
 
