@@ -14,16 +14,9 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # 12-way, svm, noNorm, trials, cope & tstat
 # Dir/Ori crossEuclid - trials/blocks
 
-# Dir, svm, noNorm, cope
-python mvpa_searchlight_memsamp.py
-
-# Dir, svm, noNorm tstat
-sed -e s:'cope':'tstat':g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+#Trials
 
 # Dir, svm, niNorm, cope
-
 sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
@@ -34,16 +27,49 @@ sed -e s:'cope':'tstat':g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# Ori, svm, noNorm, cope
+# Ori, svm, niNorm, cope
 sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# Ori, svm, noNorm tstat
+# Ori, svm, niNorm, tstat
 sed -e s:'cope':'tstat':g \
     -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+# 12-way, svm, niNorm, cope
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+# 12-way, svm, niNorm, tstat
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+    -e s:'cope':'tstat':g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+########
+#Blocks
+########
+
+# 12-way, svm, niNorm, cope
+sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+# 12-way, svm, niNorm tstat
+sed -e s:'cope':'tstat':g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
 
 
 # # crossnobis

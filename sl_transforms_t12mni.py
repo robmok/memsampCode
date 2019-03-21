@@ -5,6 +5,8 @@ Created on Tue Mar 12 15:38:39 2019
 
 @author: robert.mok
 """
+
+#%%
 import os
 import nipype.interfaces.ants as ants
 from subprocess import call
@@ -15,12 +17,12 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
-normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossEuclid' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = 'dir' #'dir', 'ori', ...
+decodeFeature = '12-way' #'dir', 'ori', ...
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'

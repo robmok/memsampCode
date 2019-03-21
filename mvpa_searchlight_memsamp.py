@@ -26,7 +26,7 @@ from sklearn.svm import LinearSVC
 from nilearn.masking import apply_mask 
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 featDir=os.path.join(mainDir,'memsampFeat')
 fmriprepDir=os.path.join(mainDir,'fmriprep_output/fmriprep')
@@ -37,19 +37,19 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
 imDat   = 'cope' # cope or tstat images
-slSiz=8 #searchlight size
+slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 10 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'ori' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 
 #%% load in trial log and append image paths
 
-for iSub in range(1,4):#range(1,34):
+for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -86,8 +86,8 @@ for iSub in range(1,4):#range(1,34):
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
 
     #start setting up brain data
-#    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
-    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
+    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
+#    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
 
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
@@ -109,9 +109,10 @@ for iSub in range(1,4):#range(1,34):
                                               target_shape=imgs.shape[:3], interpolation='nearest')
         for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
             varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
+#            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
             varIm    = np.append(varIm,varImTmp,axis=0)
             varImSiz[iRun-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
-#        dat.dat = np.append(dat.dat,varIm,axis=0)
+        dat.dat = np.append(dat.dat,varIm,axis=0)
     #set up the conditions you want to classify. if 12-way, doesn't use this
     conds2comp = getConds2comp(decodeFeature)
 
@@ -121,12 +122,12 @@ for iSub in range(1,4):#range(1,34):
         cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
         clf = LinearSVC(C=.1)
         cv.split(dat.dat,dat.y,dat.sessions)
-        cv = cv.split(dat.dat,dat.y,dat.sessions)
+#        cv = cv.split(dat.dat,dat.y,dat.sessions)
         
         # the pipeline function - function defining the computation performed in each sphere
         # - add demean / normalize variance within sphere?
         def pipeline(X,y):
-            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()
+            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
             #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
             # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
             #if normMeth in {'slNorm','slDemeaned'}:        
@@ -156,13 +157,13 @@ for iSub in range(1,4):#range(1,34):
             dat.sessions = sessPerm[condInd]
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
-            cv = cv.split(dat.dat,dat.y,dat.sessions)
+#            cv = cv.split(dat.dat,dat.y,dat.sessions)
             
             if distMeth == 'svm':
                 clf   = LinearSVC(C=.1)
 #                cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                 def pipeline(X,y):
-                    return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv).mean()
+                    return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
                 chance   = 1/len(np.unique(dat.y))
@@ -221,11 +222,11 @@ for iSub in range(1,4):#range(1,34):
                                 Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
                         
                         
-                        return crossEuclid(Xdat_whitened,y,cv).mean()                        
+                        return crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions)).mean()                        
 
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
-                        return crossEuclid(X,y,cv).mean()
+                        return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
 
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight

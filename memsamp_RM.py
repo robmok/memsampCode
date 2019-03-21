@@ -55,8 +55,8 @@ def crossEuclid(x,y,cv):
         trainIndB  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[1]))
         testIndA   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[0])) # first 1 indexes test set, second 0/1 is the condition
         testIndB   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[1]))  
-        trainDat   = x[trainIndA,].mean(axis=0)-x[trainIndB,].mean(axis=0)
-        testDat    = x[testIndA,].mean(axis=0)-x[testIndB,].mean(axis=0)
+        trainDat   = np.nanmean(x[trainIndA,],axis=0)-np.nanmean(x[trainIndB,],axis=0)
+        testDat    = np.nanmean(x[testIndA,],axis=0)-np.nanmean(x[testIndB,],axis=0)
         dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
     return dist
 
