@@ -33,9 +33,9 @@ reRun = False
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
-fwhm = 1 # optional smoothing param - 1, or None
+fwhm = None # optional smoothing param - 1, or None
 
 decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 

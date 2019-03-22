@@ -11,20 +11,20 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # blocks
 
 # Dir, svm, noNorm, cope
-python mvpa_searchlight_memsamp_blocks.py
+# python mvpa_searchlight_memsamp_blocks.py
+#
+# # Ori, svm, niNorm, cope
+# sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+#
+# # Dir, svm, noNorm tstat
+# sed -e s:'cope':'tstat':g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-# Ori, svm, niNorm, cope
-sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-# Dir, svm, noNorm tstat
-sed -e s:'cope':'tstat':g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-# Ori, svm, niNorm, cope
+# Ori, svm, niNorm, tstat
 sed -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     -e s:'cope':'tstat':g \
