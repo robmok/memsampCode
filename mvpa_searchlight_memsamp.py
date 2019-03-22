@@ -42,9 +42,9 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 10 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 
 #%% load in trial log and append image paths
