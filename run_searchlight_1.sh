@@ -10,62 +10,64 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # searchlight
 
 
-# Set up scripts for a couple larger searchlights to compare trials and blocks, 9mm
-# ○ larger searchlights (9mm) to compare trials and blocks - smooth 1mm
+# Set up scripts for a couple larger searchlights to compare trials and blocks, 8mm
+# ○ larger searchlights (8mm) to compare trials and blocks - smooth 1mm
 # ○ 5mm - no smoothing (should round up to 6)
-# ○ mahal dist 9mm - no smooth
+# ○ mahal dist 8mm - no smooth
 
-#   § 12-way t-stat, block & trials, 6mm, 9mm, cMass (4)
+#   § 12-way t-stat, block & trials, 6mm, 8mm, cMass (4)
 #   § 12-way cope too (4)
 
-# 12-way t-stat, block & trials, 9mm, cMass (2)
+# 12-way t-stat, block & trials, 8mm, cMass (2)
 # 12-way cope too (2)
 
 #Trials
 
-# 12-way cope 9mm, fwhm1
-python mvpa_searchlight_memsamp.py
-
-# 12-way tstat 9mm, fwhm1
-sed -e s:'cope':'tstat':g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-# 12-way cope 5mm, fwhm=None
-sed -e s:"slSiz=11":"slSiz=5":g \
--e s:"fwhm = 1":"fwhm = None":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-# 12-way tstat 5mm, fwhm=None
-sed -e s:"slSiz=11":"slSiz=5":g \
-    -e s:"fwhm = 1":"fwhm = None":g \
-    -e s:'cope':'tstat':g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-# 12-way mahal cope 9mm, fwhm=None
-sed -e s:"fwhm = 1":"fwhm = None":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-
 #mahal ori and Dir - Trials
 
-# ori mahal cope 9mm, fwhm=None
+# ori mahal cope 8mm, fwhm=None
 sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'ori'":g \
     -e s:"fwhm = 1":"fwhm = None":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# dir mahal cope 9mm, fwhm=None
+# dir mahal cope 8mm, fwhm=None
 sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
     -e s:"fwhm = 1":"fwhm = None":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+
+# 12-way cope 8mm, fwhm1
+python mvpa_searchlight_memsamp.py
+
+# 12-way tstat 8mm, fwhm1
+sed -e s:'cope':'tstat':g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+# 12-way cope 5mm, fwhm=None
+sed -e s:"slSiz=8":"slSiz=5":g \
+-e s:"fwhm = 1":"fwhm = None":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+# 12-way tstat 5mm, fwhm=None
+sed -e s:"slSiz=8":"slSiz=5":g \
+    -e s:"fwhm = 1":"fwhm = None":g \
+    -e s:'cope':'tstat':g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+# # 12-way mahal cope 8mm, fwhm=None - NOT done yet
+# sed -e s:"fwhm = 1":"fwhm = None":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+
 
 
 
