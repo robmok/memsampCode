@@ -19,10 +19,10 @@ imDat   = 'cope' # cope or tstat images
 slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'trials' # 'trials' or 'block'
+trainSetMeth = 'blocks' # 'trials' or 'blocks' -should change this to block..?
 fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = '12-way' #'dir', 'ori', ...
+decodeFeature = 'dir' #'12-way', 'dir', 'ori', ...
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
