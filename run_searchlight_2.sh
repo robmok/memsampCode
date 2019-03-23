@@ -19,13 +19,13 @@ sed -e s:'cope':'tstat':g \
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 # 12-way cope 5mm, fwhm=None
-sed -e s:"slSiz=10":"slSiz=5":g \
+sed -e s:"slSiz=11":"slSiz=5":g \
 -e s:"fwhm = 1":"fwhm = None":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 # 12-way tstat 5mm, fwhm=None
-sed -e s:"slSiz=10":"slSiz=5":g \
+sed -e s:"slSiz=11":"slSiz=5":g \
     -e s:"fwhm = 1":"fwhm = None":g \
     -e s:'cope':'tstat':g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py

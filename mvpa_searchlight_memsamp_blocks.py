@@ -34,7 +34,7 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, getConds2comp
 
 imDat   = 'cope' # cope or tstat images
-slSiz=10  #searchlight size
+slSiz=11  #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
