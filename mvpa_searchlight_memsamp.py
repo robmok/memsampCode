@@ -121,7 +121,7 @@ for iSub in range(1,34):
         cv  = LeaveOneGroupOut()
         cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
         clf = LinearSVC(C=.1)
-        cv.split(dat.dat,dat.y,dat.sessions)
+#        cv.split(dat.dat,dat.y,dat.sessions)
 #        cv = cv.split(dat.dat,dat.y,dat.sessions)
         
         # the pipeline function - function defining the computation performed in each sphere
