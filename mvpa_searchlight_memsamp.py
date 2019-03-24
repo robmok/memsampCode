@@ -107,11 +107,11 @@ for iSub in range(1,34):
         imgs = nib.load(dfCond['imPath'].iloc[0])
         T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
                                               target_shape=imgs.shape[:3], interpolation='nearest')
-        for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
-            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
-#            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
+        for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
+            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
+#            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
             varIm    = np.append(varIm,varImTmp,axis=0)
-            varImSiz[iRun-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
+            varImSiz[iRun1-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
         dat.dat = np.append(dat.dat,varIm,axis=0)
     #set up the conditions you want to classify. if 12-way, doesn't use this
     conds2comp = getConds2comp(decodeFeature)

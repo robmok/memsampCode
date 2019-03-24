@@ -148,14 +148,14 @@ for iSub in range(1,nSubs+1):
             if distMeth == 'crossNobis': #get variance to compute covar matrix below
                 # compute each run's covariance matrix here, then apply it to fmri_masked_cleaned, then euclid below
                 covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
-                for iRun in runs: #append to list, since var sometimes has more/less timepoints in each run
-                    varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
-                    covMat[:,:,iRun-1] = compCovMat(apply_mask(varPath,maskROI))
-                for iRun in runs:
-                    trlInd = np.where(groups==iRun)
+                for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
+                    varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
+                    covMat[:,:,iRun1-1] = compCovMat(apply_mask(varPath,maskROI))
+                for iRun1 in runs:
+                    trlInd = np.where(groups==iRun1)
                     trlInd = trlInd[0]
                     for iTrl in trlInd:
-                        fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun-1])
+                        fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun1-1])
             
             # =============================================================================
             #     #set up splits and run cv
@@ -174,6 +174,7 @@ for iSub in range(1,nSubs+1):
                 cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
                 print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
                 print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/12))*100))
+                y_indexed = y #for computing chance
             else: #all condition-wise comparisons
                 cvAccTmp = np.empty(len(conds2comp))
                 for iPair in range(0,len(conds2comp)):

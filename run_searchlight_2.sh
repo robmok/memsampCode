@@ -9,7 +9,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #blocks
 
-# ori mahal cope 8mm, fwhm=None
+# ori mahal cope 8mm, fwhm=None - NOTE: haven't coded crossnobis for block!
 sed -e s:"decodeFeature = '12-way'":"decodeFeature = 'ori'":g \
     -e s:"fwhm = 1":"fwhm = None":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
