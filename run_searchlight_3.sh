@@ -1,3 +1,4 @@
+#! /bin/bash
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 
 #love01
