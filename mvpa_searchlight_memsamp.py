@@ -37,12 +37,12 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
 imDat   = 'cope' # cope or tstat images
-slSiz=8 #searchlight size
+slSiz=5 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
@@ -112,7 +112,7 @@ for iSub in range(1,34):
 #            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
             varIm    = np.append(varIm,varImTmp,axis=0)
             varImSiz[iRun1-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
-        dat.dat = np.append(dat.dat,varIm,axis=0)
+#        dat.dat = np.append(dat.dat,varIm,axis=0)
     #set up the conditions you want to classify. if 12-way, doesn't use this
     conds2comp = getConds2comp(decodeFeature)
 
@@ -121,16 +121,12 @@ for iSub in range(1,34):
         cv  = LeaveOneGroupOut()
         cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
         clf = LinearSVC(C=.1)
-#        cv.split(dat.dat,dat.y,dat.sessions)
 #        cv = cv.split(dat.dat,dat.y,dat.sessions)
         
         # the pipeline function - function defining the computation performed in each sphere
         # - add demean / normalize variance within sphere?
         def pipeline(X,y):
-            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
-            #to normalize here instead: get shape of X, X[2]=X_flatten, normalise then get back the shape
-            # also check out - stats package of scipy zscore - might just be one function. THEN cross_val_score
-            #if normMeth in {'slNorm','slDemeaned'}:        
+            return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()    
         
         dat.pipeline = pipeline
         im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
@@ -191,36 +187,33 @@ for iSub in range(1,34):
                         Xdat = X[range(0,len(y)),:] #get fmri data
 
                         #normalise each trial by its respective run's noise cov mat
-#                        varTmp = X[len(y):,:] #get residual images
-#                        if len(runs) == 3:
-#                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
-#                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
-#                        else:
-#                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
-#                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
-#                                   varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
-                        
-#                        for iRun in range(0,len(runs)):
-#                            cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
-#                            ind = dat.sessions == iRun+1
-#                            indTrl= np.where(ind)
-#                            indTrl=indTrl[0]
-#                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
-#                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
-#                        
-                        
-                        
-                        #compute cov mat over all runs
-                        var = X[len(y):,:] 
-                        cov = compCovMat(var)
+                        varTmp = X[len(y):,:] #get residual images
+                        if len(runs) == 3:
+                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
+                        else:
+                            var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+                                   varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
+                                   varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
                         
                         for iRun in range(0,len(runs)):
+                            cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
                             ind = dat.sessions == iRun+1
                             indTrl= np.where(ind)
                             indTrl=indTrl[0]
                             for iTrl in indTrl: #prewhiten each trial to make mahal dist
-                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
-                        
+                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
+                                                
+                        #compute cov mat over all runs
+#                        var = X[len(y):,:] 
+#                        cov = compCovMat(var)
+#                        
+#                        for iRun in range(0,len(runs)):
+#                            ind = dat.sessions == iRun+1
+#                            indTrl= np.where(ind)
+#                            indTrl=indTrl[0]
+#                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
+#                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
                         
                         return crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions)).mean()                        
 

@@ -31,7 +31,7 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid, getConds2comp
+from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
 imDat   = 'cope' # cope or tstat images
 slSiz=5  #searchlight size
@@ -39,7 +39,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 4 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 #%% load in trial log and append image paths
@@ -119,6 +119,17 @@ for iSub in range(1,34):
         if normMeth == 'niNormalised':
             dat.cleaner(standardizeVox=True)
     
+    
+        if distMeth == 'crossNobis': #get variance to compute covar matrix below
+            varIm = np.empty([0,np.size(dat.dat,axis=1)]) #only works since i know nVox
+            varImSiz = np.empty((len(runs)),dtype='int')
+            imgs = nib.load(dfCond['imPath'].iloc[0])
+            T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
+                                                  target_shape=imgs.shape[:3], interpolation='nearest')
+            for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
+                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
+                varIm    = np.append(varIm,varImTmp,axis=0)
+                varImSiz[iRun1-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
         #set up the conditions you want to classify. if 12-way, doesn't use this
         conds2comp = getConds2comp(decodeFeature)
         
@@ -180,16 +191,48 @@ for iSub in range(1,34):
                               'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                               '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + str(iPair) + '.nii.gz'))
                     del im
-                elif distMeth == 'crossEuclid':
-                    def pipeline(X,y):
-                        cvBlock = crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions))
-                        return cvBlock[iRun-1]
+                    
+                elif distMeth in {'crossEuclid', 'crossNobis'}:     
+                    if distMeth == 'crossNobis': #get variance to compute covar matrix below
+                        dat.dat = np.append(dat.dat,varIm,axis=0) #append residual images to compute covar matrix
+                        #use len(dat.y) for number of functional images. use varImSiz to index run-wise variance images (nTimepoints)
+                        def pipeline(X,y):
+                            Xdat_whitened = np.empty((len(y),np.size(X,axis=1)))
+                            cov = np.empty((np.size(X,axis=1),np.size(X,axis=1),len(runs)))
+                            Xdat = X[range(0,len(y)),:] #get fmri data
+    
+                            #normalise each trial by its respective run's noise cov mat
+                            varTmp = X[len(y):,:] #get residual images
+                            if len(runs) == 3:
+                                var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+                                       varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:]]
+                            else:
+                                var = [varTmp[0:varImSiz[0],:], varTmp[varImSiz[0]:varImSiz[0]+varImSiz[1],:], 
+                                       varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
+                                       varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
+                            
+                            for iRun in range(0,len(runs)):
+                                cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
+                                ind = dat.sessions == iRun+1
+                                indTrl= np.where(ind)
+                                indTrl=indTrl[0]
+                                for iTrl in indTrl: #prewhiten each trial to make mahal dist
+                                    Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])                  
+                            
+                            cvBlock = crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions))
+                            return cvBlock[iRun-1]                   
+                    elif distMeth == 'crossEuclid': 
+                        def pipeline(X,y):
+                            cvBlock = crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions))
+                            return cvBlock[iRun-1]
+
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
         
                     tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_' + decodeFeature +
                                 distMeth + normMeth + trainSetMeth + str(fwhm) + imDat + str(iPair) + '.nii.gz'))
                     nib.save(im, tmpPath[iPair])
+                    
             #merge images
             if not decodeFeature in {"12-way", "12-way-all"}: #1st no need avg, 2nd is the indv maps that are interesting (already saved)
                 im = nli.mean_img(tmpPath) 
