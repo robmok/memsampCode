@@ -5,62 +5,45 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-#no smoothing, noNorm
+
+#svm - cope & tstat, blocks
+#mahal - cope blocks
+
+#blocks - mahal - no smooth and with smooth
 #Ori
 #Dir
+
+#svm, cope/tstat - with smoothing first
 #12-way
+#Ori
+#Dir
 
-#svm - cope & tstat, trials & blocks
-#mahal - cope, trials & blocks
+#no smoothing, noNorm
+## ori crossnobis
+python mvpa_memsamp_blocks.py
 
-#blocks
-
-# ## ori svm cope
-# python mvpa_memsamp_blocks.py
-#
-# # ori svm tstat
-# sed -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-#
-# # ori mahal
-# sed -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-
-#ABOVE RAN THROUGH FINE
-
-# ## dir svm cope - ran through but may need to check
-# sed -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-# dir svm tstat
+# dir
 sed -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
-    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-# # dir mahal - not running
-# sed -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-## 12-way svm cope
-sed -e s:"decodeFeature = 'ori'":"decodeFeature = '12-way'":g \
+#fwhm=1 smoothing, noNorm
+#ori smooth
+sed -e s:"fwhm = None":"fwhm = 1":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-# dir svm tstat
-sed -e s:"decodeFeature = 'ori'":"decodeFeature = '12-way'":g \
-    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+#dir smooth
+sed -e s:"fwhm = None":"fwhm = 1":g \
+    -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-# # dir mahal - not running
-# sed -e s:"decodeFeature = 'ori'":"decodeFeature = '12-way'":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+#SVMs
+
+#svm ori
+sed -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py

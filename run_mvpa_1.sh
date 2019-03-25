@@ -19,14 +19,13 @@ sed -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-
 #fwhm=1 smoothing, noNorm
 #ori smooth
 sed -e s:"fwhm = None":"fwhm = 1":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-#ori smooth
+#dir smooth
 sed -e s:"fwhm = None":"fwhm = 1":g \
     -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py

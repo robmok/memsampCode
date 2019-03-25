@@ -203,9 +203,7 @@ for iSub in range(1,nSubs+1):
                 cvAcc[iRun-1] = cvAccPairTmp.mean() #mean over pairs
 
         dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #mean over blocks, store to main df
-        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc.mean()*100)))
-        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc.mean()-(1/len(np.unique(y_indexed)))*100)))
-        
+        print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))
 else: 
