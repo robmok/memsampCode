@@ -17,7 +17,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
 #svm ori
-sed -e s:"#mainDir":"mainDir":g \ #take away comment for love01
+sed -e s:"#mainDir":"mainDir":g \
     -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
