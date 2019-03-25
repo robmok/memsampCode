@@ -25,7 +25,7 @@ def getConds2comp(decodeFeature):
     return conds2comp
 
 
-def crossEuclid(x,y,cv):
+def crossEuclid(x,y,cv,iRun=None):
     """ 
 
     Compute cross-validated Euclidean distance score over crossvalidation folds
@@ -46,19 +46,34 @@ def crossEuclid(x,y,cv):
         cv = LeaveOneGroupOut()
         cv.get_n_splits(fmri_masked_cleaned, y, groups)
         cv = cv.split(fmri_data,y,groups)
+        
+    iRun: optional - if include this param, using betas estimated from 'blocks' 
+          the main script should compute this over all runs, so here only computing
+          dist between training set  runs (two blocks - estimated from blocks), 
+          and test set run (one block with  many trials)- so no need to 
+          crossvalidate over all runs
     """
     
     cv_iter = list(cv) # list the cv splits to access as indices
     conds=np.unique(y) # two conds to compare
-    dist = np.empty((len(cv_iter)))
-    for iRun in range(0,len(cv_iter)): #n-folds
+    if iRun is None:
+        dist = np.empty((len(cv_iter)))
+        for iRun in range(0,len(cv_iter)): #n-folds
+            trainIndA  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[0])) #first 0 indexes train set, second 0/1 is the condition
+            trainIndB  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[1]))
+            testIndA   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[0])) # first 1 indexes test set, second 0/1 is the condition
+            testIndB   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[1]))  
+            trainDat   = np.nanmean(x[trainIndA,],axis=0)-np.nanmean(x[trainIndB,],axis=0)
+            testDat    = np.nanmean(x[testIndA,],axis=0)-np.nanmean(x[testIndB,],axis=0)
+            dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels
+    else:
         trainIndA  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[0])) #first 0 indexes train set, second 0/1 is the condition
         trainIndB  = np.intersect1d(cv_iter[iRun][0],np.where(y==conds[1]))
         testIndA   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[0])) # first 1 indexes test set, second 0/1 is the condition
         testIndB   = np.intersect1d(cv_iter[iRun][1],np.where(y==conds[1]))  
         trainDat   = np.nanmean(x[trainIndA,],axis=0)-np.nanmean(x[trainIndB,],axis=0)
         testDat    = np.nanmean(x[testIndA,],axis=0)-np.nanmean(x[testIndB,],axis=0)
-        dist[iRun] = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
+        dist = np.dot(trainDat,testDat) #first dim volumes (trials), second dim voxels        
     return dist
 
 
