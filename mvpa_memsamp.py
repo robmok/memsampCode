@@ -183,7 +183,7 @@ for iSub in range(1,nSubs+1):
         if not decodeFeature == "12-way-all": 
             cvAcc = cvAccTmp.mean() #mean over pairs
         else:
-            cvAcc = cvAccTmp
+            cvAcc = cvAccTmp #save all pairs
         
         dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
         print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
