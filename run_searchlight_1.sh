@@ -13,7 +13,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"slSiz=5":"slSiz=8":g \
     -e s:'cope':'tstat':g \
-    -e s:'for iSub in range(1,34):':'for iSub in range(24,34):':g \
+    -e s:"for iSub in range(1,34):":"for iSub in range(24,34):":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
