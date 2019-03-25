@@ -12,7 +12,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # # 12-way tstat 8mm, fwhmNone - finish off
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"slSiz=5":"slSiz=8":g \
-    -e s:'cope':'tstat':g \
+    -e s:"cope":"tstat":g \
     -e s:"for iSub in range(1,34):":"for iSub in range(24,34):":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
@@ -30,7 +30,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # 12-way tstat 6mm, fwhmNone
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"slSiz=5":"slSiz=6":g \
-    -e s:'cope':'tstat':g \
+    -e s:"cope":"tstat":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
@@ -46,7 +46,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"slSiz=5":"slSiz=6":g \
     -e s:"decodeFeature = '12-way'":"decodeFeature = 'ori'":g \
-    -e s:'cope':'tstat':g \
+    -e s:"cope":"tstat":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
@@ -62,7 +62,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"slSiz=5":"slSiz=6":g \
     -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
-    -e s:'cope':'tstat':g \
+    -e s:"cope":"tstat":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
@@ -111,7 +111,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python mvpa_searchlight_memsamp.py
 #
 # # 12-way tstat 8mm, fwhm1
-# sed -e s:'cope':'tstat':g \
+# sed -e s:"cope":"tstat":g \
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
@@ -124,7 +124,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # # 12-way tstat 5mm, fwhm=None
 # sed -e s:"slSiz=8":"slSiz=5":g \
 #     -e s:"fwhm = 1":"fwhm = None":g \
-#     -e s:'cope':'tstat':g \
+#     -e s:"cope":"tstat":g \
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
@@ -153,7 +153,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
 # # Dir, svm, niNorm, tstat
-# sed -e s:'cope':'tstat':g \
+# sed -e s:"cope":"tstat":g \
 #     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
@@ -165,7 +165,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
 # # Ori, svm, niNorm, tstat
-# sed -e s:'cope':'tstat':g \
+# sed -e s:"cope":"tstat":g \
 #     -e s:"decodeFeature = 'dir'":"decodeFeature = 'ori'":g \
 #     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
@@ -179,7 +179,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
 # # 12-way, svm, niNorm, tstat
 # sed -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
-#     -e s:'cope':'tstat':g \
+#     -e s:"cope":"tstat":g \
 #     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
@@ -195,7 +195,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
 # # 12-way, svm, niNorm tstat
-# sed -e s:'cope':'tstat':g \
+# sed -e s:"cope":"tstat":g \
 #     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
 #     -e s:"decodeFeature = 'dir'":"decodeFeature = '12-way'":g \
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
