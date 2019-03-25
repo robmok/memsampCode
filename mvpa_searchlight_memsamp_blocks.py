@@ -218,13 +218,10 @@ for iSub in range(1,34):
                                 indTrl=indTrl[0]
                                 for iTrl in indTrl: #prewhiten each trial to make mahal dist
                                     Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])                  
-                            
-                            cvBlock = crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions))
-                            return cvBlock[iRun-1]                   
+                            return crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions),iRun)                  
                     elif distMeth == 'crossEuclid': 
                         def pipeline(X,y):
-                            cvBlock = crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions))
-                            return cvBlock[iRun-1]
+                            return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions),iRun)
 
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight

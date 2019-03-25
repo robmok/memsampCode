@@ -9,6 +9,14 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # searchlight
 
+# # 12-way tstat 8mm, fwhmNone - finish off
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=5":"slSiz=8":g \
+    -e s:'cope':'tstat':g \
+    -e s:'for iSub in range(1,34):':'for iSub in range(24,34):':g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
 # 6mm's noSmooth - later run smooth for a few to compare?
 
 #trials

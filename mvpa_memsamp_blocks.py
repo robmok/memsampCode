@@ -198,8 +198,8 @@ for iSub in range(1,nSubs+1):
                         cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
                         cvAccPairTmp[iPair] = cvAccTmp[iRun-1]
                     elif distMeth in {'crossEuclid','crossNobis'}:
-                        cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv)
-                        cvAccPairTmp[iPair] = cvAccTmp[iRun-1]
+                        cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv,iRun-1)
+                        cvAccPairTmp[iPair] = cvAccTmp #  don't need to mean this with new crosseuclid func
                 cvAcc[iRun-1] = cvAccPairTmp.mean() #mean over pairs
 
         dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #mean over blocks, store to main df
