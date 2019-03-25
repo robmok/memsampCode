@@ -33,7 +33,7 @@ reRun = False
 
 imDat   = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = None # optional smoothing param - 1, or None
 
@@ -171,12 +171,11 @@ for iSub in range(1,nSubs+1):
                 cv.get_n_splits(fmri_masked_cleaned, y, groups)
                 cv   = cv.split(fmri_masked_cleaned,y,groups)   
                 clf  = LinearSVC(C=.1)
-                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
-                print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
-                print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/12))*100))
-                y_indexed = y #for computing chance
+                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv)
+                y_indexed = y #for computing chance below
+                cvAcc[iRun-1] = cvAccTmp[iRun-1] #if svm, get relevant cvAcc measure (test set)
             else: #all condition-wise comparisons
-                cvAccTmp = np.empty(len(conds2comp))
+                cvAccPairTmp = np.empty(len(conds2comp))
                 for iPair in range(0,len(conds2comp)):
                     ytmp=y.copy()
                     if not decodeFeature == "12-way-all": 
@@ -196,18 +195,16 @@ for iSub in range(1,nSubs+1):
                     cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
                     if distMeth == 'svm':
                         clf   = LinearSVC(C=.1)
-                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                        print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp[iPair]*100)))
-                        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                        cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
+                        cvAccPairTmp[iPair] = cvAccTmp[iRun-1]
                     elif distMeth in {'crossEuclid','crossNobis'}:
-                        cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                        cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv)
+                        cvAccPairTmp[iPair] = cvAccTmp[iRun-1]
+                cvAcc[iRun-1] = cvAccPairTmp.mean() #mean over pairs
 
-            #get relevant cvAcc measure - is this the right one? (test set?)
-            cvAcc[iRun-1] = cvAccTmp[iRun-1] 
-            
-        dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #store to main df
+        dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #mean over blocks, store to main df
         print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAcc.mean()*100)))
-        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc.mean()-(1/12))*100))
+        print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAcc.mean()-(1/len(np.unique(y_indexed)))*100)))
         
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))

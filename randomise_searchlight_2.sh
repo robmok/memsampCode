@@ -17,11 +17,6 @@ normMeth='noNorm'
 
 vSmooth=5
 
-imDat='tstat'
-threshMeth='cMass'
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
-
 #ori
 decodeFeature='ori'
 imDat='cope'

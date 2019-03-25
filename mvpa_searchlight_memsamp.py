@@ -26,7 +26,7 @@ from sklearn.svm import LinearSVC
 from nilearn.masking import apply_mask 
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 featDir=os.path.join(mainDir,'memsampFeat')
 fmriprepDir=os.path.join(mainDir,'fmriprep_output/fmriprep')
@@ -42,7 +42,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 10 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 

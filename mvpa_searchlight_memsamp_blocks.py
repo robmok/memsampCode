@@ -129,7 +129,8 @@ for iSub in range(1,34):
             clf = LinearSVC(C=.1)
         
             def pipeline(X,y):
-                return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
+               cvBlock = cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions))
+               return cvBlock[iRun-1] #get relevant cvAcc measure (test set)
 
             dat.pipeline = pipeline
             im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
@@ -161,7 +162,8 @@ for iSub in range(1,34):
                     clf   = LinearSVC(C=.1)
     #                cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                     def pipeline(X,y):
-                        return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                        cvBlock = cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions))
+                        return cvBlock[iRun-1] #get relevant cvAcc measure (test set)
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
                     chance   = 1/len(np.unique(dat.y))
@@ -180,7 +182,8 @@ for iSub in range(1,34):
                     del im
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
-                        return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
+                        cvBlock = crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions))
+                        return cvBlock[iRun-1]
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
         
