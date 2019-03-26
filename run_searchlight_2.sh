@@ -13,12 +13,12 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #5mm mainly to compare - runnning some on love06 too:
 
-# 12-way cope 5mm, fwhm1
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# # 12-way cope 5mm, fwhm1
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"fwhm = None":"fwhm = 1":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 # 12-way tstat 5mm, fwhm1
 sed -e s:"#mainDir":"mainDir":g \
