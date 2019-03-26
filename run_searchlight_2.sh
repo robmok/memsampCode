@@ -77,8 +77,6 @@ sed -e s:"#mainDir":"mainDir":g \
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
-# running  on love06
-
 #crossnobis
 # ori cope 6mm, fwhmNone
 sed -e s:"#mainDir":"mainDir":g \

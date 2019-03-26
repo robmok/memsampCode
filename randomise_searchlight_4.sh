@@ -4,30 +4,21 @@
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 #love01
-slDir='/home/robmok/Documents/memsamp_fMRI/mvpa_searchlight'
+# slDir='/home/robmok/Documents/memsamp_fMRI/mvpa_searchlight'
 
 tThresh=2.4486 #  - DF = 33-1, one-tailed, p=0.010002
-slSiz=5 #searchlight size
-distMeth='crossEuclid' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 fwhm=1 # smoothing - set to None if no smoothing
 
-decodeFeature='dir'
+slSiz=5 #searchlight size
 
-trainSetMeth='trials'
-imDat='cope'
-normMeth='niNormalised'
-
-vSmooth=5
-
-# threshMeth='vox' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -x
-threshMeth='tfce'
+trainSetMeth='blocks'
+normMeth='niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+decodeFeature='12-way'
+distMeth='svm'
+imDat='cope' # cope or tstat images
+threshMeth='vox' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -T
-threshMeth='cSize'
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -c ${tThresh}
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -x
 threshMeth='cMass'
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
