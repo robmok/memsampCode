@@ -34,7 +34,20 @@ Note down: category bound, face/scene for each category
 
 
 
-Next: compute subjective catgeories
+Next: compute subjective catgeories - compute Pr respond category 0 for each dir 
+
+    
+- resp - 1 if the subject responded according to the currently dominant category
+
+- key - the key they pressed - note it flipped between blocks
+
+
+
+
+
+
+
+
 
 #later:  read in subjective categories
 
@@ -43,6 +56,7 @@ Next: compute subjective catgeories
 
 import os
 import glob
+import numpy as np
 import pandas as pd
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
@@ -64,13 +78,19 @@ fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
 datafiles = sorted(glob.glob(fnames))
 
 for iFile in datafiles:   
-    iFile = datafiles[1] #temp
+#    iFile = datafiles[1] #temp
     dat=pd.read_csv(iFile, sep="\t")
     
     if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
-        catRule=0    
-    elif dat.loc[((dat['direction']==210)|(dat['direction']==330))&(dat['cat']==1),'category'].all():
+        catRule=0
+        catAconds=np.array((range(120,271,30))) 
+        catBconds=np.append(np.array((range(210,331,30))),0)
+
+    elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
         catRule=1
+        catAconds=np.append(np.array((range(210,331,30))),0)
+        catBconds=np.array((range(120,271,30))) 
+
     else: 
         catRule=9
         print("Error determining category rule")
@@ -78,19 +98,25 @@ for iFile in datafiles:
 #    print("Category rule %d" % catRule)
 
 
+#dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),['category', 'key','resp','correct']] #resp and correct are same if cat=1
+#dat.loc[((dat['direction']==120)|(dat['direction']==270)),['cat','category', 'key','resp','correct']] #shows diff between resp and correct
 
+    conds=dat.direction.unique()
+    conds.sort()
+    respCatPr = pd.Series(index=conds)
+    for iCond in conds:
+        #dat.loc[dat['direction']==iCond]
+        #dat.loc[dat['direction']==iCond,['rawdirection', 'rawcategory']]
 
-
-
-
-
-
-
-
-
-
-
-
+        respCatPr[iCond] = np.divide(dat.loc[dat['direction']==iCond,'resp'].sum(),len(dat.loc[dat['direction']==iCond,'resp'])) #this count nans (prob no resp) as incorrect
+        
+#        print("cond %s, sum %d, len %d" % (iCond, dat.loc[dat['direction']==iCond,'resp'].sum(), len(dat.loc[dat['direction']==iCond,'resp'])))
+#        print(dat.loc[dat['direction']==iCond,'resp'])
+        
+        
+#    print(respCatPr) #sub-01 getting it most except 120/300 (most incorrect) - i.e. up-down rule
+    for iBcond in catBconds:
+       respCatPr[iBcond] = 1-respCatPr[iBcond]
 
 
 
