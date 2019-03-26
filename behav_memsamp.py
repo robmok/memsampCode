@@ -61,12 +61,14 @@ import pandas as pd
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 eventsDir=os.path.join(mainDir,'orig_events')
-codeDir=os.path.join(mainDir,'memsampCode')
-os.chdir(codeDir)
+#codeDir=os.path.join(mainDir,'memsampCode')
+#os.chdir(codeDir)
+
+#laptop
+mainDir='/Users/robertmok/Downloads'
+eventsDir=os.path.join(mainDir,'orig_events')
 
 #%%
-
-
 
 #subs = range(1,34) #33 subs - range doesn't include last number
 #for iSub in subs:
@@ -77,59 +79,81 @@ subNum=f'{iSub:02d}'
 fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
 datafiles = sorted(glob.glob(fnames))
 
+dat=pd.DataFrame()
 for iFile in datafiles:   
-#    iFile = datafiles[1] #temp
-    dat=pd.read_csv(iFile, sep="\t")
+#    iFile = datafiles[0] #temp
+    df=pd.read_csv(iFile, sep="\t")
+    dat = dat.append(df)
     
-    if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
-        catRule=0
-        catAconds=np.array((range(120,271,30))) 
-        catBconds=np.append(np.array((range(210,331,30))),0)
 
-    elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
-        catRule=1
-        catAconds=np.append(np.array((range(210,331,30))),0)
-        catBconds=np.array((range(120,271,30))) 
-
-    else: 
-        catRule=9
-        print("Error determining category rule")
-    
+if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
+    catRule=0
+    catAconds=np.array((range(120,271,30))) 
+    catBconds=np.append(np.array((range(210,331,30))),0)
+elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
+    catRule=1
+    catAconds=np.append(np.array((range(210,331,30))),0)
+    catBconds=np.array((range(120,271,30))) 
+else: 
+    catRule=9
+    print("Error determining category rule")
 #    print("Category rule %d" % catRule)
+
+
+#if dat['keymap'][0] == 1: #flip - need double check if keymap is what i think it is. looks ok
+#    dat.loc[dat['key']==6,'key']=5
+#    dat.loc[dat['key']==1,'key']=6
+#    dat.loc[dat['key']==5,'key']=1
+
+#if dat['keymap'] == 1: #flip
+ind1=dat['keymap']==1
+ind2=dat['key']==6
+ind3=dat['key']==1
+dat.loc[ind1&ind2,'key']=5
+dat.loc[ind1&ind3,'key']=6
+dat.loc[ind1&ind2,'key']=1
+
+#could also check aresp?
+
+
+conds=dat.direction.unique()
+conds.sort()
+respCatPr = pd.Series(index=conds)
+respPr = pd.Series(index=conds)
+for iCond in conds:
+
+    respCatPr[iCond] = np.divide(dat.loc[dat['direction']==iCond,'resp'].sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
+    respPr[iCond] = np.divide((dat.loc[dat['direction']==iCond,'key']==6).sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
+   
+    
+    
+#  print("cond %s, sum %d, len %d" % (iCond, dat.loc[dat['direction']==iCond,'resp'].sum(), len(dat.loc[dat['direction']==iCond,'resp'])))
+#  print(dat.loc[dat['direction']==iCond,'resp'])
+    
+
+
+print(respPr>0.5) # get subjective cat
+#in subj-01, in run 1, there is one more in one cat than the other....
+#how to decide? if average over all blocks, will have one cat ambig
+#... but probably makes sense?
+
+#    plt.plot(respPr)
+#    plt.show()
+
+
+
+
+
+
+#%%
+
+#dat.loc[dat['direction']==iCond,['rawdirection', 'rawcategory']]
 
 
 #dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),['category', 'key','resp','correct']] #resp and correct are same if cat=1
 #dat.loc[((dat['direction']==120)|(dat['direction']==270)),['cat','category', 'key','resp','correct']] #shows diff between resp and correct
-
-    conds=dat.direction.unique()
-    conds.sort()
-    respCatPr = pd.Series(index=conds)
-    for iCond in conds:
-        #dat.loc[dat['direction']==iCond]
-        #dat.loc[dat['direction']==iCond,['rawdirection', 'rawcategory']]
-
-        respCatPr[iCond] = np.divide(dat.loc[dat['direction']==iCond,'resp'].sum(),len(dat.loc[dat['direction']==iCond,'resp'])) #this count nans (prob no resp) as incorrect
-        
-#        print("cond %s, sum %d, len %d" % (iCond, dat.loc[dat['direction']==iCond,'resp'].sum(), len(dat.loc[dat['direction']==iCond,'resp'])))
-#        print(dat.loc[dat['direction']==iCond,'resp'])
-        
         
 #    print(respCatPr) #sub-01 getting it most except 120/300 (most incorrect) - i.e. up-down rule
-    for iBcond in catBconds:
-       respCatPr[iBcond] = 1-respCatPr[iBcond]
-
-
-
-
-#do i need to get raw response (flips per block so need match with category) then plot pr resp key 1/6 to get hte subjective?
-# don't think there is the raw resp cat. is it aresp?
-
-
-
-
-
-
-
 
 
         
