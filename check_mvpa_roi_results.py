@@ -11,13 +11,13 @@ import pandas as pd
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 
 
-imDat    = 'cope' # cope or tstat images
-normMeth = 'demeaned_stdNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
-trainSetMeth = 'block' # 'trials' or 'block' - only tirals in this script
-fwhm = 1 # optional smoothing param - 1, or None
+imDat    = 'tstat' # cope or tstat images
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+trainSetMeth = 'trials' # 'trials' or 'block' 
+fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 
