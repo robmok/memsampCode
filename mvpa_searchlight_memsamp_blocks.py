@@ -218,7 +218,7 @@ for iSub in range(1,34):
                                 indTrl=indTrl[0]
                                 for iTrl in indTrl: #prewhiten each trial to make mahal dist
                                     Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun1])                  
-                            return crossEuclid(Xdat_whitened,y,cv=cv.split(Xdat_whitened,dat.y,dat.sessions),iRun-1)                  
+                            return crossEuclid(Xdat_whitened,y,cv.split(Xdat_whitened,dat.y,dat.sessions),iRun-1)                  
                     elif distMeth == 'crossEuclid': 
                         def pipeline(X,y):
                             return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions),iRun-1)
