@@ -121,6 +121,10 @@ for iFile in datafiles:
 
 
 
+#do i need to get raw response (flips per block so need match with category) then plot pr resp key 1/6 to get hte subjective?
+# don't think there is the raw resp cat. is it aresp?
+
+
 
 
 
