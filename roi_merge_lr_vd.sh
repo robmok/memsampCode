@@ -39,7 +39,7 @@ while read subject; do
   # echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/ips_rois_rh.txt
 
   #MD regions
-  for iRoi in 'MDroi_ips','MDroi_pcg','MDroi_ifg','MDroi_area8c','MDroi_area9'; do
+  for iRoi in 'MDroi_ips' 'MDroi_pcg' 'MDroi_ifg' 'MDroi_area8c' 'MDroi_area9'; do
       fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
   done
   fslmaths ${roiDir}/${subject}_MDroi_area8c_lrh.nii.gz -add ${roiDir}/${subject}_MDroi_area9_lrh.nii.gz -bin ${roiDir}/${subject}_dlPFC_lrh.nii.gz
