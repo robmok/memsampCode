@@ -66,8 +66,8 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
-for iSub in subs:
-    #iSub=1 #temp
+for iSub in range(32,33):
+#    iSub=6 #temp
     subNum=f'{iSub:02d}'
     fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
     datafiles = sorted(glob.glob(fnames))
@@ -116,6 +116,12 @@ for iSub in subs:
     print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
     print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
     print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
+
+    if ((respPr>0.4)&(respPr<0.6)).any():
+        print("sub %s, %d ambig" % (subNum,((respPr>0.4)&(respPr<0.6)).sum()))
+
+
+        print(respPr[(respPr>0.4)&(respPr<0.6)])
 
 #in subj-01, in run 1, there is one more in one cat than the other....
     # - how to decide when more than one in the other? 
