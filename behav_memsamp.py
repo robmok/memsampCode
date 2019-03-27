@@ -60,8 +60,8 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #os.chdir(codeDir)
 
 #laptop
-mainDir='/Users/robertmok/Downloads'
-eventsDir=os.path.join(mainDir,'orig_events')
+#mainDir='/Users/robertmok/Downloads'
+#eventsDir=os.path.join(mainDir,'orig_events')
 
 #%%
 
@@ -81,7 +81,7 @@ for iSub in subs:
     #get objective category
     if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
         catAconds=np.array((range(120,271,30))) 
-        catBconds=np.append(np.array((range(0,91,30))),300)
+        catBconds=np.append(np.array((range(0,91,30))),[300,330])
     elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
         catAconds=np.append(np.array((range(210,331,30))),0)
         catBconds=np.array((range(30,181,30))) 
@@ -109,18 +109,19 @@ for iSub in subs:
         respPr[iCond] = np.divide((dat.loc[dat['direction']==iCond,'key']==6).sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
         
     #subjective catgory bound based on responses
-    subjCatAconds=respPr.index[respPr>0.5].values
-    subjCatBconds=respPr.index[respPr<0.5].values
+    subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
+    subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
     
-    print("sub-%s, objective catA: %s" % (subNum,np.array2string(np.sort(catAconds))))
-    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(np.sort(subjCatAconds))))
-    print("sub-%s, objective catB: %s" % (subNum,np.array2string(np.sort(catBconds))))
-    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(np.sort(subjCatBconds))))
+    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
+    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
+    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
+    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
 
 #in subj-01, in run 1, there is one more in one cat than the other....
     # - how to decide when more than one in the other? 
     # - inspect how many have this - and how much (~.5?) are there nans?
     # - how to decide if ~ 0.5?
+        # if around this, then revert to prior (obj)?
     
 # see a few weird outliers where one direction is the opposite - check how many, and how much > 0.5
     # - is this true or just an error?

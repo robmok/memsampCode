@@ -21,7 +21,7 @@ def getConds2comp(decodeFeature):
                       [120,np.setxor1d(0,allDirs)],[150,np.setxor1d(0,allDirs)],[180,np.setxor1d(0,allDirs)],[210,np.setxor1d(0,allDirs)],
                       [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
     elif decodeFeature == "12-way":
-        conds2comp = []        
+        conds2comp = []          
     return conds2comp
 
 

@@ -33,12 +33,13 @@ reRun = False
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
-# others: 
+# stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+# category: 'cat' (objective catgeory), 'subjCat' 
+decodeFeature = 'cat' 
 
 #%%
 # =============================================================================
@@ -92,6 +93,33 @@ for iSub in range(1,nSubs+1):
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
         
+    #get objective category
+    if dfCond.loc[((dfCond['direction']==120)|(dfCond['direction']==270))&(dfCond['cat']==1),'category'].all():
+        catAconds=np.array((range(120,271,30))) 
+        catBconds=np.append(np.array((range(0,91,30))),[300,330])
+    elif dfCond.loc[((dfCond['direction']==210)|(dfCond['direction']==0))&(dfCond['cat']==1),'category'].all():
+        catAconds=np.append(np.array((range(210,331,30))),0)
+        catBconds=np.array((range(30,181,30))) 
+    else: 
+        print("Error determining category rule")
+        
+    #get subjective category based on responses
+    #flip responses for runs - need double check if keymap is what i think it is. looks ok
+    ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
+    ind2=dfCond['key']==6
+    ind3=dfCond['key']==1
+    dfCond.loc[ind1&ind2,'key']=5
+    dfCond.loc[ind1&ind3,'key']=6
+    dfCond.loc[ind1&ind2,'key']=1
+    #get subjective category
+    conds=dfCond.direction.unique()
+    conds.sort()
+    respPr = pd.Series(index=conds)
+    for iCond in conds:
+        respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
+    subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
+    subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+    
     # =============================================================================
     # set up brain data
     # =============================================================================
@@ -141,8 +169,13 @@ for iSub in range(1,nSubs+1):
     #     #set up splits and run cv
     # ============================================================================
     
-        #set up the conditions you want to classify. if 12-way, doesn't use this
-        conds2comp = getConds2comp(decodeFeature)
+        #set up the conditions you want to classify. if 12-way, no need
+        if decodeFeature == "cat":
+            conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
+        elif decodeFeature == "subjCat": #subjective catgory bound based on responses
+            conds2comp = [subjCatAconds, subjCatBconds]    
+        else: #stimulus decoding
+            conds2comp = getConds2comp(decodeFeature)
         
         #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all
