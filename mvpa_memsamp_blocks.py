@@ -150,7 +150,7 @@ for iSub in range(1,nSubs+1):
                 covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
                 for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
                     varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
-                    covMat[:,:,iRun1-1] = compCovMat(apply_mask(varPath,maskROI))
+                    covMat[:,:,iRun1-1] = compCovMat(apply_mask(varPath,maskROI,smoothing_fwhm=fwhm))
                 for iRun1 in runs:
                     trlInd = np.where(groups==iRun1)
                     trlInd = trlInd[0]

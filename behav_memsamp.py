@@ -29,21 +29,16 @@ THEN
 - Test if 'direction's from 120-270 are the same category, if so, cat bound 1, if not, cat bound2
 - If so, check if for that category, if 'category' is 0 or 1
 
-Note down: category bound, face/scene for each category
+Note down: objective category bound, face/scene for each category
 
 
 
 
-Next: compute subjective catgeories - compute Pr respond category 0 for each dir 
 
+Compute subjective catgeories - compute Pr respond category 0 for each dir 
     
 - resp - 1 if the subject responded according to the currently dominant category
-
 - key - the key they pressed - note it flipped between blocks
-
-
-
-
 
 
 
