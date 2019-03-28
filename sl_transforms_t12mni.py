@@ -15,14 +15,14 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep/'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'cope' # cope or tstat images
-slSiz=5 #searchlight size
-normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+imDat   = 'tstat' # cope or tstat images
+slSiz=6 #searchlight size
+normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'blocks' # 'trials' or 'blocks' 
-fwhm = 1 # smoothing - set to None if no smoothing
+trainSetMeth = 'trials' # 'trials' or 'blocks' 
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = '12-way' #'12-way', 'dir', 'ori', ...
+decodeFeature = 'ori' #'12-way', 'dir', 'ori', ...
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
