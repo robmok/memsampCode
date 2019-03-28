@@ -14,7 +14,7 @@ slSiz=6
 normMeth='noNorm'
 decodeFeature='12-way'
 distMeth='svm'
-fwhm=1
+fwhm='None'
 imDat='cope' # cope or tstat images
 threshMeth='cMass'
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \

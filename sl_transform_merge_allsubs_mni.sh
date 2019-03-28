@@ -44,6 +44,17 @@ slSiz=5 #searchlight size
 # echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
 
 
+# 12-way tstat 5mm, fwhm1 niNorm, block
+trainSetMeth='blocks'
+slSiz=5
+normMeth='niNormalised'
+decodeFeature='12-way'
+distMeth='svm'
+fwhm=1
+imDat='tstat' # cope or tstat images
+fslmerge -t ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
+
 #trials
 trainSetMeth='trials'
 slSiz=6
