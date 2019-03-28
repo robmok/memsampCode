@@ -60,14 +60,14 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #os.chdir(codeDir)
 
 #laptop
-#mainDir='/Users/robertmok/Downloads'
-#eventsDir=os.path.join(mainDir,'orig_events')
+mainDir='/Users/robertmok/Downloads'
+eventsDir=os.path.join(mainDir,'orig_events')
 
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
-for iSub in range(32,33):
-#    iSub=6 #temp
+for iSub in range(1,34):
+    iSub=1 #temp
     subNum=f'{iSub:02d}'
     fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
     datafiles = sorted(glob.glob(fnames))
@@ -78,15 +78,21 @@ for iSub in range(32,33):
         df=pd.read_csv(iFile, sep="\t")
         dat = dat.append(df)
         
-    #get objective category
-    if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
-        catAconds=np.array((range(120,271,30))) 
-        catBconds=np.append(np.array((range(0,91,30))),[300,330])
-    elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
-        catAconds=np.append(np.array((range(210,331,30))),0)
-        catBconds=np.array((range(30,181,30))) 
-    else: 
-        print("Error determining category rule")
+    #get objective category - turns out don't need this, direction is scored to be the same for each sub (see rawdirection is different)
+#    if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
+#        catAconds=np.array((range(120,271,30))) 
+#        catBconds=np.append(np.array((range(0,91,30))),[300,330])
+#        print("cat rule 1")
+#    elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
+#        catAconds=np.append(np.array((range(210,331,30))),0)
+#        catBconds=np.array((range(30,181,30))) 
+#        print("cat rule 2")
+#    else: 
+#        print("Error determining category rule")
+
+    #turns out don't need this, direction is scored to be the same for each sub (see rawdirection is different)
+    catAconds=np.array((range(120,271,30))) 
+    catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
     #get response and determine subjective category bound
     #flip - need double check if keymap is what i think it is. looks ok
@@ -112,16 +118,16 @@ for iSub in range(32,33):
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
     
-    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
-    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
-    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
-    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
+#    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
+#    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
+#    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
+#    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
 
-    if ((respPr>0.4)&(respPr<0.6)).any():
-        print("sub %s, %d ambig" % (subNum,((respPr>0.4)&(respPr<0.6)).sum()))
-
-
-        print(respPr[(respPr>0.4)&(respPr<0.6)])
+#    if ((respPr>0.4)&(respPr<0.6)).any():
+#        print("sub %s, %d ambig" % (subNum,((respPr>0.4)&(respPr<0.6)).sum()))
+#
+#
+#        print(respPr[(respPr>0.4)&(respPr<0.6)])
 
 #in subj-01, in run 1, there is one more in one cat than the other....
     # - how to decide when more than one in the other? 
