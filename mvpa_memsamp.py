@@ -98,15 +98,9 @@ for iSub in range(1,nSubs+1):
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
         
     #get objective category
-    if dfCond.loc[((dfCond['direction']==120)|(dfCond['direction']==270))&(dfCond['cat']==1),'category'].all():
-        catAconds=np.array((range(120,271,30))) 
-        catBconds=np.append(np.array((range(0,91,30))),[300,330])
-    elif dfCond.loc[((dfCond['direction']==210)|(dfCond['direction']==0))&(dfCond['cat']==1),'category'].all():
-        catAconds=np.append(np.array((range(210,331,30))),0)
-        catBconds=np.array((range(30,181,30))) 
-    else: 
-        print("Error determining category rule")
-        
+    catAconds=np.array((range(120,271,30))) 
+    catBconds=np.append(np.array((range(0,91,30))),[300,330])
+
     #get subjective category based on responses
     #flip responses for runs - need double check if keymap is what i think it is. looks ok
     ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
@@ -123,6 +117,16 @@ for iSub in range(1,nSubs+1):
         respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+    
+    #unless:
+#     Sub-05: move 240 and 270 to catA
+#     Sub-10: Move 270 to cat B
+#     Sub-17: Switch 30 to cat B
+#     Sub-24: put 120 in catA
+#     Sub-27: 270 switch to cat A
+    
+    
+    
     
     # =============================================================================
     # set up brain data

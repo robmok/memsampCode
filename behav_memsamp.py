@@ -66,7 +66,7 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
-for iSub in subs:
+for iSub in range(9,34):
 #    iSub=1 #temp
     subNum=f'{iSub:02d}'
     fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
@@ -128,6 +128,9 @@ for iSub in subs:
 #
 #
 #        print(respPr[(respPr>0.4)&(respPr<0.6)])
+
+#    print("sub-%s" % subNum)
+#    print(respPr)
 
 #in subj-01, in run 1, there is one more in one cat than the other....
     # - how to decide when more than one in the other? 
