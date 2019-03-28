@@ -125,6 +125,15 @@ for iSub in range(1,nSubs+1):
 #     Sub-24: put 120 in catA
 #     Sub-27: 270 switch to cat A
     
+#    if iSub==5:
+#        
+#    elif iSub==10:
+#        
+#    elif iSub == 17:
+#        
+#    elif iSub==24:
+#        
+#    elif iSub==27:
     
     
     
