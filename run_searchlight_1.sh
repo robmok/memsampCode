@@ -18,53 +18,6 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
 # # 6mm's noSmooth - later run smooth for a few to compare?
-#
-# #trials
-#
-# # 12-way cope 6mm, fwhmNone
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=5":"slSiz=6":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-#
-# # 12-way tstat 6mm, fwhmNone
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=5":"slSiz=6":g \
-#     -e s:"cope":"tstat":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-#
-#
-# # ori cope 6mm, fwhmNone
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=5":"slSiz=6":g \
-#     -e s:"decodeFeature = '12-way'":"decodeFeature = 'ori'":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-#
-# # ori tstat 6mm, fwhmNone
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=5":"slSiz=6":g \
-#     -e s:"decodeFeature = '12-way'":"decodeFeature = 'ori'":g \
-#     -e s:"cope":"tstat":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-#
-#
-# # dir cope 6mm, fwhmNone
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=5":"slSiz=6":g \
-#     -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-#
-# # dir tstat 6mm, fwhmNone
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=5":"slSiz=6":g \
-#     -e s:"decodeFeature = '12-way'":"decodeFeature = 'dir'":g \
-#     -e s:"cope":"tstat":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 
 #crossnobis
