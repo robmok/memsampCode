@@ -8,69 +8,74 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-#trials  - mahal
-#Ori
-#Dir
+#subjCat
+#Trials - niNorm, demeaned_stdNorm
 
-#ori smooth
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"fwhm = None":"fwhm = 3":g \
+#svm cope
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-#dir smooth
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"fwhm = None":"fwhm = 3":g \
-    -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-#svm ori
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
-    -e s:"fwhm = None":"fwhm = 3":g \
+
+#crossNobis
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-#svm dir
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
-    -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
-    -e s:"fwhm = None":"fwhm = 3":g \
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-#svm 12-way
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
-    -e s:"decodeFeature = 'ori'":"decodeFeature = '12-way'":g \
-    -e s:"fwhm = None":"fwhm = 3":g \
+
+#svm tstat
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-#
-# #svm tstat
-# #svm ori
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
-#     -e s:"fwhm = None":"fwhm = 3":g \
-#     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
-#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-#
-# #svm dir
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
-#     -e s:"decodeFeature = 'ori'":"decodeFeature = 'dir'":g \
-#     -e s:"fwhm = None":"fwhm = 3":g \
-#     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
-#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-#
-# #svm 12-way
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"distMeth = 'crossNobis'":"distMeth = 'svm'":g \
-#     -e s:"decodeFeature = 'ori'":"decodeFeature = '12-way'":g \
-#     -e s:"fwhm = None":"fwhm = 3":g \
-#     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
-#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+  < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+mvpa_memsamp1_blocks
+#block
+#svm cope
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+
+#crossNobis
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+
+
+#svm tstat
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
