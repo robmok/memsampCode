@@ -38,7 +38,7 @@ trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
-# category: 'cat' (objective catgeory), 'subjCat' 
+# category: 'objCat' (objective catgeory), 'subjCat' 
 decodeFeature = 'subjCat' 
 
 #%%
@@ -49,9 +49,12 @@ nSubs=33
 rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
         'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois'] #  leaving out: 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01', SPL1
 
-#rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-#        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois',
-#        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
+rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
+        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois',
+        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
+
+#rois = ['V1vd','V3vd','V3a','V3b','hV4','hMT', 'visRois', 'ipsRois',
+#        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
@@ -102,40 +105,38 @@ for iSub in range(1,nSubs+1):
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
     #get subjective category based on responses
-    #flip responses for runs - need double check if keymap is what i think it is. looks ok
-    ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
-    ind2=dfCond['key']==6
-    ind3=dfCond['key']==1
-    dfCond.loc[ind1&ind2,'key']=5
-    dfCond.loc[ind1&ind3,'key']=6
-    dfCond.loc[ind1&ind2,'key']=1
-    #get subjective category
-    conds=dfCond.direction.unique()
-    conds.sort()
-    respPr = pd.Series(index=conds)
-    for iCond in conds:
-        respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
-    subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
-    subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-    
-    #unless:
-#     Sub-05: move 240 and 270 to catA
-#     Sub-10: Move 270 to cat B
-#     Sub-17: Switch 30 to cat B
-#     Sub-24: put 120 in catA
-#     Sub-27: 270 switch to cat A
-    
-#    if iSub==5:
-#        
-#    elif iSub==10:
-#        
-#    elif iSub == 17:
-#        
-#    elif iSub==24:
-#        
-#    elif iSub==27:
-    
-    
+    if decodeFeature == 'subjCat':
+        #flip responses for runs - need double check if keymap is what i think it is. looks ok
+        ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
+        ind2=dfCond['key']==6
+        ind3=dfCond['key']==1
+        dfCond.loc[ind1&ind2,'key']=5
+        dfCond.loc[ind1&ind3,'key']=6
+        dfCond.loc[ind1&ind2,'key']=1
+        #get subjective category
+        conds=dfCond.direction.unique()
+        conds.sort()
+        respPr = pd.Series(index=conds)
+        for iCond in conds:
+            respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
+        subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
+        subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+        #unless:   
+        if iSub==5: #move 240 and 270 to catA
+            subjCatAconds = np.append(subjCatAconds,[240,270])
+            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+        elif iSub==10: #move 270 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds,270))
+            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+        elif iSub == 17:#move 30 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds,30))
+            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+        elif iSub==24: #move 120 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds,120))
+            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+        elif iSub==27:#move 270 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds,270))
+            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
     
     # =============================================================================
     # set up brain data
@@ -187,7 +188,7 @@ for iSub in range(1,nSubs+1):
     # ============================================================================
     
         #set up the conditions you want to classify. if 12-way, no need
-        if decodeFeature == "cat":
+        if decodeFeature == "objCat":
             conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
         elif decodeFeature == "subjCat": #subjective catgory bound based on responses
             conds2comp = [subjCatAconds, subjCatBconds]    
