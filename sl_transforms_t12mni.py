@@ -22,7 +22,7 @@ distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'ori' #'12-way', 'dir', 'ori', ...
+decodeFeature = 'dir' #'12-way', 'dir', 'ori', ...
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
