@@ -14,31 +14,37 @@ while read subject; do
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-01_block_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-01_block_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_block_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-01_block_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_block_T1_fwhm0.feat/stats/
 
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_block_T1_fwhm0.feat/
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-02_block_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-02_block_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_block_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-02_block_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_block_T1_fwhm0.feat/stats/
 
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_block_T1_fwhm0.feat/
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-03_block_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-03_block_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_block_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-03_block_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_block_T1_fwhm0.feat/stats/
 
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_trial_T1_fwhm0.feat/
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_trial_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-01_trial_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_trial_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-01_trial_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_trial_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-01_trial_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-01_trial_T1_fwhm0.feat/stats/
 
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_trial_T1_fwhm0.feat/
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_trial_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-02_trial_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_trial_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-02_trial_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_trial_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-02_trial_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-02_trial_T1_fwhm0.feat/stats/
 
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_trial_T1_fwhm0.feat/
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_trial_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-03_trial_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_trial_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-03_trial_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_trial_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-03_trial_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-03_trial_T1_fwhm0.feat/stats/
 
 done < /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/feat_design_files/subject_list_full.txt
 
@@ -47,11 +53,13 @@ for subject in sub-09 sub-12 sub-16 sub-26; do
   mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_block_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_block_T1_fwhm0.feat/stats/
   scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_block_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_block_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_block_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_block_T1_fwhm0.feat/stats/
 
-  #mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/
-  #mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
-#  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_trial_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
-#  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_trial_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
+  mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/
+  mkdir /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_trial_T1_fwhm0.feat/stats/cope* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_trial_T1_fwhm0.feat/stats/tstat* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
+  scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampFeat/${subject}_run-04_trial_T1_fwhm0.feat/stats/res* /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/
 done
 
 #then send  dir over to love01
@@ -85,3 +93,29 @@ scp -r forlove01/ robmok@love01.psychol.ucl.ac.uk:/home/robmok/Documents/memsamp
 
 #then scp to fmriprep dir
 scp -r /home/robmok/Documents/memsamp_fMRI/forlove01/* .
+
+
+
+#for when i sent res images later
+
+#then send  dir over to love01
+# scp -r forlove01/ robmok@love01.psychol.ucl.ac.uk:/home/robmok/Documents/
+
+#subj list
+#scp /Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/feat_design_files/subject_list_full.txt robmok@love01.psychol.ucl.ac.uk:/home/robmok/Documents/
+#then scp to  dir
+
+#
+# while read subject; do
+#
+# scp /home/robmok/Documents/forlove01/${subject}_run-01_trial_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-01_trial_T1_fwhm0.feat/stats/
+# scp /home/robmok/Documents/forlove01/${subject}_run-02_trial_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-02_trial_T1_fwhm0.feat/stats/
+# scp /home/robmok/Documents/forlove01/${subject}_run-03_trial_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-03_trial_T1_fwhm0.feat/stats/
+# scp /home/robmok/Documents/forlove01/${subject}_run-04_trial_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-04_trial_T1_fwhm0.feat/stats/
+
+#scp /home/robmok/Documents/forlove01/${subject}_run-01_block_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-01_block_T1_fwhm0.feat/stats/
+#scp /home/robmok/Documents/forlove01/${subject}_run-02_block_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-02_block_T1_fwhm0.feat/stats/
+#scp /home/robmok/Documents/forlove01/${subject}_run-03_block_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-03_block_T1_fwhm0.feat/stats/
+#scp /home/robmok/Documents/forlove01/${subject}_run-04_block_T1_fwhm0.feat/stats/res* /home/robmok/Documents/memsamp_fMRI/memsampFeat/${subject}_run-04_block_T1_fwhm0.feat/stats/
+
+# done < /home/robmok/Documents/subject_list_full.txt
