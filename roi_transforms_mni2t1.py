@@ -13,7 +13,10 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
 #roiNames = ['V1v', 'V1d', 'V2v', 'V2d', 'V3v', 'V3d', 'hV4','V01','V02','PHC1','PHC2','MST','hMT','L02','L01','V3b','V3a','IPS0','IPS1','IPS2','IPS3','IPS4','IPS5','SPL1','FEF']
-roiNames = ['MDroi_ips','MDroi_pcg','MDroi_ifg','MDroi_area8c','MDroi_area9']
+#roiNames = ['MDroi_ips','MDroi_pcg','MDroi_ifg','MDroi_area8c','MDroi_area9']
+roiNames = ['HIPP_HEAD','HIPP_BODY','HIPP_TAIL']    
+
+
 at = ants.ApplyTransforms() #define function
 
 #loop subs 

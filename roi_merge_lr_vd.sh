@@ -39,10 +39,23 @@ while read subject; do
   # echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/ips_rois_rh.txt
 
   #MD regions
-  for iRoi in 'MDroi_ips' 'MDroi_pcg' 'MDroi_ifg' 'MDroi_area8c' 'MDroi_area9'; do
-      fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
+  # for iRoi in 'MDroi_ips' 'MDroi_pcg' 'MDroi_ifg' 'MDroi_area8c' 'MDroi_area9'; do
+  #     fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
+  # done
+  # fslmaths ${roiDir}/${subject}_MDroi_area8c_lrh.nii.gz -add ${roiDir}/${subject}_MDroi_area9_lrh.nii.gz -bin ${roiDir}/${subject}_dlPFC_lrh.nii.gz
+
+  #HPC
+  for iRoi in 'HIPP_HEAD' 'HIPP_BODY' 'HIPP_TAIL'; do
+    fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
   done
-  fslmaths ${roiDir}/${subject}_MDroi_area8c_lrh.nii.gz -add ${roiDir}/${subject}_MDroi_area9_lrh.nii.gz -bin ${roiDir}/${subject}_dlPFC_lrh.nii.gz
+  #merge body tail for posterior hipp
+  fslmaths ${roiDir}/${subject}_HIPP_BODY_lh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_lh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_lh.nii.gz
+  fslmaths ${roiDir}/${subject}_HIPP_BODY_rh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz
+  fslmaths ${roiDir}/${subject}_HIPP_BODY_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz
+  #whole hipp
+  fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lh.nii.gz
+  fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_rh.nii.gz
+  fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lrh.nii.gz
 
   # #run fslmaths - L/R/bilateral
   # roiList=`cat ${roiDir}/visual_rois_lh.txt`

@@ -29,7 +29,7 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = False 
+reRun = True 
 
 imDat   = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -52,7 +52,9 @@ rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
 
 rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
         'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois',
-        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
+        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC',
+        'HIPP_HEAD','HIPP_BODY_TAIL','HIPP_HEAD_BODY_TAIL'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
+                                                            #hpc - anterior, posterior, whole
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
