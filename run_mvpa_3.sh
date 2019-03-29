@@ -16,11 +16,13 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #love01
 
 #crossNobis noNorm
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
 #svm tstat
-sed -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
