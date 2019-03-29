@@ -34,14 +34,17 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
 imDat   = 'cope' # cope or tstat images
-slSiz=5  #searchlight size
+slSiz=6  #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
-fwhm = 1 # smoothing - set to None if no smoothing
-nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+fwhm = None # smoothing - set to None if no smoothing
+nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+# category: 'objCat' (objective catgeory), 'subjCat' 
+
+
 #%% load in trial log and append image paths
 
 for iSub in range(1,34):
@@ -79,6 +82,44 @@ for iSub in range(1,34):
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
+    
+    #get objective category
+    catAconds=np.array((range(120,271,30))) 
+    catBconds=np.append(np.array((range(0,91,30))),[300,330])
+
+    #get subjective category based on responses
+    if decodeFeature == 'subjCat':
+        #flip responses for runs - need double check if keymap is what i think it is. looks ok
+        ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
+        ind2=dfCond['key']==6
+        ind3=dfCond['key']==1
+        dfCond.loc[ind1&ind2,'key']=5
+        dfCond.loc[ind1&ind3,'key']=6
+        dfCond.loc[ind1&ind2,'key']=1
+        #get subjective category
+        conds=dfCond.direction.unique()
+        conds.sort()
+        respPr = pd.Series(index=conds)
+        for iCond in conds:
+            respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
+        subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
+        subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+        #unless:   
+        if iSub==5: #move 240 and 270 to catA
+            subjCatAconds = np.append(subjCatAconds,[240,270])
+            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+        elif iSub==10: #move 270 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds,270))
+            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+        elif iSub == 17:#move 30 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds,30))
+            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+        elif iSub==24: #move 120 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds,120))
+            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+        elif iSub==27:#move 270 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds,270))
+            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
         
     #start setting up brain data
     T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
@@ -130,8 +171,14 @@ for iSub in range(1,34):
                 varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
                 varIm    = np.append(varIm,varImTmp,axis=0)
                 varImSiz[iRun1-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
-        #set up the conditions you want to classify. if 12-way, doesn't use this
-        conds2comp = getConds2comp(decodeFeature)
+       
+        #set up the conditions you want to classify. if 12-way, no need
+        if decodeFeature == "objCat":
+            conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
+        elif decodeFeature == "subjCat": #subjective catgory bound based on responses
+            conds2comp = [subjCatAconds, subjCatBconds]    
+        else: #stimulus decoding
+            conds2comp = getConds2comp(decodeFeature)
         
         #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all
