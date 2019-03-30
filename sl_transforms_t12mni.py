@@ -5,7 +5,10 @@ Created on Tue Mar 12 15:38:39 2019
 
 @author: robert.mok
 """
-
+#dir cope 6mm, fwhm1, block
+#subjCat - svm cope/tstat, crossNobis - trials
+#subjCat - svm tstat - block
+#
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -18,11 +21,11 @@ at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'trials' # 'trials' or 'blocks' 
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+trainSetMeth = 'blocks' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'dir' #'12-way', 'dir', 'ori', ...
+decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ...
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
