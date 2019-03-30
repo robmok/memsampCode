@@ -11,9 +11,9 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #Blocks
 #svm cope
-sed -e s:"#mainDir":"mainDir":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# sed -e s:"#mainDir":"mainDir":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 # crossNobis
 sed -e s:"#mainDir":"mainDir":g \
