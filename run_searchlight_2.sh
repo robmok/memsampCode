@@ -9,6 +9,20 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #blocks
 
+#Blocks
+#svm cope
+sed -e s:"#mainDir":"mainDir":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+# crossNobis
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+
+
 
 
 # # dir cope 6mm, fwhm1-  not sure why did 1 here, do none below
