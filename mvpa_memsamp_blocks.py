@@ -6,7 +6,6 @@ Created on Fri Mar  8 15:32:19 2019
 @author: robert.mok
 """
 import sys
-sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
 import numpy as np
 from nilearn import image as nli # Import image processing tool
@@ -20,6 +19,9 @@ import scipy.stats as stats
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 #mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+
+sys.path.append(mainDir)
+featDir=os.path.join(mainDir,'memsampFeat')
 
 featDir=os.path.join(mainDir,'memsampFeat')
 roiDir=os.path.join(mainDir,'rois')
