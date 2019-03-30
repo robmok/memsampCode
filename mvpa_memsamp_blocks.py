@@ -29,7 +29,7 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = True 
+reRun = False 
 
 imDat   = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
