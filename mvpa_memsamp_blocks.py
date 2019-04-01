@@ -34,8 +34,8 @@ from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 reRun = False 
 
 imDat   = 'cope' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = None # optional smoothing param - 1, or None
 

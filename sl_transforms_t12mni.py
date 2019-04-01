@@ -8,6 +8,10 @@ Created on Tue Mar 12 15:38:39 2019
 #dir cope 6mm, fwhm1, block
 #subjCat - svm cope/tstat, crossNobis - trials
 #subjCat - svm tstat - block
+
+#sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_tstat
+#sl6_subjCatDecoding_svm_noNorm_blocks_fwhmNone_cope
+#sl6_subjCatDecoding_svm_noNorm_blocks_fwhmNone_tstat
 #
 #%%
 import os
@@ -18,14 +22,14 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep/'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'cope' # cope or tstat images
+imDat   = 'tstat' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ...
+decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
