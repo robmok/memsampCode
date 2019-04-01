@@ -53,16 +53,11 @@ nSubs=33
                                                             #hpc - anterior, posterior, whole
 
 rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
-        'V3b_lh','V3b_rh','hV4_lh','hV4_rh', 'hMT_lh','hMT_rh', 'IPS0_lh',
-        'IPS0_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh','visRois_lh',
-        'visRois_rh', 'ipsRois_lh','ipsRois_rh', 'visRois_ipsRois_lh','visRois_ipsRois_rh',
+        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh', 
         'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
         'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
         'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh']
-
-        #MST_lh - no voxels in sub2 - removing MST
-
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
