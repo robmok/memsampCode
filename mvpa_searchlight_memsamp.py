@@ -240,13 +240,13 @@ for iSub in range(1,34):
                                    varTmp[varImSiz[0]+varImSiz[1]:varImSiz[0]+varImSiz[1]+varImSiz[2],:],
                                    varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
                         
-                        for iRun1 in range(0,len(runs)):
-                            cov[:,:,iRun1] = compCovMat(var[iRun1]) #compute cov mat per run                     
-                            ind = dat.sessions == iRun1+1
+                        for iRun in range(0,len(runs)):
+                            cov[:,:,iRun] = compCovMat(var[iRun]) #compute cov mat per run                     
+                            ind = dat.sessions == iRun+1
                             indTrl= np.where(ind)
                             indTrl=indTrl[0]
                             for iTrl in indTrl: #prewhiten each trial to make mahal dist
-                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun1])
+                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
                                                 
                         #compute cov mat over all runs
 #                        var = X[len(y):,:] 
