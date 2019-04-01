@@ -22,9 +22,6 @@ sed -e s:"#mainDir":"mainDir":g \
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
-
-
-
 # # dir cope 6mm, fwhm1-  not sure why did 1 here, do none below
 # sed -e s:"#mainDir":"mainDir":g \
 #     -e s:"slSiz=5":"slSiz=6":g \
@@ -32,18 +29,18 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 #   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-# dir tstat 6mm cope, fwhmNone
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-# dir tstat 6mm, fwhmNone
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
-    -e s:'cope':'tstat':g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# # dir  6mm cope, fwhmNone - done
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+#
+# # dir tstat 6mm, fwhmNone - done
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+#     -e s:'cope':'tstat':g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 #crossnobis
 # ori cope 6mm, fwhmNone

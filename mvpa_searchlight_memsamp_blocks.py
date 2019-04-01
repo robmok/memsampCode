@@ -167,10 +167,10 @@ for iSub in range(1,34):
             imgs = nib.load(dfCond['imPath'].iloc[0])
             T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
                                                   target_shape=imgs.shape[:3], interpolation='nearest')
-            for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
-                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
+            for iRun1 in range(0,len(runs)): #append to list, since var sometimes has more/less timepoints in each run
+                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
                 varIm    = np.append(varIm,varImTmp,axis=0)
-                varImSiz[iRun1-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
+                varImSiz[iRun1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
        
         #set up the conditions you want to classify. if 12-way, no need
         if decodeFeature == "objCat":
@@ -259,7 +259,7 @@ for iSub in range(1,34):
                                        varTmp[varImSiz[0]+varImSiz[1]+varImSiz[2]:varImSiz[0]+varImSiz[1]+varImSiz[2]+varImSiz[3],:]]
                             
                             for iRun1 in range(0,len(runs)):
-                                cov[:,:,iRun1] = compCovMat(var[iRun]) #compute cov mat per run                     
+                                cov[:,:,iRun1] = compCovMat(var[iRun1]) #compute cov mat per run                     
                                 ind = dat.sessions == iRun1+1
                                 indTrl= np.where(ind)
                                 indTrl=indTrl[0]

@@ -196,14 +196,14 @@ for iSub in range(1,nSubs+1):
             if distMeth == 'crossNobis': #get variance to compute covar matrix below
                 # compute each run's covariance matrix here, then apply it to fmri_masked_cleaned, then euclid below
                 covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
-                for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
-                    varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
-                    covMat[:,:,iRun1-1] = compCovMat(apply_mask(varPath,maskROI,smoothing_fwhm=fwhm))
-                for iRun1 in runs:
-                    trlInd = np.where(groups==iRun1)
+                for iRun1 in range(0,len(runs)): #append to list, since var sometimes has more/less timepoints in each run
+                    varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
+                    covMat[:,:,iRun1] = compCovMat(apply_mask(varPath,maskROI,smoothing_fwhm=fwhm))
+                for iRun1 in range(0,len(runs)):
+                    trlInd = np.where(groups==(iRun1+1))
                     trlInd = trlInd[0]
                     for iTrl in trlInd:
-                        fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun1-1])
+                        fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun1])
             
             # =============================================================================
             #     #set up splits and run cv
