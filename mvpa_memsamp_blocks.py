@@ -34,7 +34,7 @@ from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 reRun = False 
 
 imDat   = 'cope' # cope or tstat images
-normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = None # optional smoothing param - 1, or None
@@ -49,14 +49,20 @@ decodeFeature = 'subjCat'
 # =============================================================================
 nSubs=33
 
-rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois'] 
-
-rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois',
-        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC',
-        'HIPP_HEAD','HIPP_BODY_TAIL','HIPP_HEAD_BODY_TAIL'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
+#rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
+#        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois',
+#        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC',
+#        'HIPP_HEAD','HIPP_BODY_TAIL','HIPP_HEAD_BODY_TAIL'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
                                                             #hpc - anterior, posterior, whole
+
+rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
+        'V3b_lh','V3b_rh','hV4_lh','hV4_rh','hMT_lh','hMT_rh', 'IPS0_lh',
+        'IPS0_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh','visRois_lh',
+        'visRois_rh', 'ipsRois_lh','ipsRois_rh', 'visRois_ipsRois_lh','visRois_ipsRois_rh',
+        'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
+        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
+        'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
+        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
@@ -146,8 +152,9 @@ for iSub in range(1,nSubs+1):
     
     for roi in rois:
         #define ROI  mask
-        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') #ipsRois no stim decoding; visRois_ipsRois bad for all except self demean and std norm...!?
-    
+        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') 
+        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '.nii.gz') 
+        
         #set up block-wise
         if iSub in {9,12,16,26}:
             blocks = np.array((1,2,3,4))

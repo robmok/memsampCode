@@ -38,30 +38,45 @@ while read subject; do
   # echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz " >> ${roiDir}/ips_rois_lh.txt
   # echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/ips_rois_rh.txt
 
+  # #merge IPS1-2 and IPS3-5 (more similar properties (see Silver & Kasnter, 2009, TiCS))
+  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS3-5_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS3-5_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1-2_lh.nii.gz -add ${roiDir}/${subject}_IPS1-2_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_lrh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS3-5_lh.nii.gz -add ${roiDir}/${subject}_IPS3-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
+  #
+  # # also merge 1-5 in case (prob similar to MD ips roi)
+  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1-5_lh.nii.gz -add ${roiDir}/${subject}_IPS1-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
+
   #MD regions
   # for iRoi in 'MDroi_ips' 'MDroi_pcg' 'MDroi_ifg' 'MDroi_area8c' 'MDroi_area9'; do
   #     fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
   # done
   # fslmaths ${roiDir}/${subject}_MDroi_area8c_lrh.nii.gz -add ${roiDir}/${subject}_MDroi_area9_lrh.nii.gz -bin ${roiDir}/${subject}_dlPFC_lrh.nii.gz
+  # fslmaths ${roiDir}/${subject}_MDroi_area8c_lh.nii.gz -add ${roiDir}/${subject}_MDroi_area9_lh.nii.gz -bin ${roiDir}/${subject}_dlPFC_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_MDroi_area8c_rh.nii.gz -add ${roiDir}/${subject}_MDroi_area9_rh.nii.gz -bin ${roiDir}/${subject}_dlPFC_rh.nii.gz
 
   #HPC
-  for iRoi in 'HIPP_HEAD' 'HIPP_BODY' 'HIPP_TAIL'; do
-    fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
-  done
-  #merge body tail for posterior hipp
-  fslmaths ${roiDir}/${subject}_HIPP_BODY_lh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_lh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_lh.nii.gz
-  fslmaths ${roiDir}/${subject}_HIPP_BODY_rh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz
-  fslmaths ${roiDir}/${subject}_HIPP_BODY_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz
-  #whole hipp
-  fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lh.nii.gz
-  fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_rh.nii.gz
-  fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lrh.nii.gz
+  # for iRoi in 'HIPP_HEAD' 'HIPP_BODY' 'HIPP_TAIL'; do
+  #   fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
+  # done
+  # #merge body tail for posterior hipp
+  # fslmaths ${roiDir}/${subject}_HIPP_BODY_lh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_lh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_HIPP_BODY_rh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_HIPP_BODY_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_TAIL_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz
+  # #whole hipp
+  # fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lrh.nii.gz
 
   # #run fslmaths - L/R/bilateral
   # roiList=`cat ${roiDir}/visual_rois_lh.txt`
   # fslmaths ${roiList} -bin ${roiDir}/${subject}_visRois_lh.nii.gz
-  # roiList=`cat ${roiDir}/visual_rois_rh.txt`
-  # fslmaths ${roiList} ${roiDir}/${subject}_visRois_rh.nii.gz
+  roiList=`cat ${roiDir}/visual_rois_rh.txt`
+  fslmaths ${roiList} -bin ${roiDir}/${subject}_visRois_rh.nii.gz
   # fslmaths ${roiDir}/${subject}_visRois_lh.nii.gz -add ${roiDir}/${subject}_visRois_rh.nii.gz -bin ${roiDir}/${subject}_visRois_lrh.nii.gz
   # roiList=`cat ${roiDir}/ips_rois_lh.txt`
   # fslmaths ${roiList} -bin ${roiDir}/${subject}_ipsRois_lh.nii.gz
