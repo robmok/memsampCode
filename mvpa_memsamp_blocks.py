@@ -150,7 +150,7 @@ for iSub in range(1,nSubs+1):
     
     for roi in rois:
         #define ROI  mask
-        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') 
+#        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') 
         mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '.nii.gz') 
         
         #set up block-wise
@@ -168,9 +168,9 @@ for iSub in range(1,nSubs+1):
                 copeNum=1 #counter
                 for iCond in conds:
                     tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
-                    dfRun = tmp.iloc[0]
-                    dfRun['run']=iBlk
-                    dfRun['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
+                    dfRun = tmp.iloc[0].copy()
+                    dfRun.loc['run']=iBlk
+                    dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
                     dfCondRuns = dfCondRuns.append(dfRun)
                     copeNum=copeNum+1
     
