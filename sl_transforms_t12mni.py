@@ -9,10 +9,12 @@ Created on Tue Mar 12 15:38:39 2019
 #subjCat - svm cope/tstat, crossNobis - trials
 #subjCat - svm tstat - block
 
-#sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_tstat
-#sl6_subjCatDecoding_svm_noNorm_blocks_fwhmNone_cope
-#sl6_subjCatDecoding_svm_noNorm_blocks_fwhmNone_tstat
-#
+#sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_cope
+#sl6_subjCatDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
+
+# waiting - 
+#sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
+
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -22,10 +24,10 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep/'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 

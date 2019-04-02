@@ -2,23 +2,46 @@
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 
 #love01
-#mainDir='/home/robmok/Documents/memsamp_fMRI'#love01
+mainDir='/home/robmok/Documents/memsamp_fMRI'#love01
 
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
+# set 2 - Run subjCat 8mm - svm cope/tstat/crossnobis, trials & blocks
+#trials
+#crossnobis
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-#5mm mainly to compare:
+#svm cope
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# # 12-way tstat 5mm, fwhm1
-# sed -e s:"nCores = 12":"nCores = 4":g \
-#     -e s:"fwhm = None":"fwhm = 1":g \
-#     -e s:'cope':'tstat':g \
-#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+#svm tstat
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# 12-way cope 5mm, fwhm1
-sed -e s:"nCores = 12":"nCores = 4":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
+
+#Blocks
+#crossnobis
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#svm cope
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#svm tstat in other script

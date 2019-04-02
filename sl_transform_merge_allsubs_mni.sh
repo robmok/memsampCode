@@ -12,30 +12,35 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 
 
-#sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_tstat
-#sl6_subjCatDecoding_svm_noNorm_blocks_fwhmNone_cope
-#sl6_subjCatDecoding_svm_noNorm_blocks_fwhmNone_tstat
+#sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_cope
+#sl6_subjCatDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
 
-#trials
-trainSetMeth='blocks'
+# trainSetMeth='blocks'
+# slSiz=6
+# normMeth='noNorm'
+# decodeFeature='dir'
+# distMeth='svm'
+# fwhm='None'
+# imDat='cope' # cope or tstat images
+# fslmerge -t ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+# echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
+#
+# slSiz=6
+# normMeth='noNorm'
+# decodeFeature='subjCat'
+# distMeth='crossNobis'
+# fwhm='None'
+# imDat='cope' # cope or tstat images
+# fslmerge -t ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
+# echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
+
+#to run
+#sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
 slSiz=6
 normMeth='noNorm'
-decodeFeature='dir'
-distMeth='svm'
-fwhm='None'
-imDat='tstat' # cope or tstat images
-fslmerge -t ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
-echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
-
-slSiz=6
-normMeth='noNorm'
-decodeFeature='subjCat'
-distMeth='svm'
+decodeFeature='ori'
+distMeth='crossNobis'
 fwhm='None'
 imDat='cope' # cope or tstat images
-fslmerge -t ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
-echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
-
-imDat='tstat' # cope or tstat images
 fslmerge -t ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_sub-*mni.nii.gz
 echo "Merged: sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz"
