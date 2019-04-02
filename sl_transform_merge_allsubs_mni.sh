@@ -36,6 +36,7 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 #to run
 #sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
+trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
 decodeFeature='ori'

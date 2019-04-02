@@ -11,8 +11,6 @@ Created on Tue Mar 12 15:38:39 2019
 
 #sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_cope
 #sl6_subjCatDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
-
-# waiting - 
 #sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
 
 #%%
