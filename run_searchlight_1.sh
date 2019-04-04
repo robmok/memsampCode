@@ -34,21 +34,6 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# 8mm 12-way tstat niNorm TRIALS
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"slSiz=6":"slSiz=8":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
-    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-#12-way sl8 svms niNorm, tstat, blocks
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"slSiz=6":"slSiz=8":g \
-    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 #sl8 svm tstat BLOCKS
 sed -e s:"#mainDir":"mainDir":g \
@@ -65,7 +50,21 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
+# 8mm 12-way tstat niNorm TRIALS
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
+#12-way sl8 svms niNorm, tstat, blocks
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
 
