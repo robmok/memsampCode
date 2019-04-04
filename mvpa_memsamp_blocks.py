@@ -41,7 +41,7 @@ fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
-decodeFeature = 'subjCat' 
+decodeFeature = 'ori' 
 
 #%%
 # =============================================================================

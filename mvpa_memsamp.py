@@ -39,7 +39,7 @@ fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
-decodeFeature = 'subjCat-all' 
+decodeFeature = 'ori' 
 
 #%%
 # =============================================================================
@@ -52,7 +52,7 @@ nSubs=33
 #        'HIPP_HEAD','HIPP_BODY_TAIL','HIPP_HEAD_BODY_TAIL'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
                                                             #hpc - anterior, posterior, whole
 
-rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
+rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
         'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh', 
         'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
@@ -61,7 +61,10 @@ rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
+if decodeFeature == "subjCat-all":
+    dfDecode['subjCat'] = ""
 
+    
 # =============================================================================
 # load in trial log and append image paths
 # =============================================================================
@@ -245,8 +248,12 @@ for iSub in range(1,nSubs+1):
             cvAcc = cvAccTmp #save all pairs
         
         dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
+
         if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
+            
+    if decodeFeature=="subjCat-all": #add subjCat info to df
+        dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))
