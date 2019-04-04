@@ -27,13 +27,13 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
-# # 8mm 12-way cope TRIALS
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"slSiz=6":"slSiz=8":g \
-#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
+# 8mm 12-way cope TRIALS
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"for iSub in range(1,34)":"for iSub in range(15,34)":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #sl8 svm tstat BLOCKS
 sed -e s:"#mainDir":"mainDir":g \
