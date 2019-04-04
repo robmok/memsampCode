@@ -12,13 +12,23 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #12-way sl6 niNorm svm cope/tstat trials/blocks - x4
 #12-way sl6 niNorm svm tstat blocks
 sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
+#dir crossnobis BLOCKS - inserted here - only run till sub-15 for some reason
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"for iSub in range(1,34)":"for iSub in range(16,34)":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
 #tstat trials
 sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
@@ -26,12 +36,14 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #cope blocks
 sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 #cope trials
 sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
