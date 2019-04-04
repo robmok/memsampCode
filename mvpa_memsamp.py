@@ -195,7 +195,10 @@ for iSub in range(1,nSubs+1):
         if decodeFeature == "objCat":
             conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
         elif decodeFeature == "subjCat": #subjective catgory bound based on responses
-            conds2comp = [subjCatAconds, subjCatBconds]    
+            conds2comp = [subjCatAconds, subjCatBconds]  
+        elif decodeFeature == "subjCat-all":
+            condsTmp=list(subjCatAconds)+list(subjCatBconds)
+            conds2comp = getConds2comp(decodeFeature,condsTmp)
         else: #stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         

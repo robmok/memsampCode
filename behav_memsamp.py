@@ -60,8 +60,8 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #os.chdir(codeDir)
 
 #laptop
-mainDir='/Users/robertmok/Downloads'
-eventsDir=os.path.join(mainDir,'orig_events')
+#mainDir='/Users/robertmok/Downloads'
+#eventsDir=os.path.join(mainDir,'orig_events')
 
 #%%
 
@@ -118,10 +118,10 @@ for iSub in range(9,34):
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
     
-#    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
-#    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
-#    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
-#    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
+    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
+    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
+    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
+    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
 
 #    if ((respPr>0.4)&(respPr<0.6)).any():
 #        print("sub %s, %d ambig" % (subNum,((respPr>0.4)&(respPr<0.6)).sum()))
