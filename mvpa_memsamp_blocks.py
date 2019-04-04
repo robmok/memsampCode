@@ -111,7 +111,7 @@ for iSub in range(1,nSubs+1):
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
     #get subjective category based on responses
-    if decodeFeature == 'subjCat':
+    if decodeFeature[0:7] == 'subjCat':
         #flip responses for runs - need double check if keymap is what i think it is. looks ok
         ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
         ind2=dfCond['key']==6
@@ -219,6 +219,9 @@ for iSub in range(1,nSubs+1):
                 conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
             elif decodeFeature == "subjCat": #subjective catgory bound based on responses
                 conds2comp = [subjCatAconds, subjCatBconds]    
+            elif decodeFeature == "subjCat-all":
+                condsTmp=list(subjCatAconds)+list(subjCatBconds)
+                conds2comp = getConds2comp(decodeFeature,condsTmp)
             else: #stimulus decoding
                 conds2comp = getConds2comp(decodeFeature)       
                 
@@ -261,6 +264,7 @@ for iSub in range(1,nSubs+1):
                 cvAcc[iRun-1] = cvAccPairTmp.mean() #mean over pairs
 
         dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #mean over blocks, store to main df
+        
         print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc.mean()))    
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))
