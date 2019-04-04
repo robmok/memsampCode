@@ -20,6 +20,7 @@ from subprocess import call
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep/'
+slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
@@ -56,3 +57,5 @@ for iSub in range(1,34):
     call(runCmd,shell=True) # run in cmd line via python. to check output, use subprocess.check_output: from subprocess import check_output
 
 
+runCmdMerge='fslmerge -t' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth +
+                                         '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-*mni'  '.nii.gz')
