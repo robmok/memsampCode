@@ -22,17 +22,12 @@ def getConds2comp(decodeFeature,conds=None):
                       [240,np.setxor1d(0,allDirs)],[270,np.setxor1d(0,allDirs)],[300,np.setxor1d(0,allDirs)],[330,np.setxor1d(0,allDirs)]]
     elif decodeFeature == "12-way":
         conds2comp = []          
-        
-        
     elif decodeFeature == "subjCat-all":
         conds2comp = []
         for iCond in range(0,len(conds)):
             for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)-1]:
                 conds2comp.append([conds[iCond], compCond])
-                
-        
     return conds2comp
-
 
 def crossEuclid(x,y,cv,iRun=None):
     """ 
