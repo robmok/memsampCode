@@ -5,14 +5,11 @@ Created on Tue Mar 12 15:38:39 2019
 
 @author: robert.mok
 """
-#dir cope 6mm, fwhm1, block
-#subjCat - svm cope/tstat, crossNobis - trials
-#subjCat - svm tstat - block
 
-#sl6_dirDecoding_svm_noNorm_blocks_fwhmNone_cope
-#sl6_subjCatDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
-#sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
-
+#subjCat crossnobis 8mm, trials/blocks
+#subjCat Svm cope 8mm, noNorm, trials/blocks
+#subjCat Svm tstat 8mm, noNorm, trials
+#12-way cope/tstat, 8mm, trials
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -23,14 +20,14 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'cope' # cope or tstat images
-slSiz=6 #searchlight size
+imDat   = 'tstat' # cope or tstat images
+slSiz=8 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
-trainSetMeth = 'blocks' # 'trials' or 'blocks' 
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+trainSetMeth = 'trials' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'ori' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = '12-way' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
@@ -57,5 +54,6 @@ for iSub in range(1,34):
     call(runCmd,shell=True) # run in cmd line via python. to check output, use subprocess.check_output: from subprocess import check_output
 
 
-runCmdMerge='fslmerge -t' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth +
-                                         '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-*mni'  '.nii.gz')
+#merge all subjects into one .nii.gz file using fslmerge
+runCmdMerge='fslmerge -t ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz') +  ' ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-*mni.nii.gz')
+call(runCmdMerge,shell=True)

@@ -8,12 +8,12 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 tThresh=2.4486 #  - DF = 33-1, one-tailed, p=0.010002
 vSmooth=5
 
-#sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope
-trainSetMeth='blocks'
-slSiz=6
+#subjCat Svm cope 8mm, noNorm, trials
+trainSetMeth='trials'
+slSiz=8
 normMeth='noNorm'
-decodeFeature='ori'
-distMeth='crossNobis'
+decodeFeature='subjCat'
+distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
 threshMeth='cMass'

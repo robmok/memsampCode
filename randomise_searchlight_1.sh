@@ -10,11 +10,16 @@ vSmooth=5
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
 
-trainSetMeth='blocks'
-slSiz=6
+#subjCat crossnobis 8mm, trials/blocks
+#subjCat Svm cope/tstat 8mm, noNorm, trials/blocks
+#12-way cope/tstat, 8mm, trials
+
+#subjCat crossnobis 8mm, trials
+trainSetMeth='trials'
+slSiz=8
 normMeth='noNorm'
-decodeFeature='dir'
-distMeth='svm'
+decodeFeature='subjCat'
+distMeth='crossNobis'
 fwhm='None'
 imDat='cope' # cope or tstat images
 threshMeth='cMass'
