@@ -6,10 +6,11 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-#subjCat crossnobis 8mm, trials/blocks
-#subjCat Svm cope 8mm, noNorm, trials/blocks
-#subjCat Svm tstat 8mm, noNorm, trials
-#12-way cope/tstat, 8mm, trials
+#sl8 12-way cope TRIALS - trans done
+#sl6 dir crossnobis BLOCKS - trans done
+ 
+# ALMOST
+#12-way sl6 niNorm svm tstat trials - at sub-27
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -21,8 +22,8 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
 imDat   = 'tstat' # cope or tstat images
-slSiz=8 #searchlight size
-normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+slSiz=6 #searchlight size
+normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing

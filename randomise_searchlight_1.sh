@@ -10,16 +10,13 @@ vSmooth=5
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
 
-#subjCat crossnobis 8mm, trials/blocks
-#subjCat Svm cope/tstat 8mm, noNorm, trials/blocks
-#12-way cope/tstat, 8mm, trials
+#sl8 12-way svm cope TRIALS
 
-#subjCat crossnobis 8mm, trials
 trainSetMeth='trials'
 slSiz=8
 normMeth='noNorm'
-decodeFeature='subjCat'
-distMeth='crossNobis'
+decodeFeature='12-way'
+distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
 threshMeth='cMass'
@@ -28,3 +25,23 @@ randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth
 threshMeth='vox' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -x
+
+
+#subjCat crossnobis 8mm, trials/blocks
+#subjCat Svm cope/tstat 8mm, noNorm, trials/blocks
+#12-way cope/tstat, 8mm, trials
+
+#subjCat crossnobis 8mm, trials
+# trainSetMeth='trials'
+# slSiz=8
+# normMeth='noNorm'
+# decodeFeature='subjCat'
+# distMeth='crossNobis'
+# fwhm='None'
+# imDat='cope' # cope or tstat images
+# threshMeth='cMass'
+# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+#  -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
+# threshMeth='vox' #vox, tfce, cSize, cMass
+# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -x

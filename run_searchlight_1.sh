@@ -35,7 +35,7 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-#sl8 svm tstat BLOCKS
+#sl8 svm tstat BLOCKS - this is a re-run -.-... should've been 12-way
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"slSiz=6":"slSiz=8":g \
     -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
@@ -66,6 +66,14 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
+
+# need to run: #sl8 svm tstat BLOCKS - above ran subjCat
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"slSiz=6":"slSiz=8":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
 

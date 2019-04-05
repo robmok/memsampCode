@@ -41,7 +41,7 @@ fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
-decodeFeature = 'ori' 
+decodeFeature = 'subjCat-all' 
 
 #%%
 # =============================================================================
@@ -64,7 +64,9 @@ rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
-
+if decodeFeature == "subjCat-all":
+    dfDecode['subjCat'] = ""
+    
 # =============================================================================
 # load in trial log and append image paths
 # =============================================================================
@@ -159,7 +161,8 @@ for iSub in range(1,nSubs+1):
         else:
             blocks = np.array((1,2,3))
         
-        cvAcc = np.zeros((blocks[-1]))
+#        cvAcc = np.zeros((blocks[-1]))
+        cvAcc = [None] * len(blocks) #list so can store more values per block for subjCat-all
         for iRun in runs:
             dfCondRuns=dfCond[dfCond['run']==iRun] #get test set
             
@@ -261,11 +264,20 @@ for iSub in range(1,nSubs+1):
                     elif distMeth in {'crossEuclid','crossNobis'}:
                         cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv,iRun-1)
                         cvAccPairTmp[iPair] = cvAccTmp #  don't need to mean this with new crosseuclid func
-                cvAcc[iRun-1] = cvAccPairTmp.mean() #mean over pairs
-
-        dfDecode[roi].iloc[iSub-1]=cvAcc.mean() #mean over blocks, store to main df
+                        
+                if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
+                    cvAcc[iRun-1] = np.mean(cvAccPairTmp) #mean over pairs
+                else:
+                    cvAcc[iRun-1] = cvAccPairTmp
+        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
+            dfDecode[roi].iloc[iSub-1]=np.mean(cvAcc) #mean over blocks, store to main df
+            print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, np.mean(cvAcc)))
+        else:
+            dfDecode[roi].iloc[iSub-1]=np.mean(cvAcc,axis=0)
         
-        print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc.mean()))    
+    if decodeFeature=="subjCat-all": #add subjCat info to df
+        dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
+        
 if distMeth == 'svm':
     chance = 1/len(np.unique(y_indexed))
 else: 

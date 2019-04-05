@@ -7,22 +7,24 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-#svm block cope
-python ${codeDir}/mvpa_memsamp_blocks.py
+# roi_subjCatDecoding_svm_noNorm_block_fwhmNone_tstat - only one noNorm missed
+sed -e s:"decodeFeature = 'subjCat-all' ":"decodeFeature = 'subjCat' ":g \
+    -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-#svm block tstat
+#subjCat-all -  #svm cope/svm tstat/crossNobis trials/blocks
+
+# #svm trials cope
+python ${codeDir}/mvpa_memsamp.py
+
+#svm trials tstat
 sed -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
-  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+  < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
 
-#crossnobis done
-
-#block - normalised
-#svm cope
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+#crossnobis block
+sed -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py

@@ -39,7 +39,7 @@ fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
-decodeFeature = 'ori' 
+decodeFeature = 'subjCat-all' 
 
 #%%
 # =============================================================================
@@ -64,7 +64,6 @@ dfDecode.rename(index={nSubs:'stats'}, inplace=True)
 if decodeFeature == "subjCat-all":
     dfDecode['subjCat'] = ""
 
-    
 # =============================================================================
 # load in trial log and append image paths
 # =============================================================================
@@ -244,13 +243,11 @@ for iSub in range(1,nSubs+1):
         
         if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
             cvAcc = cvAccTmp.mean() #mean over pairs
+            print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
+
         else:
             cvAcc = cvAccTmp #save all pairs
-        
         dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
-
-        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
-            print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
             
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]

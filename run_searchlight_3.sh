@@ -50,6 +50,17 @@ sed -e s:"#mainDir":"mainDir":g \
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 
+#above didin't actually run 1:19... - rerun!
+#12-way sl6 niNorm svm tstat blocks
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"for iSub in range(1,34)":"for iSub in range(1,19)":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+
 # if done by weekend, can run:
   # - ori sl8 svms - noNorm/niNorm, trials/blocks
   # - 12-way sl8 svms niNorm, COPE, trial/blocks (before only tstat)
