@@ -10,7 +10,7 @@ vSmooth=5
 
 #12-way sl6 niNorm svm tstat trials
 trainSetMeth='trials'
-slSiz=8
+slSiz=6
 normMeth='niNormalised'
 decodeFeature='12-way'
 distMeth='svm'

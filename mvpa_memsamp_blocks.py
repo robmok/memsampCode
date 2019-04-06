@@ -283,7 +283,7 @@ if distMeth == 'svm':
 else: 
     chance = 0 #for crossvalidated distances
 
-if not decodeFeature == "12-way-all": #stores several values in each cell, so can't do t-test here
+if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
         dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
 
