@@ -8,9 +8,7 @@ Created on Tue Mar 12 15:38:39 2019
 
 #sl8 12-way cope TRIALS - trans done
 #sl6 dir crossnobis BLOCKS - trans done
- 
-# ALMOST
-#12-way sl6 niNorm svm tstat trials - at sub-27
+ #12-way sl6 niNorm svm tstat trials 
 #%%
 import os
 import nipype.interfaces.ants as ants

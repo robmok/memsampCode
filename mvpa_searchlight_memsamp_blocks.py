@@ -273,7 +273,7 @@ for iSub in range(1,34):
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
         
-                    tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_' + decodeFeature +
+                    tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_sl' + str(slSiz) + decodeFeature +
                                 distMeth + normMeth + trainSetMeth + str(fwhm) + imDat + str(iPair) + '.nii.gz'))
                     nib.save(im, tmpPath[iPair])
                     
@@ -283,7 +283,8 @@ for iSub in range(1,34):
                 for tmpImg in tmpPath: 
                     os.remove(tmpImg) #remove temp files        
         # save block-wise image
-        tmpPathBlk.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_block_run-0' + str(iRun) + '.nii.gz'))
+        tmpPathBlk.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_sl_block_run-0' + str(iRun) + str(slSiz) + 
+                                       decodeFeature + distMeth + normMeth + trainSetMeth + str(fwhm) + imDat + str(iPair) + '.nii.gz'))
         nib.save(im, tmpPathBlk[iRun-1])
         del im
 
