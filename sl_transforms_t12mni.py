@@ -5,10 +5,13 @@ Created on Tue Mar 12 15:38:39 2019
 
 @author: robert.mok
 """
+# 8mm 12-way noNorm svm tstat BLOCKS  
+# 8mm 12-way niNorm tstat  TRIALS
+#sl6_12-wayDecoding_svm_niNormalised_blocks_fwhmNone_cope
+#sl6_12-wayDecoding_svm_niNormalised_trials_fwhmNone_cope
 
-#sl8 12-way cope TRIALS - trans done
-#sl6 dir crossnobis BLOCKS - trans done
- #12-way sl6 niNorm svm tstat trials 
+#sl6_12-wayDecoding_svm_niNormalised_blocks_fwhmNone_tstat - sub-05 to 19 don't exist yet
+
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -19,7 +22,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
