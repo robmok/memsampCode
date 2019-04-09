@@ -55,11 +55,11 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-# #ori sl8 - crossnobis - blocks - rerun
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"for iSub in range(1,34)":"for iSub in range(4,34)":g \
-    -e s:"slSiz=6":"slSiz=8":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# # #ori sl8 - crossnobis - blocks - rerun
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"for iSub in range(1,34)":"for iSub in range(4,34)":g \
+#     -e s:"slSiz=6":"slSiz=8":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
