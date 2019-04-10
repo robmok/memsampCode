@@ -39,7 +39,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 1 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
@@ -168,7 +168,7 @@ for iSub in range(1,34):
             T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
                                                   target_shape=imgs.shape[:3], interpolation='nearest')
             for iRun1 in range(0,len(runs)): #append to list, since var sometimes has more/less timepoints in each run
-                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
+                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
                 varIm    = np.append(varIm,varImTmp,axis=0)
                 varImSiz[iRun1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
        
