@@ -5,20 +5,19 @@ Created on Fri Mar 15 12:10:41 2019
 
 @author: robert.mok
 """
-roi_subjCat-allDecoding_svm_noNorm_trials_fwhmNone_cope.pkl
 #%%
 import os
 import pandas as pd
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 
 
-imDat    = 'cope' # cope or tstat images
+imDat    = 'tstat' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 
