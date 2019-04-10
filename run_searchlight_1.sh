@@ -9,8 +9,6 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # searchlight
 
-
-
 #above didin't actually run 1:19... - rerun!
 #12-way sl6 niNorm svm tstat blocks
 sed -e s:"#mainDir":"mainDir":g \
@@ -21,8 +19,7 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-
-# fwhm=1
+# fwhm=1 testing
 # subjCat svm cope trials/block, noNorm/niNorm
 # Crossnobis block
 
