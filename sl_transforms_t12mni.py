@@ -5,11 +5,7 @@ Created on Tue Mar 12 15:38:39 2019
 
 @author: robert.mok
 """
-# 8mm 12-way noNorm svm tstat BLOCKS  
-# 8mm 12-way niNorm tstat  TRIALS
-#sl6_12-wayDecoding_svm_niNormalised_blocks_fwhmNone_cope
-#sl6_12-wayDecoding_svm_niNormalised_trials_fwhmNone_cope
-
+#to do
 #sl6_12-wayDecoding_svm_niNormalised_blocks_fwhmNone_tstat - sub-05 to 19 don't exist yet
 
 #%%
@@ -27,9 +23,9 @@ slSiz=6 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
-fwhm = None # smoothing - set to None if no smoothing
+fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = '12-way' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
