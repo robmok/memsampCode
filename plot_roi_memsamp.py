@@ -35,8 +35,15 @@ df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
 
 #linestyle='None' - makes simple points at the mean
 
-
-stdAll = df.iloc[0:33,:].std()/np.sqrt(33)
+#stdAll = df.iloc[0:33,:].std()/np.sqrt(33)
+stdAll = df.iloc[0:33,:].sem()
 ax=df.iloc[0:33,:].mean().plot(figsize=(10,5),kind="bar",yerr=stdAll)
 #ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll,ylim=(.5,.537))
 #ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll,ylim=(1/12,0.09))
+
+#%% subjCat-all
+
+df['V3a_lh'].iloc[0:33].mean(axis=0)
+
+df['V3a_lh'].iloc[0:33][0].std() #need to loop over conditions??
+
