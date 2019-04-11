@@ -19,21 +19,29 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
+
+#ran this subjCat by accident - 1:19 done. do the rest?
+#12-way sl6 niNorm svm tstat blocks - ran this fwhm1
+
+
+
+
+
 # fwhm=1 testing
 # subjCat svm cope trials/block, noNorm/niNorm
 # Crossnobis block
 
-# crossNobis blocks
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-#niNorm
-#cope blocks
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# # crossNobis blocks
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"fwhm = None":"fwhm = 1":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+#
+# #niNorm
+# #cope blocks
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"fwhm = None":"fwhm = 1":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
