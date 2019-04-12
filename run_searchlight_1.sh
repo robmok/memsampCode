@@ -26,7 +26,6 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-
 #12-way sl6 svm cope blocks
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')":"(roiDir, 'sub-' + subNum + '_allROIsSL.nii.gz')":g \
@@ -43,6 +42,8 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
+
+# - next tstats, ++
 
 # -e s:"imDat   = 'cope'":"imDat   = 'tstat'":g \
 #     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
