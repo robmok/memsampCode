@@ -25,7 +25,7 @@ def getConds2comp(decodeFeature,conds=None):
     elif decodeFeature == "subjCat-all":
         conds2comp = []
         for iCond in range(0,len(conds)):
-            for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)-1]:
+            for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
                 conds2comp.append([conds[iCond], compCond])
     return conds2comp
 

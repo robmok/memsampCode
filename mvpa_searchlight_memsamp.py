@@ -124,9 +124,9 @@ for iSub in range(1,34):
             subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
 
     #start setting up brain data
-    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
-#    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz') #visRois
-    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
+    T1_mask_path = os.path.join(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')
+#    T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_visRois_lrh.nii.gz')
+#    T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz')
 
     dat = cl.fmri_data(dfCond['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1
     dat.sessions = dfCond['run'].values # info about the sessions
@@ -146,8 +146,7 @@ for iSub in range(1,34):
         T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
                                               target_shape=imgs.shape[:3], interpolation='nearest')
         for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
-            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled)
-#            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
+            varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
             varIm    = np.append(varIm,varImTmp,axis=0)
             varImSiz[iRun1-1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
 #        dat.dat = np.append(dat.dat,varIm,axis=0)
@@ -165,7 +164,6 @@ for iSub in range(1,34):
         cv  = LeaveOneGroupOut()
         cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
         clf = LinearSVC(C=.1)
-#        cv = cv.split(dat.dat,dat.y,dat.sessions)
         
         # the pipeline function - function defining the computation performed in each sphere
         # - add demean / normalize variance within sphere?
@@ -197,7 +195,6 @@ for iSub in range(1,34):
             dat.sessions = sessPerm[condInd]
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
-#            cv = cv.split(dat.dat,dat.y,dat.sessions)
             
             if distMeth == 'svm':
                 clf   = LinearSVC(C=.1)
@@ -258,7 +255,6 @@ for iSub in range(1,34):
 #                            indTrl=indTrl[0]
 #                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
 #                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
-                        
                         return crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions)).mean()                        
 
                 elif distMeth == 'crossEuclid':

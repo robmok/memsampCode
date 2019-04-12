@@ -5,6 +5,9 @@ Created on Tue Mar 12 15:38:39 2019
 
 @author: robert.mok
 """
+
+#sl6_oriDecoding_crossNobis_noNorm_blocks_fwhmNone_cope_sub-24.nii.gz                             100%  459KB  66.5MB/s   00:00    
+
 #to do
 #sl6_12-wayDecoding_svm_niNormalised_blocks_fwhmNone_tstat - sub-05 to 19 don't exist yet
 
@@ -20,12 +23,12 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
-normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
-trainSetMeth = 'trials' # 'trials' or 'blocks' 
-fwhm = 1 # smoothing - set to None if no smoothing
+normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
+trainSetMeth = 'blocks' # 'trials' or 'blocks' 
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'ori' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'

@@ -19,6 +19,7 @@ import scipy.stats as stats
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 #mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+
 sys.path.append(mainDir)
 
 featDir=os.path.join(mainDir,'memsampFeat')
@@ -39,7 +40,7 @@ fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
-decodeFeature = 'ori' 
+decodeFeature = 'subjCat-all' 
 
 #%%
 # =============================================================================

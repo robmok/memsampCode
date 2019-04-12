@@ -122,8 +122,7 @@ for iSub in range(1,34):
             subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
         
     #start setting up brain data
-    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz') #whole brain
-    #T1_mask_path = os.path.join(roiDir, 'sub-' + subNum + '_V1vd_lrh.nii.gz') 
+    T1_mask_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')
     T1_path = os.path.join(fmriprepDir, 'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-preproc_T1w.nii.gz') 
     
     #set up block-wise
