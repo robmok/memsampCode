@@ -25,3 +25,5 @@ fslmaths ${roiDir}/MDROI.nii -thr 23.9 -uthr 24 -bin ${roiDir}/MDroi_area8c_lh.n
 fslmaths ${roiDir}/MDROI.nii -thr 21.9 -uthr 22 -bin ${roiDir}/MDroi_area8c_rh.nii.gz
 fslmaths ${roiDir}/MDROI.nii -thr 23 -uthr 23.1 -bin ${roiDir}/MDroi_area9_lh.nii.gz
 fslmaths ${roiDir}/MDROI.nii -thr 20.9 -uthr 21 -bin ${roiDir}/MDroi_area9_rh.nii.gz
+
+fslmaths ${roiDir}/MDROI.nii -bin ${roiDir}/MDroi_all.nii.gz

@@ -2,36 +2,19 @@
 # Rois
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
-# mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-
-#crossnobis block
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-#crossnobis trials
-sed -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memmvpa_memsamp1samp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-#svm dm_std cope trials
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+# # 12-way svm trials cope
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-
-#svm  dm_std  tstat trials
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+#12-way svm trials tstat
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-
-#crossnobis demeaned_stdNorm blocks
-sed -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
