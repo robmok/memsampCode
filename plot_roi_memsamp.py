@@ -17,7 +17,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
 # laptop
-#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
+roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -54,7 +54,7 @@ ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
 
 roi='dlPFC_lh'
 roi='dlPFC_rh'
-#roi='V1vd_lh'
+roi='V1vd_lh'
     
 
 ylims=(.4,.6)
@@ -72,18 +72,65 @@ ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 
 
+iSub=0
+
+nA=len(df['subjCat'].iloc[iSub][0])
+nB=len(df['subjCat'].iloc[iSub][1])
+
+# distance to first stim (more similar = lower acc or shorter distance)
+#df[roi].iloc[iSub][0:nA]
+#df[roi].iloc[iSub][nA:nA+nB]
+
+
+
+
+#np.reshape? - but need to add the extra ones to all other ones (apart from first)
+#df[roi].iloc[iSub]
+
+
+
+
+
+
+
+
+
+
+#or better to make the matrix, make it symmetric then index from there..?
+
+#rdm = np.zeros((11,11))
+#iu = np.triu_indices(11,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+#rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
+#il = np.tril_indices(11,-1)  #make it a symmetric matrix
+#rdm[il] = df[roi].iloc[0:33].mean(axis=0)
+#
+#iCond=0
+#rdm[iCond,1:nA+1]
+#rdm[iCond,nA+1:nA+nB] #need +1 to get the 12th value?
+#
+##for the next cond, need to wrap araound...
+#
+#
+## - nconds in A from the diagonal, then conds in B to the end, 
+# then add the rest on the other side of the diagonal. not sure if this makes sense...
+
+
+
 #%% plot RDM
-roi='dlPFC_rh'
-roi='dlPFC_lh'
+#roi='dlPFC_rh'
+#roi='dlPFC_lh'
 roi='V1vd_lh'
 
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-rdm = np.zeros((12,12))
+rdm = np.zeros((11,11))
 
+iu = np.triu_indices(11,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
-ax = plt.figure(figsize=(25,4))
+#make it a symmetric matrix
+#il = np.tril_indices(11,-1) 
+#rdm[il] = df[roi].iloc[0:33].mean(axis=0)
 
+ax = plt.figure(figsize=(25,4))
 ax = plt.imshow(rdm,cmap='viridis')
 plt.colorbar()
 
