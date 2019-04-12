@@ -14,14 +14,14 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #subjCat sl6 svm cope blocks
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')":"(roiDir, 'sub-' + subNum + '_allROIsSL.nii.gz')":g \
-    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz')):g \
+    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz'")):g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 #subjCat sl6 crossnobis cope blocks
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')":"(roiDir, 'sub-' + subNum + '_allROIsSL.nii.gz')":g \
-    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz')):g \
+    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz'")):g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
@@ -29,7 +29,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 #12-way sl6 svm cope blocks
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')":"(roiDir, 'sub-' + subNum + '_allROIsSL.nii.gz')":g \
-    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz')):g \
+    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz'")):g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
@@ -37,7 +37,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 #ori sl6 svm cope blocks
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')":"(roiDir, 'sub-' + subNum + '_allROIsSL.nii.gz')":g \
-    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz')):g \
+    -e s:"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))":"'_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '_allROIsSL.nii.gz'")):g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
