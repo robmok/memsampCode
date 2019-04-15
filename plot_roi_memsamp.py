@@ -17,7 +17,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
 # laptop
-roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
+#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -51,9 +51,9 @@ ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
 #df1 = pd.DataFrame(columns=df.columns,index=['mean', 'sem'])
 
 #for roi in df.columns.values[0:-1]:
-
-roi='dlPFC_lh'
-roi='dlPFC_rh'
+#
+#roi='dlPFC_lh'
+#roi='dlPFC_rh'
 roi='V1vd_lh'
     
 
@@ -82,6 +82,22 @@ nB=len(df['subjCat'].iloc[iSub][1])
 #df[roi].iloc[iSub][nA:nA+nB]
 
 
+df[roi].iloc[iSub][0:nA-1] #because first one is in catA
+df[roi].iloc[iSub][nA-1:nA-1+nB]
+
+#indA=np.arange(0,nA)
+#indB=np.arange(nA,nA+nB)
+
+#
+nCond=12
+#ind1=range(0,nCond-1)
+#ind2=range(nCond,(nCond*2)-2)
+#ind3=range((nCond*2)-2)
+
+ind1=range(0,nCond-1)
+ind2=range(nCond,nCond+10)
+ind3=range(nCond+10,nCond+10+9)
+ind4=range(nCond+10+9,nCond+10+9+8)
 
 
 #np.reshape? - but need to add the extra ones to all other ones (apart from first)
@@ -121,12 +137,12 @@ nB=len(df['subjCat'].iloc[iSub][1])
 #roi='dlPFC_lh'
 roi='V1vd_lh'
 
-rdm = np.zeros((11,11))
+rdm = np.zeros((12,12))
 
-iu = np.triu_indices(11,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
-#make it a symmetric matrix
+#make it a symmetric matrix - check if this is correct (looks asymmetric...)
 #il = np.tril_indices(11,-1) 
 #rdm[il] = df[roi].iloc[0:33].mean(axis=0)
 
