@@ -52,123 +52,62 @@ ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
 
 #for roi in df.columns.values[0:-1]:
 #
-#roi='dlPFC_lh'
+roi='dlPFC_lh'
 #roi='dlPFC_rh'
-roi='V1vd_lh'
-    
-
-ylims=(.4,.6)
-ylims=(-0.04,0.04)
-#ylims=(-0.01,0.01)
-
-stdAll=np.stack(df[roi].iloc[0:33]).std(axis=0)
-
-ax = plt.figure(figsize=(15,4))
-#ax = plt.bar(range(0,55),df[roi].iloc[0:33].mean(axis=0),yerr=stdAll)
-
-ax0=plt.errorbar(range(0,55), df[roi].iloc[0:33].mean(axis=0), yerr=stdAll, fmt='-o')
-
-ylim1, ylim2 = plt.ylim()
-plt.ylim(ylims[0],ylims[1])
-
-
-iSub=0
-
-nA=len(df['subjCat'].iloc[iSub][0])
-nB=len(df['subjCat'].iloc[iSub][1])
-
-# distance to first stim (more similar = lower acc or shorter distance)
-#df[roi].iloc[iSub][0:nA]
-#df[roi].iloc[iSub][nA:nA+nB]
-
-
-df[roi].iloc[iSub][0:nA-1] #because first one is in catA
-df[roi].iloc[iSub][nA-1:nA-1+nB]
-
-#indA=np.arange(0,nA)
-#indB=np.arange(nA,nA+nB)
-
-#
-nCond=12
-#ind1=range(0,nCond-1)
-#ind2=range(nCond,(nCond*2)-2)
-#ind3=range((nCond*2)-2)
-
-ind1=range(0,nCond-1)
-ind2=range(nCond,nCond+10)
-ind3=range(nCond+10,nCond+10+9)
-ind4=range(nCond+10+9,nCond+10+9+8)
-
-
-ind1a=np.arange(0,nA-1)
-ind1b=np.arange(nA-1,nA-1+nB)
-ind2a=np.arange(nA-1+nB,nA-1+nB+nA-2)
-ind2b=np.arange(nA-1+nB+nA-2,nA-1+nB+nA-2+nB)
-
-#when at catB, 6 values for A and 5 values for B
-#... BUT won't work since if 5/7 stim in cat a then this ind1,2 thing doesnt work
-
-
-
-
-#np.reshape? - but need to add the extra ones to all other ones (apart from first)
-#df[roi].iloc[iSub]
-
-
-
-
-#or better to make the matrix, make it symmetric then index from there..?
-
-rdm = np.zeros((12,12))
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-rdm[iu] = df[roi].iloc[iSub]
-
-il = np.tril_indices(12,-1) 
-rdm[il] = rdm.T[il]
-
-rdm[1,1:-1].plot(figsize=(15,5),kind="bar")
-ax = plt.bar(range(0,10),rdm[1,1:-1])
-
+roi='MDroi_ips_lh'
+roi='MDroi_ips_rh'
+#roi='V1vd_lh'
 
 # plot mean and std across subs and plot for now (ignoring some might have diff nConds per cat)
+nCond=12
 nSubs=33
-rdmAll = np.zeros((12,12,nSubs))
-rdm = np.zeros((12,12,))
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-il = np.tril_indices(12,-1) #to make symmetric rdm
+rdmAll = np.zeros((nCond,nCond,nSubs))
+rdm = np.zeros((nCond,nCond))
+iu = np.triu_indices(nCond,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+il = np.tril_indices(nCond,-1) #to make symmetric rdm
 for iSub in range(0,nSubs):
     rdm[iu] = df[roi].iloc[iSub]
     rdm[il] = rdm.T[il]
     rdmAll[:,:,iSub] = rdm
 
+rdmMean = rdmAll.mean(axis=2)
+rdmSE  = rdmAll.std(axis=2)/np.sqrt(nSubs)
 
-rdmAll.mean(axis=2)
-rdmAll.std(axis=2)
+ax = plt.figure(figsize=(8,4))
+ctuple=np.array((0.1,0.3,0.5))
+for iCond in range(0,6):
+    ax = plt.figure(figsize=(4,3))
+    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
+    ctuple = ctuple+0.05
 
+ax = plt.figure(figsize=(8,4))
+ctuple=np.array((0.5,0.3,0.1))
+for iCond in range(6,12):
+    ax = plt.figure(figsize=(4,3))
+    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
+    ctuple = ctuple+0.05
+    
+#ax = plt.errorbar(range(0,11),rdmMean[0,1:-1], yerr=rdmSE[0,1:-1], fmt='-o')
 
-
-
+#ylim1, ylim2 = plt.ylim()
+#plt.ylim(ylims[0],ylims[1])
 
 #%% plot RDM
 #roi='dlPFC_rh'
-#roi='dlPFC_lh'
-roi='V1vd_lh'
+roi='dlPFC_lh'
+#roi='V1vd_lh'
 
 rdm = np.zeros((12,12))
 
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
-
 #make it a symmetric matrix 
-il = np.tril_indices(12,-1) 
-rdm[il] = rdm.T[il]
+#il = np.tril_indices(12,-1) 
+#rdm[il] = rdm.T[il]
+
+#tstat (double check formula)
+rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
 
 ax = plt.figure(figsize=(25,4))
 ax = plt.imshow(rdm,cmap='viridis')
 plt.colorbar()
-
-
-
-
-
-
