@@ -132,20 +132,31 @@ for iSub in range(1,34):
         blocks = np.array((1,2,3))
     
     tmpPathBlk = []
-    for iRun in runs: 
-        dfCondRuns=dfCond[dfCond['run']==iRun] #get test set
-        
-        imPath=[]
-        for iBlk in blocks[blocks!=iRun]:       
-            copeNum=1 #counter
-            for iCond in conds:
-                tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
-                dfRun = tmp.iloc[0].copy()
-                dfRun.loc['run']=iBlk
-                dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
-                dfCondRuns = dfCondRuns.append(dfRun)
-                copeNum=copeNum+1
-
+    for iRun in runs:
+        if not distMeth in {'crossEuclid','crossNobis'}:
+            dfCondRuns=dfCond[dfCond['run']==iRun] #get test set                
+            imPath=[]
+            for iBlk in blocks[blocks!=iRun]:       
+                copeNum=1 #counter
+                for iCond in conds:
+                    tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
+                    dfRun = tmp.iloc[0].copy()
+                    dfRun.loc['run']=iBlk
+                    dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
+                    dfCondRuns = dfCondRuns.append(dfRun)
+                    copeNum=copeNum+1
+        else:
+            dfCondRuns=pd.DataFrame(columns=dfCond.columns.values) #empty - just use blocks
+            imPath=[]
+            for iBlk in blocks:       
+                copeNum=1 #counter
+                for iCond in conds:
+                    tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
+                    dfRun = tmp.iloc[0].copy()
+                    dfRun.loc['run']=iBlk
+                    dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
+                    dfCondRuns = dfCondRuns.append(dfRun)
+                    copeNum=copeNum+1          
     
         dat = cl.fmri_data(dfCondRuns['imPath'].values,T1_mask_path, fwhm=fwhm)  #optional smoothing param: fwhm=1 
         dat.sessions = dfCondRuns['run'].values # info about the sessions
@@ -167,7 +178,7 @@ for iSub in range(1,34):
             T1_mask_resampled =  nli.resample_img(T1_mask_path, target_affine=imgs.affine, 
                                                   target_shape=imgs.shape[:3], interpolation='nearest')
             for iRun1 in range(0,len(runs)): #append to list, since var sometimes has more/less timepoints in each run
-                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
+                varImTmp = apply_mask(os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_block_T1_fwhm0.feat', 'stats', 'res4d.nii.gz'),T1_mask_resampled,smoothing_fwhm=fwhm)
                 varIm    = np.append(varIm,varImTmp,axis=0)
                 varImSiz[iRun1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
        

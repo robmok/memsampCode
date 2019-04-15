@@ -161,21 +161,32 @@ for iSub in range(1,nSubs+1):
         else:
             blocks = np.array((1,2,3))
         
-#        cvAcc = np.zeros((blocks[-1]))
         cvAcc = [None] * len(blocks) #list so can store more values per block for subjCat-all
         for iRun in runs:
-            dfCondRuns=dfCond[dfCond['run']==iRun] #get test set
-            
-            imPath=[]
-            for iBlk in blocks[blocks!=iRun]:       
-                copeNum=1 #counter
-                for iCond in conds:
-                    tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
-                    dfRun = tmp.iloc[0].copy()
-                    dfRun.loc['run']=iBlk
-                    dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
-                    dfCondRuns = dfCondRuns.append(dfRun)
-                    copeNum=copeNum+1
+            if not distMeth in {'crossEuclid','crossNobis'}:
+                dfCondRuns=dfCond[dfCond['run']==iRun] #get test set                
+                imPath=[]
+                for iBlk in blocks[blocks!=iRun]:       
+                    copeNum=1 #counter
+                    for iCond in conds:
+                        tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
+                        dfRun = tmp.iloc[0].copy()
+                        dfRun.loc['run']=iBlk
+                        dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
+                        dfCondRuns = dfCondRuns.append(dfRun)
+                        copeNum=copeNum+1
+            else:
+                dfCondRuns=pd.DataFrame(columns=dfCond.columns.values) #empty - just use blocks
+                imPath=[]
+                for iBlk in blocks:       
+                    copeNum=1 #counter
+                    for iCond in conds:
+                        tmp=dfCond[dfCond['direction']==iCond] #just get a random row to get the same structure - key is direction and run are right
+                        dfRun = tmp.iloc[0].copy()
+                        dfRun.loc['run']=iBlk
+                        dfRun.loc['imPath'] = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iBlk) +'_block_T1_fwhm0.feat', 'stats',imDat + (str(copeNum)) + '.nii.gz')
+                        dfCondRuns = dfCondRuns.append(dfRun)
+                        copeNum=copeNum+1                    
     
             dat = dfCondRuns['imPath'].values #img paths - keeping same variables as searchlight
             y   = dfCondRuns['direction'].values #conditions / stimulus
@@ -205,7 +216,7 @@ for iSub in range(1,nSubs+1):
                 # compute each run's covariance matrix here, then apply it to fmri_masked_cleaned, then euclid below
                 covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
                 for iRun1 in range(0,len(runs)): #append to list, since var sometimes has more/less timepoints in each run
-                    varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
+                    varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1+1) +'_block_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
                     covMat[:,:,iRun1] = compCovMat(apply_mask(varPath,maskROI,smoothing_fwhm=fwhm))
                 for iRun1 in range(0,len(runs)):
                     trlInd = np.where(groups==(iRun1+1))
