@@ -17,7 +17,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
 # laptop
-#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
+roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -100,35 +100,52 @@ ind3=range(nCond+10,nCond+10+9)
 ind4=range(nCond+10+9,nCond+10+9+8)
 
 
+ind1a=np.arange(0,nA-1)
+ind1b=np.arange(nA-1,nA-1+nB)
+ind2a=np.arange(nA-1+nB,nA-1+nB+nA-2)
+ind2b=np.arange(nA-1+nB+nA-2,nA-1+nB+nA-2+nB)
+
+#when at catB, 6 values for A and 5 values for B
+#... BUT won't work since if 5/7 stim in cat a then this ind1,2 thing doesnt work
+
+
+
+
 #np.reshape? - but need to add the extra ones to all other ones (apart from first)
 #df[roi].iloc[iSub]
 
 
 
 
-
-
-
-
-
-
 #or better to make the matrix, make it symmetric then index from there..?
 
-#rdm = np.zeros((11,11))
-#iu = np.triu_indices(11,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-#rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
-#il = np.tril_indices(11,-1)  #make it a symmetric matrix
-#rdm[il] = df[roi].iloc[0:33].mean(axis=0)
-#
-#iCond=0
-#rdm[iCond,1:nA+1]
-#rdm[iCond,nA+1:nA+nB] #need +1 to get the 12th value?
-#
-##for the next cond, need to wrap araound...
-#
-#
-## - nconds in A from the diagonal, then conds in B to the end, 
-# then add the rest on the other side of the diagonal. not sure if this makes sense...
+rdm = np.zeros((12,12))
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+rdm[iu] = df[roi].iloc[iSub]
+
+il = np.tril_indices(12,-1) 
+rdm[il] = rdm.T[il]
+
+rdm[1,1:-1].plot(figsize=(15,5),kind="bar")
+ax = plt.bar(range(0,10),rdm[1,1:-1])
+
+
+# plot mean and std across subs and plot for now (ignoring some might have diff nConds per cat)
+nSubs=33
+rdmAll = np.zeros((12,12,nSubs))
+rdm = np.zeros((12,12,))
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+il = np.tril_indices(12,-1) #to make symmetric rdm
+for iSub in range(0,nSubs):
+    rdm[iu] = df[roi].iloc[iSub]
+    rdm[il] = rdm.T[il]
+    rdmAll[:,:,iSub] = rdm
+
+
+rdmAll.mean(axis=2)
+rdmAll.std(axis=2)
+
+
 
 
 
@@ -142,9 +159,9 @@ rdm = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
-#make it a symmetric matrix - check if this is correct (looks asymmetric...)
-#il = np.tril_indices(11,-1) 
-#rdm[il] = df[roi].iloc[0:33].mean(axis=0)
+#make it a symmetric matrix 
+il = np.tril_indices(12,-1) 
+rdm[il] = rdm.T[il]
 
 ax = plt.figure(figsize=(25,4))
 ax = plt.imshow(rdm,cmap='viridis')
