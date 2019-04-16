@@ -33,7 +33,7 @@ from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
 
-imDat   = 'cope' # cope or tstat images
+imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
@@ -231,7 +231,7 @@ for iSub in range(1,nSubs+1):
             #set up the conditions you want to classify. if 12-way, no need
             if decodeFeature == "objCat":
                 conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-            elif decodeFeature == "subjCat": #subjective catgory bound based on responses
+            elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth"): #subjective catgory bound based on responses
                 conds2comp = [subjCatAconds, subjCatBconds]    
             elif decodeFeature == "subjCat-all":
                 condsTmp=list(subjCatAconds)+list(subjCatBconds)
@@ -276,6 +276,41 @@ for iSub in range(1,nSubs+1):
                         cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv,iRun-1)
                         cvAccPairTmp[iPair] = cvAccTmp #  don't need to mean this with new crosseuclid func
                         
+                #subjCat-orth - code the 90 deg pairs to do deocding over, subtract above from this, then store to df
+                if decodeFeature=="subjCat-orth":
+                    subjCatA90 = subjCatAconds+90
+                    subjCatB90 = subjCatBconds+90
+                    subjCatA90[subjCatA90>359]=subjCatA90[subjCatA90>359]-360
+                    subjCatB90[subjCatB90>359]=subjCatB90[subjCatB90>359]-360
+                    conds2comp = [subjCatA90, subjCatB90]  
+                    cvAccPairTmp90 = np.empty(len(conds2comp))
+                    for iPair in range(0,len(conds2comp)):
+                        ytmp=y.copy()
+                        if not decodeFeature == "12-way-all": 
+                            condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
+                        else:
+                            condInd=np.where(y==conds2comp[iPair][0])
+                            for iVal in conds2comp[iPair][1]:
+                                condInd=np.append(condInd, np.where(y==iVal))
+                            ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    
+                        fmri_masked_cleaned_indexed=fmri_masked_cleaned[condInd,]
+                        y_indexed = ytmp[condInd]
+                        groups_indexed = groups[condInd]
+                
+                        cv    = LeaveOneGroupOut()
+                        cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
+                        cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
+                        if distMeth == 'svm':
+                            clf   = LinearSVC(C=.1)
+                            cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
+                            cvAccPairTmp90[iPair] = cvAccTmp[iRun-1]
+        #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                        elif distMeth in {'crossEuclid','crossNobis'}:
+                            cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv,iRun-1)
+                            cvAccPairTmp90[iPair] = cvAccTmp  
+                    cvAccPairTmp = cvAccPairTmp-cvAccPairTmp90            
+                        
                 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
                     cvAcc[iRun-1] = np.mean(cvAccPairTmp) #mean over pairs
                 else:
@@ -289,7 +324,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
         
-if distMeth == 'svm':
+if (distMeth=='svm')&(decodeFeature!='subjCat-orth'):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances

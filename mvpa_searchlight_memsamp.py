@@ -196,6 +196,16 @@ for iSub in range(1,34):
             cv  = LeaveOneGroupOut()
             cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
             
+            
+            #subjCat-orth - code the 90 deg pairs to do decoding over, subtract above from this, then store to df
+            
+            #for SL - need to think about how to do TWO svms/distances and subtract. do it within the pipeline? but 
+            #need edit the input... 
+            
+#            if decodeFeature=="subjCat-orth":
+            
+            
+            
             if distMeth == 'svm':
                 clf   = LinearSVC(C=.1)
 #                cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
