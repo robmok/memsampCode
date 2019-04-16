@@ -9,28 +9,55 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #unilateral Rois
 
-#ori svm trials cope
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#subjCat-orth
+#svm cope trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-#ori svm trials tstat
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#svm tstat trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# ori crossnobis block
-sed  -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#svm cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-#ori svm block tstat
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#svm tstat trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-# ori crossnobis trials - to run? not run yet
+
+
+#below done
+
+# #ori svm trials cope
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
+#
+# #ori svm trials tstat
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
+#
+# # ori crossnobis block
+# sed  -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+#
+# #ori svm block tstat
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#     -e s:"imDat    = 'cope'":"imDat    = 'tstat'":g \
+#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+#
+# # ori crossnobis trials - to run? not run yet
