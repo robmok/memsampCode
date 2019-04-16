@@ -32,7 +32,7 @@ from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
 
-imDat    = 'cope' # cope or tstat images
+imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
