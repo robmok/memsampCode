@@ -39,9 +39,9 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 24 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 
 
@@ -88,7 +88,7 @@ for iSub in range(1,34):
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
     #get subjective category based on responses
-    if decodeFeature == 'subjCat':
+    if decodeFeature[0:7] == 'subjCat':
         #flip responses for runs - need double check if keymap is what i think it is. looks ok
         ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
         ind2=dfCond['key']==6
@@ -187,6 +187,12 @@ for iSub in range(1,34):
             conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
         elif decodeFeature == "subjCat": #subjective catgory bound based on responses
             conds2comp = [subjCatAconds, subjCatBconds]    
+        elif decodeFeature == "subjCat-orth":
+            subjCatA90 = subjCatAconds+90
+            subjCatB90 = subjCatBconds+90
+            subjCatA90[subjCatA90>359]=subjCatA90[subjCatA90>359]-360
+            subjCatB90[subjCatB90>359]=subjCatB90[subjCatB90>359]-360
+            conds2comp = [subjCatA90, subjCatB90]  
         else: #stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         
