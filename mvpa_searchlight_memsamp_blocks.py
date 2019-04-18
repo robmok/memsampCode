@@ -33,15 +33,15 @@ os.chdir(codeDir)
 
 from memsamp_RM import crossEuclid, getConds2comp, compCovMat
 
-imDat   = 'cope' # cope or tstat images
-slSiz=6  #searchlight size
+imDat = 'cope' # cope or tstat images
+slSiz = 6  #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
 nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 
 
@@ -183,18 +183,19 @@ for iSub in range(1,34):
                 varImSiz[iRun1] = len(varImTmp) #to index which volumes to compute matrix in crossnobis function
        
         #set up the conditions you want to classify. if 12-way, no need
-        if decodeFeature == "objCat":
+        if decodeFeature[0:6] == "objCat":
             conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-        elif decodeFeature == "subjCat": #subjective catgory bound based on responses
+        elif decodeFeature[0:7] == "subjCat": #subjective catgory bound based on responses
             conds2comp = [subjCatAconds, subjCatBconds]    
-        elif decodeFeature == "subjCat-orth":
-            subjCatA90 = subjCatAconds+90
-            subjCatB90 = subjCatBconds+90
-            subjCatA90[subjCatA90>359]=subjCatA90[subjCatA90>359]-360
-            subjCatB90[subjCatB90>359]=subjCatB90[subjCatB90>359]-360
-            conds2comp = [subjCatA90, subjCatB90]  
         else: #stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
+        
+        if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):
+            catA90 = conds2comp[0]+90
+            catB90 = conds2comp[1]+90
+            catA90[catA90>359]=catA90[catA90>359]-360
+            catB90[catB90>359]=catB90[catB90>359]-360
+            conds2comp = [catA90, catB90] 
         
         #run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all

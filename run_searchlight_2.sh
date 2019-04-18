@@ -38,17 +38,47 @@ sed -e s:"#mainDir":"mainDir":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-#niNorm fwhmNone
+# #niNorm fwhmNone - done - on love06
+# sed -e s:"#mainDir":"mainDir":g \
+# -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+#
+# #niNorm fwhm1 - done - on love06
+# sed -e s:"#mainDir":"mainDir":g \
+# -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+#     -e s:"fwhm = None":"fwhm = 1":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+
+#objCat / orth
+
+#svm
+#noNorm fwhm0
 sed -e s:"#mainDir":"mainDir":g \
--e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-#niNorm fwhm1
+#noNorm fwhm1
 sed -e s:"#mainDir":"mainDir":g \
--e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#noNorm fwhm1
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
     -e s:"fwhm = None":"fwhm = 1":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py

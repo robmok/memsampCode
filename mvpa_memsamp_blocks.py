@@ -229,7 +229,7 @@ for iSub in range(1,nSubs+1):
             # ====================================================================
             
             #set up the conditions you want to classify. if 12-way, no need
-            if decodeFeature == "objCat":
+            if (decodeFeature=="objCat")|(decodeFeature=="objCat-orth"):
                 conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
             elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth"): #subjective catgory bound based on responses
                 conds2comp = [subjCatAconds, subjCatBconds]    
@@ -277,12 +277,12 @@ for iSub in range(1,nSubs+1):
                         cvAccPairTmp[iPair] = cvAccTmp #  don't need to mean this with new crosseuclid func
                         
                 #subjCat-orth - code the 90 deg pairs to do deocding over, subtract above from this, then store to df
-                if decodeFeature=="subjCat-orth":
-                    subjCatA90 = subjCatAconds+90
-                    subjCatB90 = subjCatBconds+90
-                    subjCatA90[subjCatA90>359]=subjCatA90[subjCatA90>359]-360
-                    subjCatB90[subjCatB90>359]=subjCatB90[subjCatB90>359]-360
-                    conds2comp = [subjCatA90, subjCatB90]  
+                if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):                
+                    catA90 = conds2comp[0]+90
+                    catB90 = conds2comp[1]+90
+                    catA90[catA90>359]=catA90[catA90>359]-360
+                    catB90[catB90>359]=catB90[catB90>359]-360
+                    conds2comp = [catA90, catB90]  
                     cvAccPairTmp90 = np.empty(len(conds2comp))
                     for iPair in range(0,len(conds2comp)):
                         ytmp=y.copy()
@@ -324,7 +324,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
         
-if (distMeth=='svm')&(decodeFeature!='subjCat-orth'):
+if (distMeth=='svm')&((decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances

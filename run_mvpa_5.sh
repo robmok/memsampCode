@@ -31,6 +31,7 @@ sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
 python ${tmpScrDir}/mvpa_memsamp1.py
 
 
+
 #tstats - extras
 #svm
 sed -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
