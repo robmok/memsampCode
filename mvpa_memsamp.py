@@ -241,14 +241,6 @@ for iSub in range(1,nSubs+1):
 #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
                 elif distMeth in {'crossEuclid','crossNobis'}:
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
-        
-            #subjCat-orth - code the 90 deg pairs to do deocding over, subtract above from this, then store to df
-#            if decodeFeature=="subjCat-orth":
-#                subjCatA90 = subjCatAconds+90
-#                subjCatB90 = subjCatBconds+90
-#                subjCatA90[subjCatA90>359]=subjCatA90[subjCatA90>359]-360
-#                subjCatB90[subjCatB90>359]=subjCatB90[subjCatB90>359]-360
-#                conds2comp = [subjCatA90, subjCatB90]  
 
             if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):                
                 catA90 = conds2comp[0]+90
@@ -256,7 +248,6 @@ for iSub in range(1,nSubs+1):
                 catA90[catA90>359]=catA90[catA90>359]-360
                 catB90[catB90>359]=catB90[catB90>359]-360
                 conds2comp = [catA90, catB90]  
-                                
                 cvAccTmp90 = np.empty(len(conds2comp))
                 for iPair in range(0,len(conds2comp)):
                     ytmp=y.copy()
