@@ -21,7 +21,7 @@ roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/'
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'block' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -46,7 +46,7 @@ ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
 #ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll,ylim=(.5,.537))
 #ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
 
-#%% subjCat-all
+#%% subjCat-all - organise
 
 #df1 = pd.DataFrame(columns=df.columns,index=['mean', 'sem'])
 
@@ -57,6 +57,8 @@ roi='dlPFC_lh'
 roi='MDroi_ips_lh'
 roi='MDroi_ips_rh'
 #roi='V1vd_lh'
+
+ylims = [0.45, 0.55]
 
 # plot mean and std across subs and plot for now (ignoring some might have diff nConds per cat)
 nCond=12
@@ -73,12 +75,16 @@ for iSub in range(0,nSubs):
 rdmMean = rdmAll.mean(axis=2)
 rdmSE  = rdmAll.std(axis=2)/np.sqrt(nSubs)
 
+#%% subjCat-all - plot 1
+
 ax = plt.figure(figsize=(8,4))
 ctuple=np.array((0.1,0.3,0.5))
 for iCond in range(0,6):
     ax = plt.figure(figsize=(4,3))
     ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
     ctuple = ctuple+0.05
+    ylim1, ylim2 = plt.ylim()
+    plt.ylim(ylims[0],ylims[1])
 
 ax = plt.figure(figsize=(8,4))
 ctuple=np.array((0.5,0.3,0.1))
@@ -86,16 +92,62 @@ for iCond in range(6,12):
     ax = plt.figure(figsize=(4,3))
     ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
     ctuple = ctuple+0.05
+    ylim1, ylim2 = plt.ylim()
+    plt.ylim(ylims[0],ylims[1])
+
     
 #ax = plt.errorbar(range(0,11),rdmMean[0,1:-1], yerr=rdmSE[0,1:-1], fmt='-o')
 
-#ylim1, ylim2 = plt.ylim()
-#plt.ylim(ylims[0],ylims[1])
+#%% subjCat-all - plot 2
+
+#prototype - 6 conds each, for prototype is middle of conds 3&4
+
+#catA
+    
+#separately
+#rdmMean[[3+1,3-1],3] #for row (condition) 3, these are adjacent directions (1 away)
+#rdmMean[[3+2,3-2],3] #for row 3, these are 2 away
+#
+#rdmMean[[4+1,4-1],4] 
+#rdmMean[[4+2,4-2],4] 
+
+#for each one - check if coding is right
+avDist = np.empty((12,5))
+for iDist in range(0,5):
+    for iC in range(0,12):
+        ind=np.array((iC+iDist+1,iC-(iDist+1)))
+#        if np.any(ind>=12):
+#            ind[ind>=12] = ind[ind>=12]-12
+#        avDist[iC,iDist]=rdmMean[[ind[0],ind[1]],iC].mean()
+        avDist[iC,iDist]=rdmMean[[np.mod(iC+iDist+1,12),np.mod(iC-(iDist+1),12)],iC].mean()
+        
+#plt.imshow(avDist,cmap='viridis')
+
+#maybe only the 'middle' prototype conditions make sense (for conds 0:11, conds 2,3,8,9)
+ax = plt.figure(figsize=(8,4))
+ctuple=np.array((0.5,0.3,0.1))
+for iCond in 2,3,8,9: #range(0,11):
+    ax = plt.figure(figsize=(4,3))
+    ax = plt.errorbar(range(0,5),avDist[iCond,:], fmt='-o', color=ctuple)
+    ctuple = ctuple+0.025
+    ylim1, ylim2 = plt.ylim()
+    plt.ylim(ylims[0],ylims[1])
+
+
+#OR, plot similar to these two, averaged (without checking similarity to each other)
+#rdmMean[[3+2,3-1],3]  #3+2=5, 3-1=2
+#rdmMean[[4+1,4-2],4] #4+1=5, 4-2=2
+#++
+
 
 #%% plot RDM
 #roi='dlPFC_rh'
 roi='dlPFC_lh'
+roi='MDroi_ips_lh'
+#roi='MDroi_ips_rh'
 #roi='V1vd_lh'
+#roi='V3a_rh'
+#roi='V3a_lh'
 
 rdm = np.zeros((12,12))
 
