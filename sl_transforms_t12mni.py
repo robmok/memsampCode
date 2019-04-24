@@ -7,7 +7,27 @@ Created on Tue Mar 12 15:38:39 2019
 """
 
 #to do
-#sl6_12-wayDecoding_svm_niNormalised_blocks_fwhmNone_tstat - sub-05 to 19 don't exist yet
+
+#	• #subjCat crossnobis niNorm fwhmNone
+#	• #subjCat crossnobis niNorm fwhm1
+
+#	• #objCat crossNobis noNorm fwhm0
+#	• #objCat crossNobis noNorm fwhm1
+#
+#
+#	• #objCat svm noNorm fwhm0
+#	• #objCat svm noNorm fwhm1
+#
+#	• #ori, crossnobis, niNorm, fwhmNone
+#	• #ori, crossnobis, niNorm, fwhm1
+#	
+#	• #12-way niNorm tstat, fwhm1
+#	• #12-way niNorm cope, fwhm1
+
+#	• # svm ori niNorm fwhmNone, cope
+##      svm ori niNorm fwhm1, cope
+
+
 
 #%%
 import os
@@ -22,11 +42,11 @@ at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
-fwhm = None # smoothing - set to None if no smoothing
+fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = 'ori' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'objCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
