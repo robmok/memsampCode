@@ -10,14 +10,15 @@ vSmooth=5
 
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
-#	• #12-way niNorm tstat, fwhm1
+
+#	• #objCat svm noNorm fwhm1
 trainSetMeth='blocks'
 slSiz=6
-normMeth='niNormalised'
-decodeFeature='12-way'
+normMeth='noNorm'
+decodeFeature='objCat'
 distMeth='svm'
 fwhm=1
-imDat='tstat' # cope or tstat images
+imDat='cope' # cope or tstat images
 threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
