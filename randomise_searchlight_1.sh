@@ -40,7 +40,6 @@ vSmooth=5
 #	• #ori, crossnobis, niNorm, fwhmNone
 #	• #ori, crossnobis, niNorm, fwhm1
 #
-#	• #12-way niNorm tstat, fwhm1
 #	• #12-way niNorm cope, fwhm1
 
 #	• # svm ori niNorm fwhmNone, cope

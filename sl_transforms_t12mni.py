@@ -8,24 +8,8 @@ Created on Tue Mar 12 15:38:39 2019
 
 #to do
 
-#	• #subjCat crossnobis niNorm fwhmNone
-#	• #subjCat crossnobis niNorm fwhm1
-
-#	• #objCat crossNobis noNorm fwhm0
-#	• #objCat crossNobis noNorm fwhm1
-#
-#
-#	• #objCat svm noNorm fwhm0
-#	• #objCat svm noNorm fwhm1
-#
-#	• #ori, crossnobis, niNorm, fwhmNone
-#	• #ori, crossnobis, niNorm, fwhm1
-#	
+#only subject 19 left!
 #	• #12-way niNorm tstat, fwhm1
-#	• #12-way niNorm cope, fwhm1
-
-#	• # svm ori niNorm fwhmNone, cope
-##      svm ori niNorm fwhm1, cope
 
 
 
@@ -39,14 +23,14 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'cope' # cope or tstat images
+imDat   = 'tstat' # cope or tstat images
 slSiz=6 #searchlight size
-normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
+normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
-fwhm = 1 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'objCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = '12-way' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
