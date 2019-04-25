@@ -9,28 +9,9 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # searchlight
 
-#subjCat-orth svm cope, noNorm, fwhmNone
-#subjCat-orth svm cope, noNorm, fwhm1
 
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-#     -e s:"for iSub in range(1,34)":"for iSub in range(12,34)":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-#
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-#     -e s:"fwhm = None":"fwhm = 1":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-#	• #12-way niNorm tstat, fwhm1 - missed sub 19!
-#niNorm fwhm1
+#sl6_subjCatDecoding_svm_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz - fwhmNone missed
 sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-    -e s:"for iSub in range(1,34)":"for iSub in range(19,20)":g \
-      < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py

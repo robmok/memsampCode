@@ -13,8 +13,8 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 # laptop
 #mainDir='/Users/robertmok/Documents/Postdoc_ucl/' 
 
-imDat    = 'cope' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+imDat    = 'tstat' # cope or tstat images
+normMeth = 'niNormalised' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None

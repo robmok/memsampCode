@@ -8,8 +8,7 @@ Created on Tue Mar 12 15:38:39 2019
 
 #to do
 
-#only subject 19 left!
-#	• #12-way niNorm tstat, fwhm1
+#	• #12-way niNorm tstat, fwhm1 - missed sub 19!
 
 
 
@@ -28,7 +27,7 @@ slSiz=6 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
-fwhm = None # smoothing - set to None if no smoothing
+fwhm = 1 # smoothing - set to None if no smoothing
 
 decodeFeature = '12-way' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
