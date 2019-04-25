@@ -27,14 +27,19 @@ distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks'
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
+decodeFeature = 'objCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 
 #sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 #sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+
+
+
+#not run subjCatDecoding - running now; do this next:
+#sl6_subjCatDecoding_svm_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz - fwhmNone
+
 
 #later
 #sl6_objCat-orthDecoding_crossNobis_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
@@ -43,12 +48,10 @@ decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat'
 #sl6_subjCat-orthDecoding_crossNobis_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_crossNobis_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 
-#%%
-
 nSubs=33
 for iSub in range(1,nSubs+1):
     subNum=f'{iSub:02d}'
-    print('Subtracting %s searchlight imgs from "orth" images: sub-%s, %s, %s, %s, %s' % (decodeFeature, subNum,  imDat, distMeth, normMeth, trainSetMeth))
+    print('Subtracting %s searchlight imgs from "orth" images: sub-%s, %s, %s, %s, %s, fwhm=%s' % (decodeFeature, subNum,  imDat, distMeth, normMeth, trainSetMeth, str(fwhm)))
 
     im1 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
                   'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 

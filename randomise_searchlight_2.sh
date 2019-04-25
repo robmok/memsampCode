@@ -10,23 +10,32 @@ vSmooth=5
 
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
-#	• #objCat crossNobis noNorm fwhm1
+#sl6_objCat-orth_subtractedDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+
+
+
+#sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhm1_cope_sub-01.nii.g
+
 trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
-decodeFeature='objCat'
-distMeth='crossNobis'
+decodeFeature='subjCat-orth_subtracted'
+distMeth='svm'
 fwhm=1
 imDat='cope' # cope or tstat images
 threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
 
-#	• #objCat svm noNorm fwhm0
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
-decodeFeature='objCat'
+decodeFeature='subjCat-orth_subtracted'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images

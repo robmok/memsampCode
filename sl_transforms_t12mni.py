@@ -6,11 +6,11 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-#to do
-
-#	• #12-way niNorm tstat, fwhm1 - missed sub 19!
-
-
+#sl6_objCat-orth_subtractedDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
 
 #%%
 import os
@@ -22,14 +22,14 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
 fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = '12-way' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'subjCat-orth_subtracted' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
