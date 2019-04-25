@@ -9,60 +9,89 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #unilateral Rois
 
-# Svm cope dm_std blocks
-# Svm tstat dm_std blocks
-# Crossnobis dm_std trials
+# 12-way cope trials
+# 12-way tstat trials
+# 12-way cope block
+# 12-way tstat block
+# Ori Svm tstat trials
+# Ori Svm tstat block
+# Ori - crossnobis trials
+# dir - svm trials cope
+# dir - svm trials tstat
 
-#subjCat-orth
-#svm cope trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-  python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# maybe next: dir - svm cope/tstat block and crossnobis trials
 
-#svm tstat trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"imDat = 'cope'":"imDat    = 'tstat'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-  python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-# Crossnobis dm_std trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-  < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# 12-way cope trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
+# 12-way tstat trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+# 12-way cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
 
 
 
 
-#below done
-
-# #ori svm trials cope
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
+#just run:
+# #subjCat-orth
+# #svm cope trials
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+#     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+#   python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 #
-# #ori svm trials tstat
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# #svm tstat trials
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
 #     -e s:"imDat = 'cope'":"imDat    = 'tstat'":g \
-#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+#     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+#   python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 #
-# # ori crossnobis block
-# sed  -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# # Crossnobis dm_std trials
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+#     -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
 #     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+#   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
 #
-# #ori svm block tstat
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-#     -e s:"imDat = 'cope'":"imDat    = 'tstat'":g \
-#   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 #
-# # ori crossnobis trials - to run? not run yet
+#
+#
+#
+#
+# #below done
+#
+# # #ori svm trials cope
+# # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# #   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# # python ${tmpScrDir}/mvpa_memsamp1.py
+# #
+# # #ori svm trials tstat
+# # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# #     -e s:"imDat = 'cope'":"imDat    = 'tstat'":g \
+# #     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# #   < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# # python ${tmpScrDir}/mvpa_memsamp1.py
+# #
+# # # ori crossnobis block
+# # sed  -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# #     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+# #   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# # python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# #
+# # #ori svm block tstat
+# # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# #     -e s:"imDat = 'cope'":"imDat    = 'tstat'":g \
+# #   < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# # python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# #
+# # # ori crossnobis trials - to run? not run yet
