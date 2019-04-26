@@ -54,15 +54,15 @@ for iSub in range(1,nSubs+1):
     print('Subtracting %s searchlight imgs from "orth" images: sub-%s, %s, %s, %s, %s, fwhm=%s' % (decodeFeature, subNum,  imDat, distMeth, normMeth, trainSetMeth, str(fwhm)))
 
     im1 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
-                  'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 
+                  'Raw' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 
                   '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     im2 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
-                  '-orth' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
+                  'Raw-orth' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
                   str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
         
     im = math_img("im1 - im2", im1=im1, im2=im2)
     
     nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
-                              '-orth_subtracted' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + 
+                              '-orth' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + 
                               trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     del im
