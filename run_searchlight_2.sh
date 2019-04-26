@@ -9,7 +9,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
 ##subjCatRaw, noNorm fwhm1
-sed -e s:"#mainDir":"mainDir":g
+sed -e s:"#mainDir":"mainDir":g  \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
     -e s:"fwhm = None":"fwhm = 1":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
