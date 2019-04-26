@@ -315,7 +315,7 @@ for iSub in range(1,nSubs+1):
                     cvAcc[iRun-1] = np.mean(cvAccPairTmp) #mean over pairs
                 else:
                     cvAcc[iRun-1] = cvAccPairTmp
-        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
+        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): 
             dfDecode[roi].iloc[iSub-1]=np.mean(cvAcc) #mean over blocks, store to main df
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, np.mean(cvAcc)))
         else:
@@ -324,12 +324,12 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
         
-if (distMeth=='svm')&((decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")):
+if (distMeth=='svm') &((decodeFeature!="subjCat-orth")|(decodeFeature!="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances
 
-if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): #stores several values in each cell, so can't do t-test here
+if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
         dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
 

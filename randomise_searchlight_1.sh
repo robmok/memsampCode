@@ -83,13 +83,25 @@ vSmooth=5
 
 
 #	• #12-way niNorm tstat, fwhm1
+# trainSetMeth='blocks'
+# slSiz=6
+# normMeth='niNormalised'
+# decodeFeature='12-way'
+# distMeth='svm'
+# fwhm=1
+# imDat='tstat' # cope or tstat images
+# threshMeth='cMass' #vox, tfce, cSize, cMass
+# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
+
+#sl6_subjCatDecoding_svm_niNormalised_blocks_fwhmNone_cope
 trainSetMeth='blocks'
 slSiz=6
 normMeth='niNormalised'
-decodeFeature='12-way'
+decodeFeature='subjCat'
 distMeth='svm'
-fwhm=1
-imDat='tstat' # cope or tstat images
+fwhm='None'
+imDat='cope' # cope or tstat images
 threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}

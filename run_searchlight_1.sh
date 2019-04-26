@@ -9,9 +9,49 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # searchlight
 
+#subjCatRaw, subjCat-orth, trials/blocks, fwhm0/1, cope/tstat
 
-#sl6_subjCatDecoding_svm_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz - fwhmNone missed
+#next: #objCatRaw, objCat-orth, blocks/trials, fwhm0/1
+
+
+#subjCatRaw, subjCatRaw-orth: blocks svm
+
+##subjCatRaw, noNorm fwhm0
 sed -e s:"#mainDir":"mainDir":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#subjCatRaw-orth, noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#trials svm
+##subjCatRaw, noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+#subjCatRaw-orth, noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+
+##subjCatRaw tstat, noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#subjCatRaw-orth, tstat, noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py

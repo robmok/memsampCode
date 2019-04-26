@@ -39,7 +39,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 24 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
@@ -190,7 +190,7 @@ for iSub in range(1,34):
         else: #stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         
-        if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):
+        if (decodeFeature=="subjCatRaw-orth")|(decodeFeature=="objCatRaw-orth"):
             catA90 = conds2comp[0]+90
             catB90 = conds2comp[1]+90
             catA90[catA90>359]=catA90[catA90>359]-360
@@ -241,10 +241,11 @@ for iSub in range(1,34):
                         return cvBlock[iRun-1] #get relevant cvAcc measure (test set)
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
-                    chance   = 1/len(np.unique(dat.y))
-                    imVec    = dat.masker(im)
-                    imVec    = imVec - chance
-                    im       = dat.unmasker(imVec)
+                    if not ((decodeFeature=='subjCatRaw')|(decodeFeature=='subjCatRaw-orth')|(decodeFeature=='objCatRaw')|(decodeFeature=='objCatRaw-orth')): #if these, no need norm since need subtract from each other later
+                        chance   = 1/len(np.unique(dat.y))
+                        imVec    = dat.masker(im)
+                        imVec    = imVec - chance
+                        im       = dat.unmasker(imVec)
                     #save image with 'iPair' appended to it; join it below
                     if not decodeFeature == "12-way-all": 
                         tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_' + decodeFeature +

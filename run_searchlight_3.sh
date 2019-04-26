@@ -9,42 +9,45 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #love06
 
-# - 12-way niNorm tstat, fwhm1
+#trials
+#svm
+#subjCatRaw, noNorm fwhm1
 sed -e s:"nCores = 12":"nCores = 6":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+#subjCatRaw-orth, noNorm fwhm1
+sed -e s:"nCores = 12":"nCores = 6":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+#trials svm
+##subjCatRaw tstat, , noNorm fwhm0
+sed -e s:"nCores = 12":"nCores = 6":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCatRaw'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-# 12-way niNorm  cope, fwhm1
+#subjCatRaw-orth tstat, noNorm fwhm0
 sed -e s:"nCores = 12":"nCores = 6":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-# - svm ori niNorm fwhmNone/fwhm1, cope - MAYBE TSTAT LATER
-#niNorm fwhm0
-sed -e s:"nCores = 12":"nCores = 6":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-#niNorm fwhm1
-sed -e s:"nCores = 12":"nCores = 6":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCatRaw-orth'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 
 
-#
+
+
+
+
+
+
 # #12-way sl6 niNorm svm cope/tstat trials/blocks - x4
 # #12-way sl6 niNorm svm tstat blocks
 # sed -e s:"#mainDir":"mainDir":g \

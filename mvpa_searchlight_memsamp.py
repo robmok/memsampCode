@@ -46,6 +46,7 @@ nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
+# subjCatRaw, subjCatRaw-orth, objCatRaw, objCatRaw-orth #no chance normalisation since need to subtract these SL images from one another later
 
 #%% load in trial log and append image paths
 
@@ -159,7 +160,7 @@ for iSub in range(1,34):
     else: #stimulus decoding
         conds2comp = getConds2comp(decodeFeature)
 
-    if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):
+    if (decodeFeature=="subjCatRaw-orth")|(decodeFeature=="objCatRaw-orth"):
         catA90 = conds2comp[0]+90
         catB90 = conds2comp[1]+90
         catA90[catA90>359]=catA90[catA90>359]-360
@@ -211,10 +212,11 @@ for iSub in range(1,34):
                     return cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions)).mean()
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
-                chance   = 1/len(np.unique(dat.y))
-                imVec    = dat.masker(im)
-                imVec    = imVec - chance
-                im       = dat.unmasker(imVec)
+                if not ((decodeFeature=='subjCatRaw')|(decodeFeature=='subjCatRaw-orth')|(decodeFeature=='objCatRaw')|(decodeFeature=='objCatRaw-orth')): #if these, no need norm since need subtract from each other later
+                    chance   = 1/len(np.unique(dat.y))
+                    imVec    = dat.masker(im)
+                    imVec    = imVec - chance
+                    im       = dat.unmasker(imVec)
                 
                 #save image with 'iPair' appended to it; join it below
                 if not decodeFeature == "12-way-all": 

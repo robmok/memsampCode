@@ -274,7 +274,7 @@ for iSub in range(1,nSubs+1):
                         cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
                 cvAccTmp = cvAccTmp-cvAccTmp90
         
-        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): 
+        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): 
             cvAcc = cvAccTmp.mean() #mean over pairs
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
         else:
@@ -284,12 +284,12 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
-if (distMeth=='svm')&((decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")):
+if (distMeth=='svm')&((decodeFeature!="subjCat-orth")|(decodeFeature!="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances
 
-if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all"): #stores several values in each cell, so can't do t-test here
+if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
         dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
 
