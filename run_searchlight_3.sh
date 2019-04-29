@@ -25,20 +25,20 @@ sed -e s:"nCores = 12":"nCores = 4":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-#trials svm
-##subjCatRaw tstat, , noNorm fwhm0
-sed -e s:"nCores = 12":"nCores = 4":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCatRaw'":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-#subjCatRaw-orth tstat, noNorm fwhm0
-sed -e s:"nCores = 12":"nCores = 4":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCatRaw-orth'":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# #trials svm
+# ##subjCatRaw tstat, , noNorm fwhm0
+# sed -e s:"nCores = 12":"nCores = 4":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
+#     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+#
+# #subjCatRaw-orth tstat, noNorm fwhm0
+# sed -e s:"nCores = 12":"nCores = 4":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+#     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 
 

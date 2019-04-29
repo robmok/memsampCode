@@ -5,7 +5,7 @@ Created on Thu Apr 25 16:38:28 2019
 
 @author: robert.mok
 """
-
+#%%
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
 import os
@@ -24,29 +24,24 @@ imDat = 'cope' # cope or tstat images
 slSiz = 6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
-trainSetMeth = 'blocks' # 'trials' or 'blocks'
-fwhm = None # smoothing - set to None if no smoothing
+trainSetMeth = 'trials' # 'trials' or 'blocks'
+fwhm = 1 # smoothing - set to None if no smoothing
 
-decodeFeature = 'objCat' # category: 'objCat' (objective catgeory), 'subjCat' 
+decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 
-#sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+#subjCatRaw&subjCatRaw-orth, noNorm fwhm0, cope/tstat, blocks
+#subjCatRaw&subjCatRaw-orth, noNorm fwhm0/1, cope, trials
 
+#done:
+#sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
+#sl6_subjCatRaw-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCatRaw-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
 
+#so above missing...
+# tstat, block/trial, fwhm1; subjCatRaw/subjCatRaw-orth tstat, noNorm fwhm0trials
 
-#not run subjCatDecoding - running now; do this next:
-#sl6_subjCatDecoding_svm_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz - fwhmNone
-
-
-#later
-#sl6_objCat-orthDecoding_crossNobis_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_objCat-orthDecoding_crossNobis_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_crossNobis_niNormalised_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_crossNobis_niNormalised_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_crossNobis_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 
 nSubs=33
 for iSub in range(1,nSubs+1):
