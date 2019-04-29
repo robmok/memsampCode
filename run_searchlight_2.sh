@@ -7,7 +7,6 @@ mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-
 # ##subjCatRaw, noNorm fwhm1
 # sed -e s:"#mainDir":"mainDir":g  \
 #     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \

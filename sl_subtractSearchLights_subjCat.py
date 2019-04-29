@@ -20,12 +20,12 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-imDat = 'cope' # cope or tstat images
+imDat = 'tstat' # cope or tstat images
 slSiz = 6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks'
-fwhm = 1 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 
@@ -39,9 +39,10 @@ decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat'
 #sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 #sl6_subjCatRaw-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
 
-#so above missing...
-# tstat, block/trial, fwhm1; subjCatRaw/subjCatRaw-orth tstat, noNorm fwhm0trials
-
+##subjCatRaw tstat, fwhm1, blocks
+##subjCatRaw tstat fwhm1 trials
+# ##subjCatRaw, cope fwhm0, trials
+# ##subjCatRaw, tstat fwhm0, trials
 
 nSubs=33
 for iSub in range(1,nSubs+1):
