@@ -236,6 +236,8 @@ for iSub in range(1,nSubs+1):
             elif decodeFeature == "subjCat-all":
                 condsTmp=list(subjCatAconds)+list(subjCatBconds)
                 conds2comp = getConds2comp(decodeFeature,condsTmp)
+            elif decodeFeature == "subjCat-resp":
+                conds2comp = np.empty((1)) #len of 1 placeholder
             else: #stimulus decoding
                 conds2comp = getConds2comp(decodeFeature)       
                 
@@ -253,13 +255,17 @@ for iSub in range(1,nSubs+1):
                 cvAccPairTmp = np.empty(len(conds2comp))
                 for iPair in range(0,len(conds2comp)):
                     ytmp=y.copy()
-                    if not decodeFeature == "12-way-all": 
-                        condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
-                    else:
+                    if decodeFeature == "12-way-all": 
                         condInd=np.where(y==conds2comp[iPair][0])
                         for iVal in conds2comp[iPair][1]:
                             condInd=np.append(condInd, np.where(y==iVal))
                         ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    elif decodeFeature == "subjCat-resp":
+                        condInd = np.append(np.where(dfCondRuns['key']==1),np.where(dfCondRuns['key']==6))
+                        ytmp[np.where(dfCondRuns['key']==1)]=0 #change stim directions to category responses (changed to cat resp from above if decodeFeature[0:7]=="subjCat")
+                        ytmp[np.where(dfCondRuns['key']==6)]=1  
+                    else:
+                        condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
                 
                     fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
                     y_indexed = ytmp[condInd]

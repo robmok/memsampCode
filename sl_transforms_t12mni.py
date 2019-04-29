@@ -6,12 +6,11 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-#sl6_objCat-orth_subtractedDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_objCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_niNormalised_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -27,9 +26,9 @@ slSiz=6 #searchlight size
 normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'blocks' # 'trials' or 'blocks' 
-fwhm = 1 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat-orth_subtracted' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'

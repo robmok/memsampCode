@@ -28,80 +28,33 @@ vSmooth=5
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
 
-#	• #subjCat crossnobis niNorm fwhmNone
-#	• #subjCat crossnobis niNorm fwhm1
 
-#	• #objCat crossNobis noNorm fwhm0
-#	• #objCat crossNobis noNorm fwhm1
-#
-#	• #objCat svm noNorm fwhm0
-#	• #objCat svm noNorm fwhm1
-#
-#	• #ori, crossnobis, niNorm, fwhmNone
-#	• #ori, crossnobis, niNorm, fwhm1
-#
-#	• #12-way niNorm cope, fwhm1
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
+#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
 
-#	• # svm ori niNorm fwhmNone, cope
-##    svm ori niNorm fwhm1, cope
-
-# #subjCat crossnobis niNorm fwhmNone
-# trainSetMeth='blocks'
-# slSiz=6
-# normMeth='niNormalised'
-# decodeFeature='subjCat'
-# distMeth='crossNobis'
-# fwhm='None'
-# imDat='cope' # cope or tstat images
-# threshMeth='cMass' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
-#
-# #	• #subjCat crossnobis niNorm fwhm1
-# trainSetMeth='blocks'
-# slSiz=6
-# normMeth='niNormalised'
-# decodeFeature='subjCat'
-# distMeth='crossNobis'
-# fwhm=1
-# imDat='cope' # cope or tstat images
-# threshMeth='cMass' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
-#
-# #	• #objCat crossNobis noNorm fwhm0
-# trainSetMeth='blocks'
-# slSiz=6
-# normMeth='noNorm'
-# decodeFeature='objCat'
-# distMeth='crossNobis'
-# fwhm='None'
-# imDat='cope' # cope or tstat images
-# threshMeth='cMass' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
-
-
-#	• #12-way niNorm tstat, fwhm1
-# trainSetMeth='blocks'
-# slSiz=6
-# normMeth='niNormalised'
-# decodeFeature='12-way'
-# distMeth='svm'
-# fwhm=1
-# imDat='tstat' # cope or tstat images
-# threshMeth='cMass' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
-
-#sl6_subjCatDecoding_svm_niNormalised_blocks_fwhmNone_cope
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
 trainSetMeth='blocks'
 slSiz=6
-normMeth='niNormalised'
-decodeFeature='subjCat'
+normMeth='noNorm'
+decodeFeature='subjCat-orth'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
+threshMeth='cMass' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
+
+#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
+trainSetMeth='blocks'
+slSiz=6
+normMeth='noNorm'
+decodeFeature='subjCat-orth'
+distMeth='svm'
+fwhm='None'
+imDat='tstat' # cope or tstat images
 threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}

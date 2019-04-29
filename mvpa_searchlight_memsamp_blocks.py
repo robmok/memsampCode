@@ -189,6 +189,9 @@ for iSub in range(1,34):
             conds2comp = [subjCatAconds, subjCatBconds]    
         else: #stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
+            
+        if decodeFeature == "subjCat-resp":
+            conds2comp = np.empty((1)) #len of 1 placeholder
         
         if (decodeFeature=="subjCatRaw-orth")|(decodeFeature=="objCatRaw-orth"):
             catA90 = conds2comp[0]+90
@@ -219,14 +222,13 @@ for iSub in range(1,34):
             tmpPath = []
             for iPair in range(0,len(conds2comp)):
                 ytmp=yPerm.copy() #need to copy this for 12-way-all since will edit ytmp (which will change yPerm if not copy since it's referring to the same object)
-                if not decodeFeature == "12-way-all": 
+                if decodeFeature == "subjCat-resp":
+                    condInd = np.append(np.where(dfCondRuns['key']==1),np.where(dfCondRun['key']==6))
+                    ytmp[np.where(dfCondRuns['key']==1)]=0 #change stim directions to category responses (changed to cat resp from above if decodeFeature[0:7]=="subjCat")
+                    ytmp[np.where(dfCondRuns['key']==6)]=1                      
+                else:
                     condInd=np.append(np.where(yPerm==conds2comp[iPair][0]), np.where(yPerm==conds2comp[iPair][1]))   
-                else: # append multiple conditions in a cell of the array
-                    condInd=np.where(dat.y==conds2comp[iPair][0])
-                    for iVal in conds2comp[iPair][1]:
-                        condInd=np.append(condInd, np.where(yPerm==iVal))
-                    ytmp[yPerm!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
-            
+
                 dat.dat = datPerm[condInd,]
                 dat.y = ytmp[condInd]
                 dat.sessions = sessPerm[condInd]

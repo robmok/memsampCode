@@ -8,34 +8,36 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-#subjCat
+# subjCat-resp cope trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
 
-#svm block tstat
-sed -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+# subjCat-resp tstat trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+# subjCat-resp cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-#objCat
-#svm block tstat
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
+# subjCat-resp tstat block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-
-#objCat - norm
-#svm
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
+# subjCat-resp crossnobis trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-
-
-#tstats - extras
-#svm
-sed -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
+# subjCat-resp cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
