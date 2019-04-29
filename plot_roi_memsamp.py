@@ -9,7 +9,9 @@ Created on Thu Apr  4 16:00:52 2019
 import os
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(style="ticks", color_codes=True)
 #import bootstrapped.bootstrap as bs
 #import bootstrapped.stats_functions as bs_stats
 
@@ -25,16 +27,12 @@ distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 #%% plot
-
-#p = avg_time.plot(figsize=15,5),legend=False,kind="bar",rot=45,color="blue",fontsize=16,yerr=std);
-
-#linestyle='None' - makes simple points at the mean
 
 #stdAll = df.iloc[0:33,:].std()/np.sqrt(33)
 stdAll = df.iloc[0:33,:].sem()
@@ -49,6 +47,14 @@ ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
 ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),yerr=stdAll, fmt='o')
 
 #ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[0:33,:], yerr=stdAll, fmt='-o')
+
+ax = sns.catplot(data=df.iloc[0:33,:],height=4,aspect=4, kind="swarm")
+df.iloc[0:33,:].mean().plot(yerr=stdAll, fmt='o')
+
+#g = sns.catplot(data=df.iloc[0:33,:],height=4,aspect=4, kind="box")
+
+g = sns.catplot(data=df.iloc[0:33,:],height=4,aspect=4.2, kind="violin", inner=None)
+sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 
 #%% subjCat-all - organise
 
