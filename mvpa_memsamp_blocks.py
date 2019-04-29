@@ -324,7 +324,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
         
-if (distMeth=='svm') &((decodeFeature!="subjCat-orth")|(decodeFeature!="objCat-orth")):
+if (distMeth=='svm') &((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances

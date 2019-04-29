@@ -40,7 +40,7 @@ fwhm = None # optional smoothing param - 1, or None
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
-decodeFeature = 'subjCat' 
+decodeFeature = 'subjCat-orth' 
 
 #%%
 # =============================================================================
@@ -284,7 +284,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
-if (distMeth=='svm')&((decodeFeature!="subjCat-orth")|(decodeFeature!="objCat-orth")):
+if (distMeth=='svm')&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances
