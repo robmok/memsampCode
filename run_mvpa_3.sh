@@ -7,59 +7,43 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-# subjCat-orth cope block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-# subjCat-orth tstat block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'demeaned_stdNorm'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-#niNormalised
-
-# subjCat-orth cope trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+#niNorm
+# dir cope trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# subjCat-orth tstat trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+# dir tstat trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# subjCat-orth cope block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+# dir cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-# subjCat-orth tstat block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+# dir tstat block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-#niNormalised
-
-
-# objCat-orth cope block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
+# dir crossnobis trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
 
-# objCat-orth tstat block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+# dir cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
