@@ -15,6 +15,9 @@ sns.set(style="ticks", color_codes=True)
 #import bootstrapped.bootstrap as bs
 #import bootstrapped.stats_functions as bs_stats
 
+# bootstrap CIs - over subjects....
+#print(bs.bootstrap(np.asarray(df.iloc[0:33,0]), stat_func=bs_stats.mean))
+
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
@@ -27,26 +30,26 @@ distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
-#%% plot
+#%% plot bar / errobar plot
 
 #stdAll = df.iloc[0:33,:].std()/np.sqrt(33)
 stdAll = df.iloc[0:33,:].sem()
-# bootstrap CIs - over subjects....
-#print(bs.bootstrap(np.asarray(df.iloc[0:33,0]), stat_func=bs_stats.mean))
 
 
-ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
-#ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll,ylim=(.5,.537))
-#ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
+#ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
+#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
+#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
+ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
 
-ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),yerr=stdAll, fmt='o')
-
+#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
 #ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[0:33,:], yerr=stdAll, fmt='-o')
+
+#%% univariate scatter plots, violin plots
 
 ax = sns.catplot(data=df.iloc[0:33,:],height=4,aspect=4, kind="swarm")
 df.iloc[0:33,:].mean().plot(yerr=stdAll, fmt='o')
@@ -62,11 +65,13 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 
 #for roi in df.columns.values[0:-1]:
 #
-roi='dlPFC_lh'
+#roi='dlPFC_lh'
 #roi='dlPFC_rh'
-roi='MDroi_ips_lh'
-roi='MDroi_ips_rh'
+#roi='MDroi_ips_lh'
+#roi='MDroi_ips_rh'
 #roi='V1vd_lh'
+#roi='V3a_lh'
+roi='V3a_rh'
 
 ylims = [0.45, 0.55]
 
@@ -152,24 +157,41 @@ for iCond in 2,3,8,9: #range(0,11):
 
 #%% plot RDM
 #roi='dlPFC_rh'
-roi='dlPFC_lh'
-roi='MDroi_ips_lh'
+#roi='dlPFC_lh'
+#roi='MDroi_ips_lh'
 #roi='MDroi_ips_rh'
 #roi='V1vd_lh'
-#roi='V3a_rh'
+roi='V3a_rh'
 #roi='V3a_lh'
 
 rdm = np.zeros((12,12))
 
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
-#make it a symmetric matrix 
-#il = np.tril_indices(12,-1) 
-#rdm[il] = rdm.T[il]
 
 #tstat (double check formula)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
 
+#make it a symmetric matrix 
+il = np.tril_indices(12,-1) 
+rdm[il] = rdm.T[il]
+
 ax = plt.figure(figsize=(25,4))
 ax = plt.imshow(rdm,cmap='viridis')
 plt.colorbar()
+plt.show()
+
+from sklearn import manifold
+seed = np.random.RandomState(seed=3)
+mds = manifold.MDS(n_components=2, max_iter=3000, eps=1e-9, random_state=seed,
+                   dissimilarity="precomputed", n_jobs=1)
+pos = mds.fit(rdm).embedding_
+
+ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
+cnt = np.array((0.0,0.0,0.0))
+for icol in range(0,12):
+    ctuple[icol,:] = ctuple[icol,:]+cnt
+    cnt = cnt+np.array((0,-0.085,0))
+
+plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.show()
