@@ -11,6 +11,12 @@ Created on Tue Mar 12 15:38:39 2019
 #sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
 #sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
+
+##subjCatRaw tstat, fwhm1, blocks
+##subjCatRaw tstat fwhm1 trials
+# ##subjCatRaw, tstat fwhm0, trials
+# ##subjCatRaw, cope fwhm0, trials
+
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -23,12 +29,12 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
-normMeth = 'niNormalised' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
-trainSetMeth = 'blocks' # 'trials' or 'blocks' 
+trainSetMeth = 'trials' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'subjCat-orth' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
