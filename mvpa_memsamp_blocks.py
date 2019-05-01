@@ -60,7 +60,9 @@ rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3
         'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
         'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
-        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh']
+        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
+
+#reRunROIs
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
@@ -236,7 +238,7 @@ for iSub in range(1,nSubs+1):
             elif decodeFeature == "subjCat-all":
                 condsTmp=list(subjCatAconds)+list(subjCatBconds)
                 conds2comp = getConds2comp(decodeFeature,condsTmp)
-            elif decodeFeature == "subjCat-resp":
+            elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
                 conds2comp = np.empty((1)) #len of 1 placeholder
             else: #stimulus decoding
                 conds2comp = getConds2comp(decodeFeature)       
@@ -260,9 +262,9 @@ for iSub in range(1,nSubs+1):
                         for iVal in conds2comp[iPair][1]:
                             condInd=np.append(condInd, np.where(y==iVal))
                         ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
-                    elif decodeFeature == "subjCat-resp":
+                    elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
                         condInd = np.append(np.where(dfCondRuns['key']==1),np.where(dfCondRuns['key']==6))
-                        ytmp[np.where(dfCondRuns['key']==1)]=0 #change stim directions to category responses (changed to cat resp from above if decodeFeature[0:7]=="subjCat")
+                        ytmp[np.where(dfCondRuns['key']==1)]=0
                         ytmp[np.where(dfCondRuns['key']==6)]=1  
                     else:
                         condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
