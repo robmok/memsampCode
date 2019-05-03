@@ -203,6 +203,13 @@ for iSub in range(1,nSubs+1):
             conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
         elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth"): #subjective catgory bound based on responses
             conds2comp = [subjCatAconds, subjCatBconds]  
+        elif decodeFeature=="subjCat-orth-ctrl":
+            conds2comp = [subjCatAconds, subjCatBconds]  
+            catA90 = conds2comp[0]+90
+            catB90 = conds2comp[1]+90
+            catA90[catA90>359]=catA90[catA90>359]-360
+            catB90[catB90>359]=catB90[catB90>359]-360
+            conds2comp = [catA90, catB90]  
         elif decodeFeature == "subjCat-all":
             condsTmp=list(subjCatAconds)+list(subjCatBconds)
             conds2comp = getConds2comp(decodeFeature,condsTmp)

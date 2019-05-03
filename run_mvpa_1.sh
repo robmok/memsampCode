@@ -16,21 +16,21 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #re-run subjCat, subjCat-orth, subjCat-resp - add on motor ROI - script 3,4,5
 # - subjCat-Resp run when original (first 2 terminals) completes - script 5
 
-# motor cope trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-# motor cope block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-# motor cope block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# # motor cope trials
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
+#
+# # motor cope block
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+#     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+#
+# # motor cope block
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+# python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
 #niNorm
 # motor cope trials
