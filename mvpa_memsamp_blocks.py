@@ -275,7 +275,7 @@ for iSub in range(1,nSubs+1):
                         ytmp[np.where(dfCondRuns['key']==6)]=1  
                     else:
                         condInd=np.empty(0,dtype=int) 
-                        if np.size(conds2comp[iPair])>2: #need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
+                        if np.size(conds2comp[iPair][0])>2: #need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
                             for iVal in conds2comp[iPair][0]:
                                 ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
                                 condInd=np.append(condInd, np.where(y==iVal)) # index all conds
