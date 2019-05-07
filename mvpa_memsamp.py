@@ -200,16 +200,16 @@ for iSub in range(1,nSubs+1):
     
         #set up the conditions you want to classify. if 12-way, no need
         if (decodeFeature=="objCat")|(decodeFeature=="objCat-orth"):
-            conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
+            conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
         elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth"): #subjective catgory bound based on responses
-            conds2comp = [subjCatAconds, subjCatBconds]  
+            conds2comp = [[subjCatAconds, subjCatBconds]] 
         elif decodeFeature=="subjCat-orth-ctrl":
             conds2comp = [subjCatAconds, subjCatBconds]  
             catA90 = conds2comp[0]+90
             catB90 = conds2comp[1]+90
             catA90[catA90>359]=catA90[catA90>359]-360
             catB90[catB90>359]=catB90[catB90>359]-360
-            conds2comp = [catA90, catB90]  
+            conds2comp = [[catA90, catB90]]  
         elif decodeFeature == "subjCat-all":
             condsTmp=list(subjCatAconds)+list(subjCatBconds)
             conds2comp = getConds2comp(decodeFeature,condsTmp)
@@ -243,37 +243,46 @@ for iSub in range(1,nSubs+1):
                     ytmp[np.where(dfCond['key']==1)]=0 # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
                     ytmp[np.where(dfCond['key']==6)]=1  
                 else:
-                    condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
+                    condInd=np.empty(0,dtype=int) 
+                    if np.size(conds2comp[iPair])>2: #need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
+                        for iVal in conds2comp[iPair][0]:
+                            ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
+                            condInd=np.append(condInd, np.where(y==iVal)) # index all conds
+                        for iVal in conds2comp[iPair][1]:
+                            ytmp[np.where(y==iVal)]=1
+                            condInd=np.append(condInd, np.where(y==iVal)) 
+                    else: #ori, dir
+                        condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1])) 
 
-            fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
-            y_indexed = ytmp[condInd]
-            groups_indexed = groups[condInd]
-            cv    = LeaveOneGroupOut()
-            cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
-            cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
-            if distMeth == 'svm':
-                clf   = LinearSVC(C=.1)
-                cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-    #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
-            elif distMeth in {'crossEuclid','crossNobis'}:
-                cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
+                y_indexed = ytmp[condInd]
+                groups_indexed = groups[condInd]
+                cv    = LeaveOneGroupOut()
+                cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
+                cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
+                if distMeth == 'svm':
+                    clf   = LinearSVC(C=.1)
+                    cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+        #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                elif distMeth in {'crossEuclid','crossNobis'}:
+                    cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
 
             if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):                
-                catA90 = conds2comp[0]+90
-                catB90 = conds2comp[1]+90
+                catA90 = conds2comp[0][0]+90
+                catB90 = conds2comp[0][1]+90
                 catA90[catA90>359]=catA90[catA90>359]-360
                 catB90[catB90>359]=catB90[catB90>359]-360
-                conds2comp = [catA90, catB90]  
+                conds2comp = [[catA90, catB90]]  
                 cvAccTmp90 = np.empty(len(conds2comp))
                 for iPair in range(0,len(conds2comp)):
                     ytmp=y.copy()
-                    if not decodeFeature == "12-way-all": 
-                        condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1]))   
-                    else:
-                        condInd=np.where(y==conds2comp[iPair][0])
-                        for iVal in conds2comp[iPair][1]:
-                            condInd=np.append(condInd, np.where(y==iVal))
-                        ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    condInd=np.empty(0,dtype=int) 
+                    for iVal in conds2comp[iPair][0]:
+                        ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
+                        condInd=np.append(condInd, np.where(y==iVal)) # index all conds
+                    for iVal in conds2comp[iPair][1]:
+                        ytmp[np.where(y==iVal)]=1
+                        condInd=np.append(condInd, np.where(y==iVal)) 
                 
                     fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
                     y_indexed = ytmp[condInd]

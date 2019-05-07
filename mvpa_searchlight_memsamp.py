@@ -157,9 +157,9 @@ for iSub in range(1,34):
             
     #set up the conditions you want to classify. if 12-way, no need
     if decodeFeature[0:6] == "objCat":
-        conds2comp = [catAconds, catBconds]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
+        conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
     elif decodeFeature[0:7] == "subjCat": #subjective catgory bound based on responses
-        conds2comp = [subjCatAconds, subjCatBconds]
+        conds2comp = [[subjCatAconds, subjCatBconds]]
     else: #stimulus decoding
         conds2comp = getConds2comp(decodeFeature)
 
@@ -171,7 +171,7 @@ for iSub in range(1,34):
         catB90 = conds2comp[1]+90
         catA90[catA90>359]=catA90[catA90>359]-360
         catB90[catB90>359]=catB90[catB90>359]-360
-        conds2comp = [catA90, catB90]  
+        conds2comp = [[catA90, catB90]]  
 
     #run cv
     if decodeFeature == "12-way": # no need conds2comp, just compare all
@@ -201,7 +201,16 @@ for iSub in range(1,34):
                 ytmp[np.where(dfCond['key']==1)]=0 #change stim directions to category responses (changed to cat resp from above if decodeFeature[0:7]=="subjCat")
                 ytmp[np.where(dfCond['key']==6)]=1  
             else:
-                condInd=np.append(np.where(yPerm==conds2comp[iPair][0]), np.where(yPerm==conds2comp[iPair][1]))   
+                condInd=np.empty(0,dtype=int) 
+                if np.size(conds2comp[iPair])>2: #need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
+                    for iVal in conds2comp[iPair][0]:
+                        ytmp[np.where(yPerm==iVal)]=0 #change cat A to 0 and cat B to 1
+                        condInd=np.append(condInd, np.where(yPerm==iVal)) # index all conds
+                    for iVal in conds2comp[iPair][1]:
+                        ytmp[np.where(yPerm==iVal)]=1
+                        condInd=np.append(condInd, np.where(yPerm==iVal)) 
+                else: #ori, dir
+                    condInd=np.append(np.where(yPerm==conds2comp[iPair][0]), np.where(yPerm==conds2comp[iPair][1])) 
 
             dat.dat = datPerm[condInd,]
             dat.y = ytmp[condInd]

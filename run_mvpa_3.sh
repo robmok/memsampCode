@@ -8,26 +8,37 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-# 12-way-all cope trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
+# subjCat-orth-ctrl
+# subjCat-orth-ctrl cope trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# 12-way-all cope block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-#niNorm
-# 12-way-all cope trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-# 12-way-all crossNobis block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
+# subjCat-orth-ctrl crossNobis block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+# subjCat-orth-ctrl tstat trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+# subjCat-orth-ctrl cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+# subjCat-orth-ctrl tstat block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+# subjCat-orth-ctrl crossNobis trials
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
