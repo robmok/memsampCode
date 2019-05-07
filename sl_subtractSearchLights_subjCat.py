@@ -29,28 +29,13 @@ fwhm = None # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 
-#subjCatRaw&subjCatRaw-orth, noNorm fwhm0, cope/tstat, blocks
-#subjCatRaw&subjCatRaw-orth, noNorm fwhm0/1, cope, trials
-
-#done:
-#sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
-#sl6_subjCatRaw-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCatRaw-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCatRaw-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
-
-##subjCatRaw tstat, fwhm1, blocks
-##subjCatRaw tstat fwhm1 trials
-# ##subjCatRaw, cope fwhm0, trials
-# ##subjCatRaw, tstat fwhm0, trials
-
 nSubs=33
 for iSub in range(1,nSubs+1):
     subNum=f'{iSub:02d}'
     print('Subtracting %s searchlight imgs from "orth" images: sub-%s, %s, %s, %s, %s, fwhm=%s' % (decodeFeature, subNum,  imDat, distMeth, normMeth, trainSetMeth, str(fwhm)))
 
     im1 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
-                  'Raw' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 
+                  + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 
                   '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     im2 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
                   'Raw-orth' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 

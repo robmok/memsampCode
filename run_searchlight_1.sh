@@ -9,37 +9,45 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # searchlight
 
-#subjCatRaw, subjCat-orth, trials/blocks, fwhm0/1, cope/tstat
+#subjCat, subjCat-orth, trials/blocks, fwhm0, svm cope/tstat crossnobis
 
-#next: #objCatRaw, objCat-orth, blocks/trials, fwhm0/1
+#later: fwhm1
+# -e s:"fwhm = None":"fwhm = 1":g \
 
-##subjCatRaw tstat & subjCatRaw-orth tstat, block/trial, fwhm1
-
-##subjCatRaw tstat, , noNorm fwhm1
+##subjCat cope, noNorm fwhm0
 sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-#subjCatRaw-orth tstat, -orth, noNorm fwhm1
+#subjCatRaw-orth cope, noNorm
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+##subjCat cope, tstat fwhm0
+sed -e s:"#mainDir":"mainDir":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-#trials
-#svm
-#subjCatRaw tstat, , noNorm fwhm1
+#subjCatRaw-orth tstat, noNorm
 sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw'":g \
-    -e s:"fwhm = None":"fwhm = 1":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+
+
+#subjCat tstat, noNorm fwhm0
+sed -e s:"#mainDir":"mainDir":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+
+
 
 #
 # #subjCatRaw, subjCatRaw-orth: blocks svm

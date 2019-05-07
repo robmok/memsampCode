@@ -253,11 +253,11 @@ for iSub in range(1,34):
                         return cvBlock[iRun-1] #get relevant cvAcc measure (test set)
                     dat.pipeline = pipeline
                     im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
-                    if not ((decodeFeature=='subjCatRaw')|(decodeFeature=='subjCatRaw-orth')|(decodeFeature=='objCatRaw')|(decodeFeature=='objCatRaw-orth')): #if these, no need norm since need subtract from each other later
-                        chance   = 1/len(np.unique(dat.y))
-                        imVec    = dat.masker(im)
-                        imVec    = imVec - chance
-                        im       = dat.unmasker(imVec)
+#                    if not ((decodeFeature=='subjCatRaw')|(decodeFeature=='subjCatRaw-orth')|(decodeFeature=='objCatRaw')|(decodeFeature=='objCatRaw-orth')): #if these, no need norm since need subtract from each other later
+                    chance   = 1/len(np.unique(dat.y))
+                    imVec    = dat.masker(im)
+                    imVec    = imVec - chance
+                    im       = dat.unmasker(imVec)
                     #save image with 'iPair' appended to it; join it below
                     if not decodeFeature == "12-way-all": 
                         tmpPath.append(os.path.join(mainDir, 'mvpa_searchlight', 'tmp_mvpa_searchlight_' + decodeFeature +
