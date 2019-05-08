@@ -28,14 +28,31 @@ vSmooth=5
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
 
+##subjCat cope, noNorm fwhm0, blocks
+#subjCat-orth cope, noNorm
+##subjCat cope, tstat fwhm0
+#subjCat-orth tstat, noNorm
+##subjCat crossNobis, noNorm fwhm0
+#subjCat-orth crossNobis, noNorm
 
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
+#subjCat cope, noNorm fwhm0, trials
+#subjCat-orth cope, noNorm fwhm
+#subjCat tstat, noNorm fwhm0
+#subjCat-orth tstat, noNorm fwhm0
 
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
+##subjCat cope, noNorm fwhm0, blocks
+trainSetMeth='blocks'
+slSiz=6
+normMeth='noNorm'
+decodeFeature='subjCat'
+distMeth='svm'
+fwhm='None'
+imDat='cope' # cope or tstat images
+threshMeth='cMass' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
+
+#subjCat-orth cope, noNorm, blocks
 trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
@@ -47,11 +64,11 @@ threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
 
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
+##subjCat cope, tstat fwhm0
 trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
-decodeFeature='subjCat-orth'
+decodeFeature='subjCat'
 distMeth='svm'
 fwhm='None'
 imDat='tstat' # cope or tstat images

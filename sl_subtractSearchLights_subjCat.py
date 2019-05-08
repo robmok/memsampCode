@@ -5,6 +5,17 @@ Created on Thu Apr 25 16:38:28 2019
 
 @author: robert.mok
 """
+##subjCat cope, noNorm fwhm0, blocks
+#subjCatRaw-orth cope, noNorm
+##subjCat cope, tstat fwhm0
+#subjCatRaw-orth tstat, noNorm
+##subjCat crossNobis, noNorm fwhm0
+#subjCatRaw-orth crossNobis, noNorm
+
+#subjCat cope, noNorm fwhm0, trials
+#subjCat-orth cope, noNorm fwhm
+#subjCat tstat, noNorm fwhm0
+#subjCat-orth tstat, noNorm fwhm0
 #%%
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
@@ -35,7 +46,7 @@ for iSub in range(1,nSubs+1):
     print('Subtracting %s searchlight imgs from "orth" images: sub-%s, %s, %s, %s, %s, fwhm=%s' % (decodeFeature, subNum,  imDat, distMeth, normMeth, trainSetMeth, str(fwhm)))
 
     im1 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
-                  + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 
+                  'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + 
                   '_' + imDat + '_sub-' + subNum + '.nii.gz'))
     im2 = nib.load(os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
                   'Raw-orth' + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 

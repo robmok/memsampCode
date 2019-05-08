@@ -6,16 +6,17 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhmNone_tstat_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhmNone_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_blocks_fwhm1_cope_sub-01.nii.gz
-#sl6_subjCat-orthDecoding_svm_noNorm_trials_fwhm1_cope_sub-01.nii.gz
+##subjCat cope, noNorm fwhm0, blocks
+#subjCatRaw-orth cope, noNorm
+##subjCat cope, tstat fwhm0
+#subjCatRaw-orth tstat, noNorm
+##subjCat crossNobis, noNorm fwhm0
+#subjCatRaw-orth crossNobis, noNorm
 
-##subjCatRaw tstat, fwhm1, blocks
-##subjCatRaw tstat fwhm1 trials
-# ##subjCatRaw, tstat fwhm0, trials
-# ##subjCatRaw, cope fwhm0, trials
+#subjCat cope, noNorm fwhm0, trials
+#subjCat-orth cope, noNorm fwhm
+#subjCat tstat, noNorm fwhm0
+#subjCat-orth tstat, noNorm fwhm0
 
 #%%
 import os
@@ -27,7 +28,7 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'cope' # cope or tstat images
+imDat   = 'tstat' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
