@@ -11,23 +11,11 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #subjCat, subjCat-orth, trials/blocks, fwhm0, svm cope/tstat crossnobis
 
-#later: fwhm1
-# -e s:"fwhm = None":"fwhm = 1":g \
-
-##subjCat cope, noNorm fwhm0
-sed -e s:"#mainDir":"mainDir":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-#subjCatRaw-orth cope, noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
-
-##subjCat cope, tstat fwhm0
+#finish off
+##subjCat cope, tstat fwhm1
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"for iSub in range(1,34)":"for iSub in range(21,34)":g \
   < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
@@ -39,14 +27,37 @@ sed -e s:"#mainDir":"mainDir":g \
 python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
+# fwhm1
+# -e s:"fwhm = None":"fwhm = 1":g \
 
-#subjCat tstat, noNorm fwhm0
+
+##subjCat cope, noNorm fwhm1
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+#subjCatRaw-orth cope, noNorm
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+
+##subjCat cope, tstat fwhm1
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
-
+#subjCatRaw-orth tstat, noNorm
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"fwhm = None":"fwhm = 1":g \
+  < ${codeDir}/mvpa_searchlight_memsamp_blocks.py > ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp_blocks1.py
 
 
 #
