@@ -40,11 +40,11 @@ vSmooth=5
 #subjCat tstat, noNorm fwhm0
 #subjCat-orth tstat, noNorm fwhm0
 
-##subjCat cope, noNorm fwhm0, blocks
+#subjCat-orth cope, noNorm, blocks
 trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
-decodeFeature='subjCat'
+decodeFeature='subjCat-orth'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
@@ -52,11 +52,11 @@ threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
 
-#subjCat-orth cope, noNorm, blocks
+##subjCat cope, noNorm fwhm0, blocks
 trainSetMeth='blocks'
 slSiz=6
 normMeth='noNorm'
-decodeFeature='subjCat-orth'
+decodeFeature='subjCat'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
