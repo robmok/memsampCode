@@ -33,7 +33,7 @@ from memsamp_RM import crossEuclid, compCovMat, getConds2comp
 reRun = False 
 
 imDat = 'cope' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
+normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
 distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
@@ -48,12 +48,7 @@ decodeFeature = 'subjCat'
 # =============================================================================
 # Set up decoding accuracy dataframe 
 # =============================================================================
-nSubs=33
-#rois = ['V1vd','V2vd','V3vd','V3a','V3b','hV4','MST','hMT','IPS0','IPS1','IPS2',
-#        'IPS3','IPS4','IPS5', 'visRois', 'ipsRois', 'visRois_ipsRois',
-#        'MDroi_ips','MDroi_ifg','MDroi_area8c','MDroi_area9', 'dlPFC',
-#        'HIPP_HEAD','HIPP_BODY_TAIL','HIPP_HEAD_BODY_TAIL'] #dlPFC is a merge of area 8c and 9. # MDroi_pcg - premotor... useful for motor later?
-                                                            #hpc - anterior, posterior, whole
+nSubs=33                                                           #hpc - anterior, posterior, whole
 
 rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
         'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh', 
@@ -178,7 +173,7 @@ for iSub in range(1,nSubs+1):
             fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned.transpose()
-        elif norMeth == 'dCentred': #both niNorm and demeaned stdNorm
+        elif normMeth == 'dCentred': #both niNorm and demeaned stdNorm
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
             fmri_masked_cleaned=fmri_masked_cleaned.transpose()-np.nanmean(fmri_masked_cleaned,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)

@@ -167,7 +167,7 @@ for iSub in range(1,34):
         sessPerm   = dat.sessions.copy()
     
         # normalise voxels - demean and norm by var - across conditions; try to do only within sphere? also try demean only or demean + norm variance
-        if normMeth == 'niNormalised':
+        if normMeth==(normMeth=='niNormalised')|(normMeth=='dCentred'):
             dat.cleaner(standardizeVox=True)
     
     
