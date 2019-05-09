@@ -178,6 +178,11 @@ for iSub in range(1,nSubs+1):
             fmri_masked_cleaned=fmri_masked.transpose()-np.nanmean(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
             fmri_masked_cleaned=fmri_masked_cleaned.transpose()
+        elif norMeth == 'dCentred': #both niNorm and demeaned stdNorm
+            fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
+            fmri_masked_cleaned=fmri_masked_cleaned.transpose()-np.nanmean(fmri_masked_cleaned,axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned/np.nanstd(fmri_masked,axis=1)
+            fmri_masked_cleaned=fmri_masked_cleaned.transpose()
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
 
