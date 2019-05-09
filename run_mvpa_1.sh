@@ -15,34 +15,42 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #objCat
 # objCat cope trials
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
+
+
 
 # objCat crossNobis block
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
 # objCat trials
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
 # objCat cope block
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 # objCat tstat block
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
 # objCat crossNobis trials
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
@@ -53,5 +61,6 @@ python ${tmpScrDir}/mvpa_memsamp1.py
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
