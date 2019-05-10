@@ -8,6 +8,13 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
+#rerun
+# subjCat-orth cope block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+
 # subjCat-orth cope trials
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
     -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \

@@ -42,7 +42,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 24 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 15 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
@@ -155,23 +155,21 @@ for iSub in range(1,34):
 #        dat.dat = np.append(dat.dat,varIm,axis=0)
             
     #set up the conditions you want to classify. if 12-way, no need
-    if decodeFeature[0:6] == "objCat":
+    if decodeFeature == "objCat":
         conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-    elif decodeFeature[0:7] == "subjCat": #subjective catgory bound based on responses
+    elif decodeFeature == "subjCat": #subjective catgory bound based on responses
         conds2comp = [[subjCatAconds, subjCatBconds]]
-    else: #stimulus decoding
-        conds2comp = getConds2comp(decodeFeature)
-
-    if (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
+    elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
         conds2comp = np.empty((1)) #len of 1 placeholder
-
-    if (decodeFeature=="subjCatRaw-orth")|(decodeFeature=="objCatRaw-orth"):
+    elif (decodeFeature=="subjCatRaw-orth")|(decodeFeature=="objCatRaw-orth"):
         catA90 = conds2comp[0][0]+90
         catB90 = conds2comp[0][1]+90
         catA90[catA90>359]=catA90[catA90>359]-360
         catB90[catB90>359]=catB90[catB90>359]-360
         conds2comp = [[catA90, catB90]]  
-
+    else: #stimulus decoding
+        conds2comp = getConds2comp(decodeFeature)
+    
     #run cv
     if decodeFeature == "12-way": # no need conds2comp, just compare all
         cv  = LeaveOneGroupOut()
