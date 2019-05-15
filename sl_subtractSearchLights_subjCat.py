@@ -5,17 +5,10 @@ Created on Thu Apr 25 16:38:28 2019
 
 @author: robert.mok
 """
-##subjCat cope, noNorm fwhm0, blocks
-#subjCatRaw-orth cope, noNorm
-##subjCat cope, tstat fwhm0
-#subjCatRaw-orth tstat, noNorm
+#trials
 ##subjCat crossNobis, noNorm fwhm0
 #subjCatRaw-orth crossNobis, noNorm
 
-#subjCat cope, noNorm fwhm0, trials
-#subjCat-orth cope, noNorm fwhm
-#subjCat tstat, noNorm fwhm0
-#subjCat-orth tstat, noNorm fwhm0
 #%%
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
@@ -34,9 +27,9 @@ os.chdir(codeDir)
 imDat = 'cope' # cope or tstat images
 slSiz = 6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks'
-fwhm = 1 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 

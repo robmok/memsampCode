@@ -6,17 +6,19 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-##subjCat cope, noNorm fwhm0, blocks
-#subjCatRaw-orth cope, noNorm
-##subjCat cope, tstat fwhm0
-#subjCatRaw-orth tstat, noNorm
+
+#trials
 ##subjCat crossNobis, noNorm fwhm0
 #subjCatRaw-orth crossNobis, noNorm
 
-#subjCat cope, noNorm fwhm0, trials
-#subjCat-orth cope, noNorm fwhm
-#subjCat tstat, noNorm fwhm0
-#subjCat-orth tstat, noNorm fwhm0
+#motor
+##subjCat cope, noNorm fwhm0, blocks
+##subjCat cope, tstat fwhm0
+##subjCat crossNobis, noNorm fwhm0
+
+##subjCat cope, noNorm fwhm0, trials
+##subjCat cope, tstat fwhm0
+##subjCat crossNobis, noNorm fwhm0
 
 #%%
 import os
@@ -28,14 +30,14 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
-fwhm = 1 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat-orth' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'motor' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
