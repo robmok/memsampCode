@@ -8,21 +8,17 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-# subjCat-orth cope niNorm block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-# subjCat-orth tstat niNorm block
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'niNormalised'":g \
+# dir tstat block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-
-
+# dir crossNobis block
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
 
 
