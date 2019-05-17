@@ -34,17 +34,3 @@ sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
-
-# subjCat-all crossnobis trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-# subjCat-all crossnobis blocks
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
-    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
-python ${tmpScrDir}/mvpa_memsamp_blocks1.py
