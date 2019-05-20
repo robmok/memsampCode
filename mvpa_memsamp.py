@@ -15,6 +15,7 @@ from nilearn.masking import apply_mask
 from nilearn.signal import clean 
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import scipy.stats as stats
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
@@ -42,7 +43,7 @@ fwhm = None # optional smoothing param - 1, or None
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = 'subjCat'   
+decodeFeature = '12-way'   
 
 #%%
 # =============================================================================
@@ -226,6 +227,10 @@ for iSub in range(1,nSubs+1):
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
             clf  = LinearSVC(C=.1)
+            #LDA:
+#            clf = LinearDiscriminantAnalysis()
+#            clf.fit(fmri_masked_cleaned, y) 
+            
             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
             print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
             print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
