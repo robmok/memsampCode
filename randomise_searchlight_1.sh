@@ -28,37 +28,19 @@ vSmooth=5
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
 
-#trials
-##subjCat crossNobis, noNorm fwhm0, trials
-#subjCatRaw-orth crossNobis, noNorm, trials
+#subjCat svm cope, noNorm fwhm0, trials
+#subjCat svm tstat, noNorm fwhm0, trials
+#subjCat svm cope, noNorm fwhm0, blocks
+#subjCat svm tstat, noNorm fwhm1, trials
+#subjCat svm tstat, noNorm fwhm0, blocks
 
-#motor
-##motor cope, noNorm fwhm0, blocks
-##motor cope, tstat fwhm0
-##motor crossNobis, noNorm fwhm0
 
-##motor cope, noNorm fwhm0, trials
-##motor cope, tstat fwhm0
-##motor crossNobis, noNorm fwhm0
-
-##subjCat crossNobis, noNorm fwhm0, trials
-trainSetMeth='trials'
-slSiz=6
-normMeth='noNorm'
-decodeFeature='subjCat-orth'
-distMeth='crossNobis'
-fwhm='None'
-imDat='cope' # cope or tstat images
-threshMeth='cMass' #vox, tfce, cSize, cMass
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
-
-#subjCatRaw-orth crossNobis, noNorm, trials
+#subjCat svm cope, noNorm fwhm0, trials
 trainSetMeth='trials'
 slSiz=6
 normMeth='noNorm'
 decodeFeature='subjCat'
-distMeth='crossNobis'
+distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
 threshMeth='cMass' #vox, tfce, cSize, cMass
