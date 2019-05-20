@@ -15,6 +15,7 @@ from nilearn.masking import apply_mask
 from nilearn.signal import clean 
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import scipy.stats as stats
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
@@ -52,7 +53,7 @@ nSubs=33                                             #hpc - anterior, posterior,
 rois = ['V1vd_lh','V1vd_rh','V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
         'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh', 
         'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
-        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
+        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh','mPFC_sph10',
         'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
         'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
 
@@ -256,7 +257,11 @@ for iSub in range(1,nSubs+1):
                 cv   = LeaveOneGroupOut()
                 cv.get_n_splits(fmri_masked_cleaned, y, groups)
                 cv   = cv.split(fmri_masked_cleaned,y,groups)   
-                clf  = LinearSVC(C=.1)
+                if distMeth == 'svm':
+                    clf   = LinearSVC(C=.1)
+                elif distMeth == 'lda':
+                    clf = LinearDiscriminantAnalysis()
+                    clf.fit(fmri_masked_cleaned, y) 
                 cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv)
                 y_indexed = y #for computing chance below
                 cvAcc[iRun-1] = cvAccTmp[iRun-1] #if svm, get relevant cvAcc measure (test set)
@@ -296,6 +301,11 @@ for iSub in range(1,nSubs+1):
                         clf   = LinearSVC(C=.1)
                         cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
                         cvAccPairTmp[iPair] = cvAccTmp[iRun-1]
+                    elif distMeth == 'lda':
+                        clf = LinearDiscriminantAnalysis()
+                        clf.fit(fmri_masked_cleaned, y) 
+                        cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
+                        cvAccPairTmp[iPair] = cvAccTmp[iRun-1]
                     elif distMeth in {'crossEuclid','crossNobis'}:
                         cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv,iRun-1)
                         cvAccPairTmp[iPair] = cvAccTmp #  don't need to mean this with new crosseuclid func
@@ -329,7 +339,11 @@ for iSub in range(1,nSubs+1):
                             clf   = LinearSVC(C=.1)
                             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
                             cvAccPairTmp90[iPair] = cvAccTmp[iRun-1]
-        #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                        elif distMeth == 'lda':
+                            clf = LinearDiscriminantAnalysis()
+                            clf.fit(fmri_masked_cleaned, y) 
+                            cvAccTmp = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv)
+                            cvAccPairTmp90[iPair] = cvAccTmp[iRun-1]
                         elif distMeth in {'crossEuclid','crossNobis'}:
                             cvAccTmp = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv,iRun-1)
                             cvAccPairTmp90[iPair] = cvAccTmp  
@@ -348,7 +362,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
         
-if (distMeth=='svm') &((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
+if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances

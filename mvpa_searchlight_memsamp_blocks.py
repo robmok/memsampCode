@@ -20,6 +20,7 @@ import pandas as pd
 import nibabel as nib
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from nilearn.masking import apply_mask 
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
@@ -39,7 +40,7 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'blocks' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 15 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 12 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
@@ -243,9 +244,13 @@ for iSub in range(1,34):
                 cv  = LeaveOneGroupOut()
                 cv.get_n_splits(dat.dat, dat.y, dat.sessions) #group param is sessions
                 
-                if distMeth == 'svm':
-                    clf   = LinearSVC(C=.1)
-    #                cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                if distMeth in {'svm','lda'}:
+                    if distMeth == 'svm':
+                        clf   = LinearSVC(C=.1)
+                    elif distMeth == 'lda':
+                        clf = LinearDiscriminantAnalysis()
+                        clf.fit(dat.dat, dat.y) 
+                    
                     def pipeline(X,y):
                         cvBlock = cross_val_score(clf,X,y=y,scoring='accuracy',cv=cv.split(dat.dat,dat.y,dat.sessions))
                         return cvBlock[iRun-1] #get relevant cvAcc measure (test set)

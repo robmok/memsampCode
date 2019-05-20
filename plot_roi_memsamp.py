@@ -30,7 +30,7 @@ distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -42,9 +42,9 @@ stdAll = df.iloc[0:33,:].sem()
 
 
 #ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
-ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
+#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
 #ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
-#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
+ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
 
 #ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
 #ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[0:33,:], yerr=stdAll, fmt='-o')
@@ -71,7 +71,11 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 #roi='MDroi_ips_rh'
 #roi='V1vd_lh'
 #roi='V3a_lh'
-roi='V3a_rh'
+
+roi='V2vd_rh'
+#roi='hMT_lh'
+#roi='MDroi_area8c_lh'
+
 
 ylims = [0.45, 0.55]
 
@@ -161,8 +165,13 @@ for iCond in 2,3,8,9: #range(0,11):
 #roi='MDroi_ips_lh'
 #roi='MDroi_ips_rh'
 #roi='V1vd_lh'
-roi='V3a_rh'
+#roi='V3a_rh'
 #roi='V3a_lh'
+    
+    
+roi='V2vd_rh'
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
 
 rdm = np.zeros((12,12))
 

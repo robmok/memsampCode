@@ -9,35 +9,65 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-# objCat-orth crossnobis trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+#subjCat-all
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
     -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# objCat-orth crossnobis blocks
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
+    -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
     < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
 python ${tmpScrDir}/mvpa_memsamp_blocks1.py
 
-# subjCat-orth-ctrl - svm cope/tstat, crossNobis trials/blocks
-
-# subjCat-orth-ctrl svm cope trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
     -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+
+#dir
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
+    -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# subjCat-orth-ctrl svm tstat trials
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-ctrl'":g \
-    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
+    -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
+    -e s:"#mainDir":"mainDir":g \
+    -e s:"normMeth = 'noNorm'":"normMeth = 'dCentred'":g \
+    < ${codeDir}/mvpa_memsamp_blocks.py > ${tmpScrDir}/mvpa_memsamp_blocks1.py
+python ${tmpScrDir}/mvpa_memsamp_blocks1.py

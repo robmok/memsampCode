@@ -35,7 +35,7 @@ reRun = False
 
 imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'svm' # 'svm', 'lda' 'crossEuclid', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
 
@@ -43,7 +43,7 @@ fwhm = None # optional smoothing param - 1, or None
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = '12-way'   
+decodeFeature = 'subjCat'   
 
 #%%
 # =============================================================================
@@ -54,7 +54,7 @@ nSubs=33                                                           #hpc - anteri
 rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
         'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh', 
         'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
-        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
+        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh','mPFC_sph10',
         'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
         'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
 
@@ -227,11 +227,13 @@ for iSub in range(1,nSubs+1):
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
             clf  = LinearSVC(C=.1)
-            #LDA:
-#            clf = LinearDiscriminantAnalysis()
-#            clf.fit(fmri_masked_cleaned, y) 
-            
+            if distMeth == 'svm':
+                clf   = LinearSVC(C=.1)
+            elif distMeth == 'lda':
+                clf = LinearDiscriminantAnalysis()
+                clf.fit(fmri_masked_cleaned, y) 
             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
+            
             print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
             print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
             y_indexed = y #for computing chance
@@ -269,7 +271,10 @@ for iSub in range(1,nSubs+1):
                 if distMeth == 'svm':
                     clf   = LinearSVC(C=.1)
                     cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-        #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                elif distMeth == 'lda':
+                    clf = LinearDiscriminantAnalysis()
+                    clf.fit(fmri_masked_cleaned, y) 
+                    cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                 elif distMeth in {'crossEuclid','crossNobis'}:
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
 
@@ -300,7 +305,10 @@ for iSub in range(1,nSubs+1):
                     if distMeth == 'svm':
                         clf   = LinearSVC(C=.1)
                         cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-    #                    print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp[iPair]-(1/len(np.unique(y_indexed))))*100))
+                    elif distMeth == 'lda':
+                        clf = LinearDiscriminantAnalysis()
+                        clf.fit(fmri_masked_cleaned, y) 
+                        cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                     elif distMeth in {'crossEuclid','crossNobis'}:
                         cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
                 cvAccTmp = cvAccTmp-cvAccTmp90
@@ -315,7 +323,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
-if (distMeth=='svm')&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
+if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances
