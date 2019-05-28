@@ -24,6 +24,8 @@ Created on Tue Mar 12 15:38:39 2019
 import os
 import nipype.interfaces.ants as ants
 from subprocess import call
+from nilearn import image as nli # Import image processing tool
+import nibabel as nib
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'
 fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_output/fmriprep/'
@@ -33,11 +35,11 @@ at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
 slSiz=6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'motor' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'dir' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
@@ -67,6 +69,10 @@ for iSub in range(1,34):
 #merge all subjects into one .nii.gz file using fslmerge
 runCmdMerge='fslmerge -t ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz') +  ' ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-*mni.nii.gz')
 call(runCmdMerge,shell=True)
+
+#compute a mean image for visualisation
+im = nli.mean_img(os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz')) 
+nib.save(im, os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni_meanIm.nii.gz'))
 
 
 ##allrois - did searchlight within an roi/a set of rois
