@@ -15,11 +15,11 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' #  'noNorm', 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'dCentred' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'lda' # 'svm', 'crossNobis', 'lda'
+distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth-ctrl' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 
