@@ -25,11 +25,11 @@ codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
 imDat = 'cope' # cope or tstat images
-slSiz = 6 #searchlight size
+slSiz = 9 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks'
-fwhm = None # smoothing - set to None if no smoothing
+fwhm = 3 # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 
