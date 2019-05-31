@@ -19,12 +19,13 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
-# #subjCat-orth cope, noNorm
-# sed -e s:"#mainDir":"mainDir":g \
-#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
-#     -e s:"slSiz = 6":"slSiz = 9":g \
-#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+#subjCat-orth cope, noNorm
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"slSiz = 6":"slSiz = 9":g \
+    -e s:"nCores = 16":"nCores = 7":g \
+  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #
 # #subjCat tstat, noNorm
 # sed -e s:"#mainDir":"mainDir":g \
@@ -38,31 +39,33 @@ sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"slSiz = 6":"slSiz = 9":g \
+    -e s:"nCores = 16":"nCores = 7":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-#subjCat crossNobis, trials noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"slSiz = 6":"slSiz = 9":g \
-    < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# #subjCat crossNobis, trials noNorm
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#     -e s:"slSiz = 6":"slSiz = 9":g \
+#     < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth crossNobis, trials noNorm
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     -e s:"slSiz = 6":"slSiz = 9":g \
+    -e s:"nCores = 16":"nCores = 7":g \
     < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 
 #svm  trials
 #subjCat cope, noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"slSiz = 6":"slSiz = 12":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"slSiz = 6":"slSiz = 12":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth cope, noNorm
 sed -e s:"#mainDir":"mainDir":g \
@@ -72,32 +75,34 @@ sed -e s:"#mainDir":"mainDir":g \
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCat tstat, noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-    -e s:"slSiz = 6":"slSiz = 12":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+#     -e s:"slSiz = 6":"slSiz = 12":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth tstat, noNorm
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"slSiz = 6":"slSiz = 12":g \
+    -e s:"nCores = 16":"nCores = 24":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-#subjCat crossNobis, trials noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"slSiz = 6":"slSiz = 12":g \
-    < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# #subjCat crossNobis, trials noNorm
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#     -e s:"slSiz = 6":"slSiz = 12":g \
+#     < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth crossNobis, trials noNorm
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     -e s:"slSiz = 6":"slSiz = 12":g \
+    -e s:"nCores = 16":"nCores = 24":g \
     < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
@@ -106,28 +111,29 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #fwhm=5, sph=12
 
 #svm  trials
-#subjCat cope, noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"slSiz = 6":"slSiz = 12":g \
-    -e s:"fwhm = None":"fwhm = 5":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# #subjCat cope, noNorm
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"slSiz = 6":"slSiz = 12":g \
+#     -e s:"fwhm = None":"fwhm = 5":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth cope, noNorm
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
     -e s:"slSiz = 6":"slSiz = 12":g \
     -e s:"fwhm = None":"fwhm = 5":g \
+    -e s:"nCores = 16":"nCores = 24":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCat tstat, noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
-    -e s:"slSiz = 6":"slSiz = 12":g \
-    -e s:"fwhm = None":"fwhm = 5":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
+#     -e s:"slSiz = 6":"slSiz = 12":g \
+#     -e s:"fwhm = None":"fwhm = 5":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth tstat, noNorm
 sed -e s:"#mainDir":"mainDir":g \
@@ -135,16 +141,17 @@ sed -e s:"#mainDir":"mainDir":g \
     -e s:"imDat = 'cope'":"imDat = 'tstat'":g \
     -e s:"slSiz = 6":"slSiz = 12":g \
     -e s:"fwhm = None":"fwhm = 5":g \
+    -e s:"nCores = 16":"nCores = 24":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCat crossNobis, trials noNorm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"slSiz = 6":"slSiz = 12":g \
-    -e s:"fwhm = None":"fwhm = 5":g \
-    < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+#     -e s:"slSiz = 6":"slSiz = 12":g \
+#     -e s:"fwhm = None":"fwhm = 5":g \
+#     < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 #subjCatRaw-orth crossNobis, trials noNorm
 sed -e s:"#mainDir":"mainDir":g \
@@ -152,6 +159,7 @@ sed -e s:"#mainDir":"mainDir":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     -e s:"slSiz = 6":"slSiz = 12":g \
     -e s:"fwhm = None":"fwhm = 5":g \
+    -e s:"nCores = 16":"nCores = 24":g \
     < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 

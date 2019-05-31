@@ -6,9 +6,9 @@ Created on Thu Apr 25 16:38:28 2019
 @author: robert.mok
 """
 #trials
-##subjCat crossNobis, noNorm fwhm0
-#subjCatRaw-orth crossNobis, noNorm
-
+# sl9/12, subjCat/Raw-orth cope, noNorm, fwhm3
+# sl9/12, subjCat/Raw-orth tstat, noNorm, fwhm3
+# sl9/12, subjCat/Raw-orth crossNobis, noNorm, fwhm3
 #%%
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
