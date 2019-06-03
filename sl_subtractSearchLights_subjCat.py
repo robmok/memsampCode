@@ -5,10 +5,28 @@ Created on Thu Apr 25 16:38:28 2019
 
 @author: robert.mok
 """
-#trials
-# sl9/12, subjCat/Raw-orth cope, noNorm, fwhm3
-# sl9/12, subjCat/Raw-orth tstat, noNorm, fwhm3
-# sl9/12, subjCat/Raw-orth crossNobis, noNorm, fwhm3
+# subjCat/Raw-orth
+
+#love06 - subtracted:
+# #fwhm=3, sph=9 - subjCat/orth cope/tstat, crossnobis, noNorm
+# #fwhm=3, sph=12 - subjCat/orth cope/tstat, noNorm
+
+#love01
+#sl9_subjCatDecoding_svm_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
+#sl9_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
+#sl9_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
+
+#sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
+#sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
+#sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
+
+#missing - running in love06 now
+#sl12_subjCatRawDecoding-orth_svm_noNorm_trials_fwhm5_cope_sub-33.nii.gz
+
+
+# NOT finished running - still waiting for the orths:
+#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
+#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhm5_cope_sub-33.nii.gz
 #%%
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
@@ -24,12 +42,12 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-imDat = 'cope' # cope or tstat images
-slSiz = 9 #searchlight size
+imDat = 'tstat' # cope or tstat images
+slSiz = 12 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks'
-fwhm = 3 # smoothing - set to None if no smoothing
+fwhm = 5 # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 

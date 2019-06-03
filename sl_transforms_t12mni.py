@@ -6,19 +6,9 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-
-#trials
-##subjCat crossNobis, noNorm fwhm0
-#subjCatRaw-orth crossNobis, noNorm
-
-#motor
-##subjCat cope, noNorm fwhm0, blocks
-##subjCat cope, tstat fwhm0
-##subjCat crossNobis, noNorm fwhm0
-
-##subjCat cope, noNorm fwhm0, trials
-##subjCat cope, tstat fwhm0
-##subjCat crossNobis, noNorm fwhm0
+# subjCat/Raw-orth - diff sl size and smoothing
+# #fwhm=3, sph=9 - subjCat/orth cope/tstat, crossnobis, noNorm
+# #fwhm=3, sph=12 - subjCat/orth cope/tstat, noNorm
 
 #%%
 import os
