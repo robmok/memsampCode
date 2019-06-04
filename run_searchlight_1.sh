@@ -118,7 +118,7 @@ python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 #   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 # python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-#subjCatRaw-orth cope, noNorm
+#subjCatRaw-orth cope, noNorm, sl12, fwhm5
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
     -e s:"slSiz = 6":"slSiz = 12":g \

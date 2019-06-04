@@ -20,13 +20,21 @@ Created on Thu Apr 25 16:38:28 2019
 #sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
 #sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
 
+
+
+
 #missing - running in love06 now
-#sl12_subjCatRawDecoding-orth_svm_noNorm_trials_fwhm5_cope_sub-33.nii.gz
+#sl12_subjCatRawDecoding-orth_svm_noNorm_trials_fwhm5_cope_sub-33.nii.gz - almost
 
-
-# NOT finished running - still waiting for the orths:
+#to do
 #sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhm5_cope_sub-33.nii.gz - almost*
+#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhm5_cope_sub-33.nii.gz 
+
+#love06 running
+#subjCatRaw-orth cope, noNorm, sl12, fwhm5 - almost done
+#subjCatRaw-orth tstat, noNorm, sl12, fwhm5
+#subjCatRaw-orth crossnobis, noNorm, sl12, fwhm5
+
 #%%
 import sys
 sys.path.append('/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/')
