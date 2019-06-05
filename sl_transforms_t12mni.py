@@ -21,7 +21,6 @@ Created on Tue Mar 12 15:38:39 2019
 #sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
 
 
-
 #subjCatRaw-orth cope, noNorm, sl12, fwhm5 
 #subjCatRaw-orth tstat, noNorm, sl12, fwhm5 - randomised the subjCat but not orth
 #subjCatRaw-orth crossnobis, noNorm, sl12, fwhm5
@@ -43,7 +42,7 @@ slSiz = 12 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'crossNobis' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
-fwhm = None # smoothing - set to None if no smoothing
+fwhm = 5 # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat-orth' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 

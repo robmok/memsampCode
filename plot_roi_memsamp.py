@@ -94,28 +94,57 @@ for iSub in range(0,nSubs):
 rdmMean = rdmAll.mean(axis=2)
 rdmSE  = rdmAll.std(axis=2)/np.sqrt(nSubs)
 
-#%% subjCat-all - plot 1
+#% subjCat-all - plot 1
 
-ax = plt.figure(figsize=(8,4))
-ctuple=np.array((0.1,0.3,0.5))
-for iCond in range(0,6):
-    ax = plt.figure(figsize=(4,3))
-    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
-    ctuple = ctuple+0.05
-    ylim1, ylim2 = plt.ylim()
-    plt.ylim(ylims[0],ylims[1])
-
-ax = plt.figure(figsize=(8,4))
-ctuple=np.array((0.5,0.3,0.1))
-for iCond in range(6,12):
-    ax = plt.figure(figsize=(4,3))
-    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
-    ctuple = ctuple+0.05
-    ylim1, ylim2 = plt.ylim()
-    plt.ylim(ylims[0],ylims[1])
+#ax = plt.figure(figsize=(8,4))
+#ctuple=np.array((0.1,0.3,0.5))
+#for iCond in range(0,nCond//2):
+#    ax = plt.figure(figsize=(4,3))
+#    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
+#    ctuple = ctuple+0.05
+#    ylim1, ylim2 = plt.ylim()
+#    plt.ylim(ylims[0],ylims[1])
+#
+#ax = plt.figure(figsize=(8,4))
+#ctuple=np.array((0.5,0.3,0.1))
+#for iCond in range(nCond//2,nCond):
+#    ax = plt.figure(figsize=(4,3))
+#    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
+#    ctuple = ctuple+0.05
+#    ylim1, ylim2 = plt.ylim()
+#    plt.ylim(ylims[0],ylims[1])
 
     
-#ax = plt.errorbar(range(0,11),rdmMean[0,1:-1], yerr=rdmSE[0,1:-1], fmt='-o')
+#average values, ignoring the current training category (values 0)
+rdmAll[rdmAll==0]=np.nan #so can nanmean
+
+ylims = [0.45, 0.55]
+
+ctuple=np.array((0.1,0.3,0.5))
+#rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
+rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,:],axis=0).mean(axis=1)
+rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,:],axis=0),axis=1)
+
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+
+ctuple=np.array((0.5,0.3,0.1))
+#rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
+rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,:],axis=0).mean(axis=1)
+rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,:],axis=0),axis=1)
+
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+
+
+#average values within the training example category (e.g. av cat A, but plot all values for cat B) - 
+
+
+
 
 #%% subjCat-all - plot 2
 
