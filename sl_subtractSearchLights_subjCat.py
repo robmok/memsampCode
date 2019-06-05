@@ -21,19 +21,10 @@ Created on Thu Apr 25 16:38:28 2019
 #sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
 
 
-
-
-#missing - running in love06 now
-#sl12_subjCatRawDecoding-orth_svm_noNorm_trials_fwhm5_cope_sub-33.nii.gz - almost
-
-#to do
-#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhm5_cope_sub-33.nii.gz 
-
-#love06 running
-#subjCatRaw-orth cope, noNorm, sl12, fwhm5 - almost done
-#subjCatRaw-orth tstat, noNorm, sl12, fwhm5
+#subjCatRaw-orth cope, noNorm, sl12, fwhm5 
+#subjCatRaw-orth tstat, noNorm, sl12, fwhm5 - randomised the subjCat but not orth
 #subjCatRaw-orth crossnobis, noNorm, sl12, fwhm5
+#subjCatRaw-orth crossnobis, noNorm, sl12, fwhmNone
 
 #%%
 import sys
@@ -50,12 +41,12 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-imDat = 'tstat' # cope or tstat images
+imDat = 'cope' # cope or tstat images
 slSiz = 12 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks'
-fwhm = 5 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 

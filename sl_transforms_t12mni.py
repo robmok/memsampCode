@@ -20,13 +20,12 @@ Created on Tue Mar 12 15:38:39 2019
 #sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
 #sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
 
-#missing - running in love06 now
-#sl12_subjCatRawDecoding-orth_svm_noNorm_trials_fwhm5_cope_sub-33.nii.gz
 
 
-# NOT finished running - still waiting for the orths:
-#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl12_subjCatDecoding_crossNobis_noNorm_trials_fwhm5_cope_sub-33.nii.gz
+#subjCatRaw-orth cope, noNorm, sl12, fwhm5 
+#subjCatRaw-orth tstat, noNorm, sl12, fwhm5 - randomised the subjCat but not orth
+#subjCatRaw-orth crossnobis, noNorm, sl12, fwhm5
+#subjCatRaw-orth crossnobis, noNorm, sl12, fwhmNone
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -39,14 +38,14 @@ fmriprepDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/fmriprep_outpu
 slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
-imDat   = 'tstat' # cope or tstat images
+imDat   = 'cope' # cope or tstat images
 slSiz = 12 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'crossNobis'
+distMeth = 'crossNobis' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
-fwhm = 5 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'subjCat-orth' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
