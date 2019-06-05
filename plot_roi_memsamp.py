@@ -30,7 +30,7 @@ distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -72,6 +72,7 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 #roi='V1vd_lh'
 #roi='V3a_lh'
 
+#subjCat sig
 roi='V2vd_rh'
 #roi='hMT_lh'
 #roi='MDroi_area8c_lh'
