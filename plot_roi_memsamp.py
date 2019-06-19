@@ -238,10 +238,10 @@ plt.show()
 
 #%%12-way-all
 
-roi='V3a'
+#roi='V3a'
 
 
-ax=df.iloc[0:33,].mean().plot(figsize=(15,5),kind="bar")
+#ax=df.iloc[0:33,].mean().plot(figsize=(15,5),kind="bar")
 #plt.errorbar(range(0,12),np.mean(df[roi].iloc[0:33]), fmt='-o')
 
 
@@ -253,19 +253,26 @@ ax=df.iloc[0:33,].mean().plot(figsize=(15,5),kind="bar")
 #        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
 
 
-#rois = list(df)
+rois = list(df)
 
 dfMean = pd.DataFrame(columns=rois,index=range(0,12))
 dfSem  = pd.DataFrame(columns=rois,index=range(0,12))
 
 for roi in rois:
-    dfMean[roi] = np.asarray(np.stack(df[roi].iloc[0:33])).mean(axis=0)
+    dfMean[roi] = np.mean(np.asarray(np.stack(df[roi].iloc[0:33])),axis=0)
     dfSem[roi] = np.asarray(np.stack(df[roi].iloc[0:33])).std(axis=0)/np.sqrt(33)
      
     
 #ax=dfMean.iloc[0:33,:].T.plot(figsize=(20,5),kind="bar",yerr=dfSem.T,ylim=(.55,.65))
 
-roi= rois[0]
+roi='V1vd_lh'
+roi='V1vd_rh'
+
+roi='V2vd_rh'
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
+
+
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
 
