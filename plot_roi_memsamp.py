@@ -269,16 +269,18 @@ roi='V1vd_lh'
 roi='V1vd_rh'
 
 roi='V2vd_rh'
-roi='hMT_lh'
-roi='MDroi_area8c_lh'
+#roi='hMT_lh'
+#roi='MDroi_area8c_lh'
 
 
-ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+#ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
 
 
-
+#single subs
+#plt.plot(np.stack(df[roi].iloc[0:33]).T)
   
-    
+plt.plot(np.stack(df[roi].iloc[3]).T)
+
 
 
