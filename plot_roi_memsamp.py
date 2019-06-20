@@ -22,7 +22,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
 # laptop
-#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
+roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -30,7 +30,7 @@ distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = '12-way-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -61,6 +61,28 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 
 #%% subjCat-all - organise
 
+
+#if iSub==5: #move 240 and 270 to catA
+#elif iSub==10: #move 270 to cat B
+#elif iSub == 17:#move 30 to cat B
+#elif iSub==24: #move 120 to cat A
+#elif iSub==27:#move 270 to cat A
+
+
+
+#exclude subjects with unequal directions in each category
+# - NOTE: need to check if equal but not continous as well
+
+exclSubs = True
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
+        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
 #df1 = pd.DataFrame(columns=df.columns,index=['mean', 'sem'])
 
 #for roi in df.columns.values[0:-1]:
@@ -74,13 +96,13 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 
 #subjCat sig
 roi='V2vd_rh'
-#roi='hMT_lh'
-#roi='MDroi_area8c_lh'
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
 
 
 ylims = [0.45, 0.55]
 
-# plot mean and std across subs and plot for now (ignoring some might have diff nConds per cat)
+# plot mean and std across subs and plot (if including all subs, this ignores that some might have diff nConds per cat)
 nCond=12
 nSubs=33
 rdmAll = np.zeros((nCond,nCond,nSubs))
@@ -92,8 +114,8 @@ for iSub in range(0,nSubs):
     rdm[il] = rdm.T[il]
     rdmAll[:,:,iSub] = rdm
 
-rdmMean = rdmAll.mean(axis=2)
-rdmSE  = rdmAll.std(axis=2)/np.sqrt(nSubs)
+rdmMean = rdmAll[:,:,indSubs].mean(axis=2)
+rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(np.count_nonzero(indSubs))
 
 #% subjCat-all - plot 1
 
@@ -123,8 +145,8 @@ ylims = [0.45, 0.55]
 
 ctuple=np.array((0.1,0.3,0.5))
 #rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
-rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,:],axis=0).mean(axis=1)
-rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,:],axis=0),axis=1)
+rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
+rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)
 
 ax = plt.figure(figsize=(4,3))
 ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
@@ -133,8 +155,8 @@ plt.ylim(ylims[0],ylims[1])
 
 ctuple=np.array((0.5,0.3,0.1))
 #rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
-rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,:],axis=0).mean(axis=1)
-rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,:],axis=0),axis=1)
+rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
+rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)
 
 ax = plt.figure(figsize=(4,3))
 ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
@@ -171,6 +193,7 @@ for iDist in range(0,5):
         avDist[iC,iDist]=rdmMean[[np.mod(iC+iDist+1,12),np.mod(iC-(iDist+1),12)],iC].mean()
         
 #plt.imshow(avDist,cmap='viridis')
+#plt.colorbar()
 
 #maybe only the 'middle' prototype conditions make sense (for conds 0:11, conds 2,3,8,9)
 ax = plt.figure(figsize=(8,4))
@@ -238,6 +261,7 @@ plt.show()
 
 #%%12-way-all
 
+    
 #roi='V3a'
 
 
@@ -273,14 +297,14 @@ roi='V2vd_rh'
 #roi='MDroi_area8c_lh'
 
 
-#ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
 
 
 #single subs
 #plt.plot(np.stack(df[roi].iloc[0:33]).T)
   
-plt.plot(np.stack(df[roi].iloc[3]).T)
+#plt.plot(np.stack(df[roi].iloc[3]).T)
 
 
 
