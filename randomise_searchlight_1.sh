@@ -30,13 +30,18 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 # -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allROIsSL_allsubs_mni.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -C ${tThresh}
 
 # tThresh=2.4486 #  - DF = 33-1, one-tailed, p=0.010002
-tThresh=1.6938#  - DF = 33-1, one-tailed, p=0.05 - #new 190619 - only re-doing copes for now; old ones in directory: old_randomises_p001
+tThresh=1.6938 #  - DF = 33-1, one-tailed, p=0.05 - #new 190619 - only re-doing copes for now; old ones in directory: old_randomises_p001
 vSmooth=5
 
 # threshMeth='vox' #vox, tfce, cSize, cMass
+# cluster forming threshold: 0.05, cope only for now
 
+#randomise:
+#subjCat, subjCat-orth
+#sl6, fwhmNone/fwhm1
+#ori sl6 fwhmNone
+#12-way #sl6, sl8 fwhmNone
 
-# cluster forming threshold: 0.05, cope only fow now
 
 #sl6
 # subjCat - sl6, fwhmNone, cope
@@ -63,30 +68,18 @@ threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
 -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
 
-#tfce
 
-#sl6
-# subjCat - sl6, fwhmNone, cope
+# subjCat - sl6, fwhm1, cope
 trainSetMeth='trials'
 slSiz=6
 normMeth='noNorm'
 decodeFeature='subjCat'
 distMeth='svm'
-fwhm='None'
+fwhm=1
 imDat='cope' # cope or tstat images
-threshMeth='tfce' #vox, tfce, cSize, cMass
+threshMeth='cMass' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -T
-
-
-
-
-
-
-
-
-
-
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
 
 
 
