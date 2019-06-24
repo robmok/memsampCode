@@ -14,6 +14,7 @@ import seaborn as sns
 sns.set(style="ticks", color_codes=True)
 #import bootstrapped.bootstrap as bs
 #import bootstrapped.stats_functions as bs_stats
+import scipy.stats as stats
 
 # bootstrap CIs - over subjects....
 #print(bs.bootstrap(np.asarray(df.iloc[0:33,0]), stat_func=bs_stats.mean))
@@ -22,7 +23,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
 # laptop
-#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
+roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -278,11 +279,39 @@ plt.show()
 
 #%% model RDMs
 
-modelRDM = np.zeros((12,12))
+#edit
+indSubs=np.ones(33,dtype=bool)
 
+
+#model
+modelRDM = np.zeros((12,12))
 #simple just for the category one
 modelRDM[0:6,6:12]=np.ones((6,6))
-modelRDM[il] = modelRDM.T[il]
+#modelRDM[il] = modelRDM.T[il]
+
+#data
+roi='V2vd_rh'
+#roi='hMT_lh' 
+roi='MDroi_area8c_lh'
+rdm = np.zeros((12,12)) #one-sided rho, p=0.0663
+
+rho=np.empty((sum(indSubs)))
+tau=np.empty((sum(indSubs)))
+pval=np.empty((sum(indSubs)))
+
+useSubs=np.where(indSubs)
+i=0
+for iSub in useSubs[0]:    
+    rdm[iu] = df[roi].iloc[iSub]
+    rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+    tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
+    i=i+1
+
+t,p=stats.ttest_1samp(rho,0)
+print('spearman: t=%.3f, p=%.4f' % (t,p))
+t,p=stats.ttest_1samp(tau,0)
+print('tau-b: t=%.3f, p=%.4f' % (t,p))
+#%%
 
 #modelRDM[iu] =  np.concatenate((-np.ones(np.int(np.size(iu,1)/2)),np.ones(np.int(np.size(iu,1)/2))))
 #modelRDM[il] = modelRDM.T[il]
@@ -294,7 +323,7 @@ modelRDM[il] = modelRDM.T[il]
 #modelRDM[iu[0][0:5],iu[1][0:5]]=np.ones(5)
 
 
-# angular distance 
+# angular distance - direction
 # https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
 
 # using % - modulo
@@ -308,11 +337,12 @@ a = (a + 180) % 360 - 180
 #  import math
 #  return min(y-x, y-x+2*math.pi, y-x-2*math.pi, key=abs
 
-             
-
 ax = plt.imshow(modelRDM,cmap='viridis')
 plt.colorbar()
 plt.show()
+
+# angular distance - orientation
+
 
 
 
