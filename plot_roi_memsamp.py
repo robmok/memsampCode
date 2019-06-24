@@ -279,6 +279,11 @@ plt.show()
 #%% model RDMs
 
 modelRDM = np.zeros((12,12))
+
+#simple just for the category one
+modelRDM[0:6,6:12]=np.ones((6,6))
+modelRDM[il] = modelRDM.T[il]
+
 #modelRDM[iu] =  np.concatenate((-np.ones(np.int(np.size(iu,1)/2)),np.ones(np.int(np.size(iu,1)/2))))
 #modelRDM[il] = modelRDM.T[il]
 
@@ -289,10 +294,21 @@ modelRDM = np.zeros((12,12))
 #modelRDM[iu[0][0:5],iu[1][0:5]]=np.ones(5)
 
 
-#simple just for the category one
-modelRDM[0:6,6:12]=np.ones((6,6))
-modelRDM[il] = modelRDM.T[il]
+# angular distance 
+# https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
 
+# using % - modulo
+targetA=90
+sourceA=330
+a = targetA - sourceA
+a = (a + 180) % 360 - 180
+
+#using a function:
+#def f(x,y):
+#  import math
+#  return min(y-x, y-x+2*math.pi, y-x-2*math.pi, key=abs
+
+             
 
 ax = plt.imshow(modelRDM,cmap='viridis')
 plt.colorbar()
