@@ -30,7 +30,7 @@ distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -96,8 +96,8 @@ else:
 
 #subjCat sig
 roi='V2vd_rh'
-roi='hMT_lh'
-roi='MDroi_area8c_lh'
+#roi='hMT_lh'
+#roi='MDroi_area8c_lh'
 
 
 ylims = [0.45, 0.55]
@@ -223,8 +223,8 @@ for iCond in 2,3,8,9: #range(0,11):
     
     
 roi='V2vd_rh'
-roi='hMT_lh'
-roi='MDroi_area8c_lh'
+#roi='hMT_lh'
+#roi='MDroi_area8c_lh'
 
 rdm = np.zeros((12,12))
 
@@ -232,7 +232,7 @@ iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores di
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
 #tstat (double check formula)
-rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
+#rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
 
 #make it a symmetric matrix 
 il = np.tril_indices(12,-1) 
@@ -258,53 +258,116 @@ for icol in range(0,12):
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 
+#%% #single sub RDMs
+iSub=5
+
+rdm = np.zeros((12,12))
+rdm[iu] = df[roi].iloc[iSub]
+
+#make it a symmetric matrix 
+il = np.tril_indices(12,-1) 
+rdm[il] = rdm.T[il]
+ax = plt.figure(figsize=(25,4))
+ax = plt.imshow(rdm,cmap='viridis')
+plt.colorbar()
+plt.show()
+
+pos = mds.fit(rdm).embedding_
+plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.show()
+
+#%% model RDMs
+
+modelRDM = np.zeros((12,12))
+#modelRDM[iu] =  np.concatenate((-np.ones(np.int(np.size(iu,1)/2)),np.ones(np.int(np.size(iu,1)/2))))
+#modelRDM[il] = modelRDM.T[il]
+
+# 0:4 (inclusive) are 0, 0:5 (incl) are 1:5
+
+#iu[0][0:5]
+#iu[1][0:5]    
+#modelRDM[iu[0][0:5],iu[1][0:5]]=np.ones(5)
+
+
+#simple just for the category one
+modelRDM[0:6,6:12]=np.ones((6,6))
+modelRDM[il] = modelRDM.T[il]
+
+
+ax = plt.imshow(modelRDM,cmap='viridis')
+plt.colorbar()
+plt.show()
+
+
+
 
 #%%12-way-all
 
-    
-#roi='V3a'
+# test the shape: 
+# more senory modulation, strongest decoding in the middle of each category, lowest at boundary
+# task based / abstract - step function
+
+# results
+# visualsing; looks more like a noisy U-shaped curve; which is consistent with sensory modulation; lowest decoding acc at boundary
+
+# but may want to test quantitatively on each subject rather than group - more consistent with peak-valley-peak, or inverted-U, or flat-valley-flat (harder to distinguish with first?)
 
 
-#ax=df.iloc[0:33,].mean().plot(figsize=(15,5),kind="bar")
-#plt.errorbar(range(0,12),np.mean(df[roi].iloc[0:33]), fmt='-o')
+# if look at median, MT looks a bit more like peak-valley-peak; V2 also a little. PFC just flat
 
 
-#rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
-#        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh', 
-#        'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
-#        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh',
-#        'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
-#        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
 
+#selecting subjects (based on equal number of dirs in each category)
+# - atm taking from subjCat-all; since that saved the subjCat conditions) - need to load that in and run the "exclSubs" bit above first
+
+#if not excluding subjects
+#indSubs=np.ones(33,dtype=bool)
 
 rois = list(df)
-
 dfMean = pd.DataFrame(columns=rois,index=range(0,12))
 dfSem  = pd.DataFrame(columns=rois,index=range(0,12))
 
 for roi in rois:
-    dfMean[roi] = np.mean(np.asarray(np.stack(df[roi].iloc[0:33])),axis=0)
-    dfSem[roi] = np.asarray(np.stack(df[roi].iloc[0:33])).std(axis=0)/np.sqrt(33)
+    dfMean[roi] = np.mean(np.asarray(np.stack(df[roi].iloc[indSubs])),axis=0)
+    dfSem[roi] = np.asarray(np.stack(df[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
      
     
 #ax=dfMean.iloc[0:33,:].T.plot(figsize=(20,5),kind="bar",yerr=dfSem.T,ylim=(.55,.65))
 
-roi='V1vd_lh'
-roi='V1vd_rh'
-
-roi='V2vd_rh'
-#roi='hMT_lh'
-#roi='MDroi_area8c_lh'
-
-
+roi='V1vd_lh' # up and down; median bit more flat
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+roi='V1vd_rh' # U shaped; median U shaped
+plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
 
+roi='V2vd_rh'
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+roi='hMT_lh'
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+roi='MDroi_area8c_lh'
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
-#single subs
+
+#%% single subs
+
 #plt.plot(np.stack(df[roi].iloc[0:33]).T)
   
-#plt.plot(np.stack(df[roi].iloc[3]).T)
+iSub=8
+
+roi='V2vd_rh'
+plt.figure(figsize=(5,3))
+plt.plot(np.stack(df[roi].iloc[iSub]).T)
+roi='hMT_lh'
+plt.figure(figsize=(5,3))
+plt.plot(np.stack(df[roi].iloc[iSub]).T)
+roi='MDroi_area8c_lh'
+plt.figure(figsize=(5,3))
+plt.plot(np.stack(df[roi].iloc[iSub]).T)
 
 
 

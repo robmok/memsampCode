@@ -7,24 +7,7 @@ Created on Thu Apr 25 16:38:28 2019
 """
 # subjCat/Raw-orth
 
-#love06 - subtracted:
-# #fwhm=3, sph=9 - subjCat/orth cope/tstat, crossnobis, noNorm
-# #fwhm=3, sph=12 - subjCat/orth cope/tstat, noNorm
-
-#love01
-#sl9_subjCatDecoding_svm_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl9_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
-#sl9_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-
-#sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
-#sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
-
-
-#subjCatRaw-orth cope, noNorm, sl12, fwhm5 
-#subjCatRaw-orth tstat, noNorm, sl12, fwhm5 - randomised the subjCat but not orth
-#subjCatRaw-orth crossnobis, noNorm, sl12, fwhm5
-#subjCatRaw-orth crossnobis, noNorm, sl12, fwhmNone
+#sl8, sl10: subjCat/orth, fwhmNone, fwhm1
 
 #%%
 import sys
@@ -42,11 +25,11 @@ codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
 imDat = 'cope' # cope or tstat images
-slSiz = 12 #searchlight size
+slSiz = 10 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks'
-fwhm = None # smoothing - set to None if no smoothing
+fwhm = 1 # smoothing - set to None if no smoothing
 
 decodeFeature = 'subjCat' # category: 'objCat' (objective catgeory), 'subjCat' 
 

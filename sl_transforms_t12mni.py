@@ -6,25 +6,8 @@ Created on Tue Mar 12 15:38:39 2019
 @author: robert.mok
 """
 
-# subjCat/Raw-orth - diff sl size and smoothing
-# #fwhm=3, sph=9 - subjCat/orth cope/tstat, crossnobis, noNorm
-# #fwhm=3, sph=12 - subjCat/orth cope/tstat, noNorm
+#waiting sl9, sl10 12-way, fwhmNone
 
-
-#love01
-#sl9_subjCatDecoding_svm_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl9_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
-#sl9_subjCatDecoding_crossNobis_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-
-#sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_cope_sub-33.nii.gz
-#sl12_subjCatDecoding_svm_noNorm_trials_fwhmNone_tstat_sub-33.nii.gz
-#sl12_subjCatDecoding_svm_noNorm_trials_fwhm5_tstat_sub-33.nii.gz
-
-
-#subjCatRaw-orth cope, noNorm, sl12, fwhm5 
-#subjCatRaw-orth tstat, noNorm, sl12, fwhm5 - randomised the subjCat but not orth
-#subjCatRaw-orth crossnobis, noNorm, sl12, fwhm5
-#subjCatRaw-orth crossnobis, noNorm, sl12, fwhmNone
 #%%
 import os
 import nipype.interfaces.ants as ants
@@ -38,13 +21,13 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
-slSiz = 12 #searchlight size
+slSiz = 10 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'crossNobis' # 'svm', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
-fwhm = 5 # smoothing - set to None if no smoothing
+fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'subjCat-orth' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'ori' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
