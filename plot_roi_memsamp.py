@@ -74,7 +74,7 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 #exclude subjects with unequal directions in each category
 # - NOTE: need to check if equal but not continous as well
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -322,9 +322,11 @@ for iRoi in roiList:
     t,p=stats.ttest_1samp(tau,0)
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
     
-#%% model RDMs - angular distance - direction
-    
+#%% model RDMs - angular distance - direction / ori 
+
 modelRDM = np.zeros((12,12))
+    
+ #direction
 angDist=np.empty((66)) #number of upper diagonal cells
 conds = np.arange(0,360,30)
 i=0
@@ -333,10 +335,25 @@ for iCond in range(0,len(conds)):
         angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
         i=i+1
 
-modelRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 modelRDM[iu] = angDist
 #modelRDM[il] = modelRDM.T[il]
+
+
+#orientation
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,210,30)
+condsTmp = np.arange(30,180,30)
+condsTmp=condsTmp[::-1]
+conds = np.append(conds,condsTmp)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        i=i+1
+
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
 
 #data
 rdm = np.zeros((12,12)) 
@@ -390,9 +407,6 @@ modelRDM = np.zeros((12,12))
 #  return min(y-x, y-x+2*math.pi, y-x-2*math.pi, key=abs
 
 
-
-
-# angular distance - orientation
 
 
 
