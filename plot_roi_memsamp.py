@@ -27,7 +27,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'crossNobis'
+distMeth = 'crossNobis' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -215,17 +215,22 @@ for iCond in 2,3,8,9: #range(0,11):
 
 #%% plot RDM
 #roi='dlPFC_rh'
-#roi='dlPFC_lh'
+roi='dlPFC_lh'
 #roi='MDroi_ips_lh'
 #roi='MDroi_ips_rh'
 #roi='V1vd_lh'
 #roi='V3a_rh'
 #roi='V3a_lh'
     
-    
-roi='V2vd_rh'
-roi='hMT_lh'
+#decoding subjCat sig    
+#roi='V2vd_rh'
+#roi='hMT_lh'
 #roi='MDroi_area8c_lh'
+
+
+#rdmModel category sig - crossnobis
+#roi='MDroi_area9_rh'
+
 
 rdm = np.zeros((12,12))
 
@@ -233,7 +238,7 @@ iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores di
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
 #tstat (double check formula)
-#rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
+rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
 
 #make it a symmetric matrix 
 il = np.tril_indices(12,-1) 
@@ -277,99 +282,124 @@ pos = mds.fit(rdm).embedding_
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 
-#%% model RDMs
+#%% model RDMs - category
 
 #edit
 #indSubs=np.ones(33,dtype=bool)
 
 
 #model
-modelRDM = np.ones((12,12))
-#simple just for the category one
-modelRDM[0:6,6:12]=np.zeros((6,6))
-#modelRDM[il] = modelRDM.T[il]
+modelRDM = np.zeros((12,12))
+
+#category
+modelRDM[0:6,6:12]=np.ones((6,6))
 
 #data
-roi='V2vd_rh'
-roi='hMT_lh' 
-roi='MDroi_area8c_lh'
-
-rdm = np.zeros((12,12)) #one-sided rho, p=0.0663
+rdm = np.zeros((12,12)) 
 rho=np.empty((sum(indSubs)))
 tau=np.empty((sum(indSubs)))
 pval=np.empty((sum(indSubs)))
 
 useSubs=np.where(indSubs)
-i=0
-for iSub in useSubs[0]:    
-    rdm[iu] = df[roi].iloc[iSub]
-    rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
-    tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
-    i=i+1
-
-t,p=stats.ttest_1samp(rho,0)
-print('spearman: t=%.3f, p=%.4f' % (t,p))
-t,p=stats.ttest_1samp(tau,0)
-print('tau-b: t=%.3f, p=%.4f' % (t,p))
-
-
-
 
 roiList=list(df)
 roiList.remove('subjCat')
 for iRoi in roiList:
     roi=iRoi
-    rdm = np.zeros((12,12)) #one-sided rho, p=0.0663
+    rdm = np.zeros((12,12)) 
     rho=np.empty((sum(indSubs)))
     tau=np.empty((sum(indSubs)))
     pval=np.empty((sum(indSubs)))
-    
-    useSubs=np.where(indSubs)
     i=0
     for iSub in useSubs[0]:    
         rdm[iu] = df[roi].iloc[iSub]
         rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
         tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
         i=i+1
-    
     t,p=stats.ttest_1samp(rho,0)
     print('roi: %s' % (iRoi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
-#%%
+    
+#%% model RDMs - angular distance - direction
+    
+modelRDM = np.zeros((12,12))
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,360,30)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        i=i+1
 
-#modelRDM[iu] =  np.concatenate((-np.ones(np.int(np.size(iu,1)/2)),np.ones(np.int(np.size(iu,1)/2))))
+modelRDM = np.zeros((12,12))
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
 #modelRDM[il] = modelRDM.T[il]
 
-# 0:4 (inclusive) are 0, 0:5 (incl) are 1:5
+#data
+rdm = np.zeros((12,12)) 
+rho=np.empty((sum(indSubs)))
+tau=np.empty((sum(indSubs)))
+pval=np.empty((sum(indSubs)))
 
+useSubs=np.where(indSubs)
+
+roiList=list(df)
+roiList.remove('subjCat')
+for iRoi in roiList:
+    roi=iRoi
+    rdm = np.zeros((12,12)) 
+    rho=np.empty((sum(indSubs)))
+    tau=np.empty((sum(indSubs)))
+    pval=np.empty((sum(indSubs)))
+    i=0
+    for iSub in useSubs[0]:    
+        rdm[iu] = df[roi].iloc[iSub]
+        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
+        i=i+1
+    t,p=stats.ttest_1samp(rho,0)
+    print('roi: %s' % (iRoi))
+    print('spearman: t=%.3f, p=%.4f' % (t,p))
+    t,p=stats.ttest_1samp(tau,0)
+    print('tau-b: t=%.3f, p=%.4f' % (t,p))
+    
+    
+#%%
+modelRDM = np.zeros((12,12))
+
+# 0:4 (inclusive) are 0, 0:5 (incl) are 1:5
 #iu[0][0:5]
 #iu[1][0:5]    
 #modelRDM[iu[0][0:5],iu[1][0:5]]=np.ones(5)
-
 
 # angular distance - direction
 # https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
 
 # using % - modulo
-targetA=90
-sourceA=330
-a = targetA - sourceA
-a = (a + 180) % 360 - 180
+#targetA=90
+#sourceA=330
+#a = targetA - sourceA
+#a = (a + 180) % 360 - 180
 
 #using a function:
 #def f(x,y):
 #  import math
 #  return min(y-x, y-x+2*math.pi, y-x-2*math.pi, key=abs
 
-ax = plt.imshow(modelRDM,cmap='viridis')
-plt.colorbar()
-plt.show()
+
+
 
 # angular distance - orientation
 
 
+
+
+ax = plt.imshow(modelRDM,cmap='viridis')
+plt.colorbar()
+plt.show()
 
 
 
