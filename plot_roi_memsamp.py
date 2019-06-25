@@ -23,7 +23,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
 
 # laptop
-roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
+#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -74,7 +74,7 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 #exclude subjects with unequal directions in each category
 # - NOTE: need to check if equal but not continous as well
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -224,7 +224,7 @@ for iCond in 2,3,8,9: #range(0,11):
     
     
 roi='V2vd_rh'
-#roi='hMT_lh'
+roi='hMT_lh'
 #roi='MDroi_area8c_lh'
 
 rdm = np.zeros((12,12))
@@ -280,21 +280,21 @@ plt.show()
 #%% model RDMs
 
 #edit
-indSubs=np.ones(33,dtype=bool)
+#indSubs=np.ones(33,dtype=bool)
 
 
 #model
-modelRDM = np.zeros((12,12))
+modelRDM = np.ones((12,12))
 #simple just for the category one
-modelRDM[0:6,6:12]=np.ones((6,6))
+modelRDM[0:6,6:12]=np.zeros((6,6))
 #modelRDM[il] = modelRDM.T[il]
 
 #data
 roi='V2vd_rh'
-#roi='hMT_lh' 
+roi='hMT_lh' 
 roi='MDroi_area8c_lh'
-rdm = np.zeros((12,12)) #one-sided rho, p=0.0663
 
+rdm = np.zeros((12,12)) #one-sided rho, p=0.0663
 rho=np.empty((sum(indSubs)))
 tau=np.empty((sum(indSubs)))
 pval=np.empty((sum(indSubs)))
@@ -311,6 +311,32 @@ t,p=stats.ttest_1samp(rho,0)
 print('spearman: t=%.3f, p=%.4f' % (t,p))
 t,p=stats.ttest_1samp(tau,0)
 print('tau-b: t=%.3f, p=%.4f' % (t,p))
+
+
+
+
+roiList=list(df)
+roiList.remove('subjCat')
+for iRoi in roiList:
+    roi=iRoi
+    rdm = np.zeros((12,12)) #one-sided rho, p=0.0663
+    rho=np.empty((sum(indSubs)))
+    tau=np.empty((sum(indSubs)))
+    pval=np.empty((sum(indSubs)))
+    
+    useSubs=np.where(indSubs)
+    i=0
+    for iSub in useSubs[0]:    
+        rdm[iu] = df[roi].iloc[iSub]
+        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
+        i=i+1
+    
+    t,p=stats.ttest_1samp(rho,0)
+    print('roi: %s' % (iRoi))
+    print('spearman: t=%.3f, p=%.4f' % (t,p))
+    t,p=stats.ttest_1samp(tau,0)
+    print('tau-b: t=%.3f, p=%.4f' % (t,p))
 #%%
 
 #modelRDM[iu] =  np.concatenate((-np.ones(np.int(np.size(iu,1)/2)),np.ones(np.int(np.size(iu,1)/2))))
@@ -367,8 +393,8 @@ plt.show()
 # - atm taking from subjCat-all; since that saved the subjCat conditions) - need to load that in and run the "exclSubs" bit above first
 
 #if not excluding subjects
-#indSubs=np.ones(33,dtype=bool)
-
+indSubs=np.ones(33,dtype=bool)
+#
 rois = list(df)
 dfMean = pd.DataFrame(columns=rois,index=range(0,12))
 dfSem  = pd.DataFrame(columns=rois,index=range(0,12))
@@ -417,3 +443,26 @@ plt.plot(np.stack(df[roi].iloc[iSub]).T)
 
 
 
+
+#%% univariate scatter plots, violin plots
+
+roi='V2vd_rh'
+dfPlt=pd.DataFrame(np.asarray(np.stack(df[roi].iloc[indSubs])))
+ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
+ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+
+roi='hMT_lh'
+dfPlt=pd.DataFrame(np.asarray(np.stack(df[roi].iloc[indSubs])))
+ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
+ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+
+roi='MDroi_area8c_lh'
+dfPlt=pd.DataFrame(np.asarray(np.stack(df[roi].iloc[indSubs])))
+ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
+ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
