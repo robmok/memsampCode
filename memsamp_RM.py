@@ -128,7 +128,26 @@ def compCovMat(var):
 #    covMat = fractional_matrix_power(covTmp.covariance_,-0.5)
     return covMat
 
+def kendall_a(a, b):
+    """Kendalls tau-a
+    
+    Arguments:
+        a {array} -- [description]
+        b {[array]} -- [description]
+    
+    Returns:
+        tau -- Kendalls tau-a   
+    """
+    a, b = np.array(a), np.array(b)
+    assert a.size == b.size, 'Both arrays need to be the same size'
+    K = 0
+    n = a.size
+    for k in range(n):
+        pairRelations_a = np.sign(a[k]-a[k+1:])
+        pairRelations_b = np.sign(b[k]-b[k+1:])
+        K = K + np.sum(pairRelations_a * pairRelations_b)
 
+    return K/(n*(n-1)/2)
 
 
 
