@@ -27,28 +27,38 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 #%% plot bar / errobar plot
 
+#edit to load in EXCLUDE subs
+indSubs=np.ones(33,dtype=bool)
+    
 #stdAll = df.iloc[0:33,df.loc['stats']:].std()/np.sqrt(33)
-stdAll = df.iloc[0:33,:].sem()
+stdAll = df.iloc[indSubs,:].sem()
 
 
-#ax=df.iloc[0:33,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
-ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
-#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
-#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
+#ax=df.iloc[indSubs,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
+#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
+#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
+ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
 
-#ax=df.iloc[0:33,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
-#ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[0:33,:], yerr=stdAll, fmt='-o')
+#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
+#ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[indSubs,:], yerr=stdAll, fmt='-o')
+
+
+# without excluding, V2 p=0.1 MT: p=0.02715; area8c_lhp= 0.00855  - NOTE: pvals are 2-tailed; should be 1, so halve them
+# after excluding, V2 p=0.3449, MT: p=0.0346, area8c_lh: p=0.00337 
+#stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0)
+#stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0)
+#stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0)
 
 #%% univariate scatter plots, violin plots
 
@@ -68,8 +78,6 @@ sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
 #elif iSub == 17:#move 30 to cat B
 #elif iSub==24: #move 120 to cat A
 #elif iSub==27:#move 270 to cat A
-
-
 
 #exclude subjects with unequal directions in each category
 # - NOTE: need to check if equal but not continous as well
@@ -282,110 +290,8 @@ pos = mds.fit(rdm).embedding_
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 
-#%% model RDMs - category
 
-#edit
-#indSubs=np.ones(33,dtype=bool)
-
-
-#model
-modelRDM = np.zeros((12,12))
-
-#category
-modelRDM[0:6,6:12]=np.ones((6,6))
-
-#data
-rdm = np.zeros((12,12)) 
-rho=np.empty((sum(indSubs)))
-tau=np.empty((sum(indSubs)))
-pval=np.empty((sum(indSubs)))
-
-useSubs=np.where(indSubs)
-
-roiList=list(df)
-roiList.remove('subjCat')
-for iRoi in roiList:
-    roi=iRoi
-    rdm = np.zeros((12,12)) 
-    rho=np.empty((sum(indSubs)))
-    tau=np.empty((sum(indSubs)))
-    pval=np.empty((sum(indSubs)))
-    i=0
-    for iSub in useSubs[0]:    
-        rdm[iu] = df[roi].iloc[iSub]
-        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
-        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
-        i=i+1
-    t,p=stats.ttest_1samp(rho,0)
-    print('roi: %s' % (iRoi))
-    print('spearman: t=%.3f, p=%.4f' % (t,p))
-    t,p=stats.ttest_1samp(tau,0)
-    print('tau-b: t=%.3f, p=%.4f' % (t,p))
-    
-#%% model RDMs - angular distance - direction / ori 
-
-modelRDM = np.zeros((12,12))
-    
- #direction
-angDist=np.empty((66)) #number of upper diagonal cells
-conds = np.arange(0,360,30)
-i=0
-for iCond in range(0,len(conds)):
-    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
-        i=i+1
-
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-modelRDM[iu] = angDist
-#modelRDM[il] = modelRDM.T[il]
-
-
-#orientation
-angDist=np.empty((66)) #number of upper diagonal cells
-conds = np.arange(0,210,30)
-condsTmp = np.arange(30,180,30)
-condsTmp=condsTmp[::-1]
-conds = np.append(conds,condsTmp)
-i=0
-for iCond in range(0,len(conds)):
-    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
-        i=i+1
-
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-modelRDM[iu] = angDist
-
-#data
-rdm = np.zeros((12,12)) 
-rho=np.empty((sum(indSubs)))
-tau=np.empty((sum(indSubs)))
-pval=np.empty((sum(indSubs)))
-
-useSubs=np.where(indSubs)
-
-roiList=list(df)
-roiList.remove('subjCat')
-for iRoi in roiList:
-    roi=iRoi
-    rdm = np.zeros((12,12)) 
-    rho=np.empty((sum(indSubs)))
-    tau=np.empty((sum(indSubs)))
-    pval=np.empty((sum(indSubs)))
-    i=0
-    for iSub in useSubs[0]:    
-        rdm[iu] = df[roi].iloc[iSub]
-        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
-        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
-        i=i+1
-    t,p=stats.ttest_1samp(rho,0)
-    print('roi: %s' % (iRoi))
-    print('spearman: t=%.3f, p=%.4f' % (t,p))
-    t,p=stats.ttest_1samp(tau,0)
-    print('tau-b: t=%.3f, p=%.4f' % (t,p))
-    
-    
-#%%
-modelRDM = np.zeros((12,12))
+#%% model visualise
 
 # 0:4 (inclusive) are 0, 0:5 (incl) are 1:5
 #iu[0][0:5]
@@ -407,15 +313,184 @@ modelRDM = np.zeros((12,12))
 #  return min(y-x, y-x+2*math.pi, y-x-2*math.pi, key=abs
 
 
+modelRDM = np.zeros((12,12))
 
-
-
+#category
+modelRDM[0:6,6:12]=np.ones((6,6))
+modelRDM[il] = modelRDM.T[il]
 
 ax = plt.imshow(modelRDM,cmap='viridis')
 plt.colorbar()
 plt.show()
 
+ #direction
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,360,30)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        i=i+1
 
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
+modelRDM[il] = modelRDM.T[il]
+
+ax = plt.imshow(modelRDM,cmap='viridis')
+plt.colorbar()
+plt.show()
+
+#orientation
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,210,30)
+condsTmp = np.arange(30,180,30)
+condsTmp=condsTmp[::-1]
+conds = np.append(conds,condsTmp)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        i=i+1
+
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
+modelRDM[il] = modelRDM.T[il]
+
+ax = plt.imshow(modelRDM,cmap='viridis')
+plt.colorbar()
+plt.show()
+
+#%% model RDMs - category
+
+exclSubs = True
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
+        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+
+#model
+modelRDM = np.zeros((12,12))
+
+#category
+modelRDM[0:6,6:12]=np.ones((6,6))
+
+#data
+rdm = np.zeros((12,12)) 
+rho = np.empty((sum(indSubs)))
+tau = np.empty((sum(indSubs)))
+pval = np.empty((sum(indSubs)))
+
+useSubs=np.where(indSubs)
+roiList=list(df)
+roiList.remove('subjCat')
+rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+
+for iRoi in roiList:
+    roi=iRoi
+    rdm = np.zeros((12,12)) 
+    rho=np.empty((sum(indSubs)))
+    tau=np.empty((sum(indSubs)))
+    pval=np.empty((sum(indSubs)))
+    i=0
+    for iSub in useSubs[0]:    
+        rdm[iu] = df[roi].iloc[iSub]
+        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
+        i=i+1
+    t,p=stats.ttest_1samp(rho,0)
+    print('roi: %s' % (iRoi))
+    print('spearman: t=%.3f, p=%.4f' % (t,p))
+    t,p=stats.ttest_1samp(tau,0)
+    print('tau-b: t=%.3f, p=%.4f' % (t,p))
+    rhoAll[roi]=rho
+    
+ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
+
+
+#%% model RDMs - angular distance - direction / ori 
+
+exclSubs = True
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
+        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+
+modelRDM = np.zeros((12,12))
+
+
+ #direction
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,360,30)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        i=i+1
+
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
+#modelRDM[il] = modelRDM.T[il]
+
+
+
+#orientation
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,210,30)
+condsTmp = np.arange(30,180,30)
+condsTmp=condsTmp[::-1]
+conds = np.append(conds,condsTmp)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        i=i+1
+
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
+
+
+
+
+
+#data
+rdm = np.zeros((12,12)) 
+rho=np.empty((sum(indSubs)))
+tau=np.empty((sum(indSubs)))
+pval=np.empty((sum(indSubs)))
+
+useSubs=np.where(indSubs)
+
+roiList=list(df)
+roiList.remove('subjCat')
+rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+for iRoi in roiList:
+    roi=iRoi
+    rdm = np.zeros((12,12)) 
+    rho=np.empty((sum(indSubs)))
+    tau=np.empty((sum(indSubs)))
+    pval=np.empty((sum(indSubs)))
+    i=0
+    for iSub in useSubs[0]:    
+        rdm[iu] = df[roi].iloc[iSub]
+        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
+        i=i+1
+    t,p=stats.ttest_1samp(rho,0)
+    print('roi: %s' % (iRoi))
+    print('spearman: t=%.3f, p=%.4f' % (t,p))
+    t,p=stats.ttest_1samp(tau,0)
+    print('tau-b: t=%.3f, p=%.4f' % (t,p))
+    rhoAll[roi]=rho
+    
+ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 
 #%%12-way-all
 
