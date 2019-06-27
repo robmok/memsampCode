@@ -35,7 +35,7 @@ reRun = False
 
 imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
-distMeth = 'mNobis' # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
+distMeth = 'svm' # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
 
@@ -43,7 +43,7 @@ fwhm = None # optional smoothing param - 1, or None
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = 'subjCat-orth'   
+decodeFeature = 'subjCat'   
 
 #%%
 # =============================================================================
