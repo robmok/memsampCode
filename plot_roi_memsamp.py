@@ -18,7 +18,12 @@ import scipy.stats as stats
 
 
 codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode' #love06
-codeDir='/Users/robertmok/Documents/Postdoc_ucl/memsampCode' #laptop
+#codeDir='/Users/robertmok/Documents/Postdoc_ucl/memsampCode' #laptop
+
+roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
+#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
+# laptop
+#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 os.chdir(codeDir)
 from memsamp_RM import kendall_a
@@ -26,11 +31,6 @@ from memsamp_RM import kendall_a
 # bootstrap CIs - over subjects....
 #print(bs.bootstrap(np.asarray(df.iloc[0:33,0]), stat_func=bs_stats.mean))
 
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
-#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
-
-# laptop
-roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
@@ -319,6 +319,9 @@ plt.show()
 #  import math
 #  return min(y-x, y-x+2*math.pi, y-x-2*math.pi, key=abs
 
+#angles within 180
+#a = targetA - sourceA
+#a += (a>180) ? -360 : (a<-180) ? 360 : 0
 
 modelRDM = np.zeros((12,12))
 
@@ -349,14 +352,14 @@ plt.show()
 
 #orientation
 angDist=np.empty((66)) #number of upper diagonal cells
-conds = np.arange(0,210,30)
-condsTmp = np.arange(30,180,30)
+conds = np.arange(0,120,30)
+condsTmp = np.arange(30,90,30)
 condsTmp=condsTmp[::-1]
-conds = np.append(conds,condsTmp)
+conds = np.tile(np.append(conds,condsTmp),2)
 i=0
 for iCond in range(0,len(conds)):
     for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+        angDist[i] = abs(conds[iCond]-compCond)
         i=i+1
 
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
@@ -424,7 +427,7 @@ ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.04,0.
 
 #%% model RDMs - angular distance - direction / ori 
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -452,23 +455,20 @@ modelRDM[iu] = angDist
 
 
 
-##orientation
-#angDist=np.empty((66)) #number of upper diagonal cells
-#conds = np.arange(0,210,30)
-#condsTmp = np.arange(30,180,30)
-#condsTmp=condsTmp[::-1]
-#conds = np.append(conds,condsTmp)
-#i=0
-#for iCond in range(0,len(conds)):
-#    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-#        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
-#        i=i+1
-#
-#iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-#modelRDM[iu] = angDist
+#orientation
+angDist=np.empty((66)) #number of upper diagonal cells
+conds = np.arange(0,120,30)
+condsTmp = np.arange(30,90,30)
+condsTmp=condsTmp[::-1]
+conds = np.tile(np.append(conds,condsTmp),2)
+i=0
+for iCond in range(0,len(conds)):
+    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+        angDist[i] = abs(conds[iCond]-compCond)
+        i=i+1
 
-
-
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+modelRDM[iu] = angDist
 
 #data
 rdm = np.zeros((12,12)) 
