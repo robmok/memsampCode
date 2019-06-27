@@ -29,6 +29,8 @@ fwhm = None # smoothing - set to None if no smoothing
 
 decodeFeature = 'ori' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
+exclSubs = True #only  with subjCat - include only subs with equal nDirs within a category
+
 for iSub in range(1,34):
     subNum=f'{iSub:02d}'
     print('Transforming searchlight imgs from T1 to MNI space: sub-%s, %s, %s, %s, %s' % (subNum, imDat, distMeth, normMeth, trainSetMeth))
@@ -55,12 +57,22 @@ for iSub in range(1,34):
 
 
 #merge all subjects into one .nii.gz file using fslmerge
-runCmdMerge='fslmerge -t ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz') +  ' ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-*mni.nii.gz')
-call(runCmdMerge,shell=True)
-
-#compute a mean image for visualisation
-im = nli.mean_img(os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz')) 
-nib.save(im, os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni_meanIm.nii.gz'))
+if not exclSubs:
+    runCmdMerge='fslmerge -t ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz') +  ' ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-*mni.nii.gz')
+    call(runCmdMerge,shell=True)
+    
+    #compute a mean image for visualisation
+    im = nli.mean_img(os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni.nii.gz')) 
+    nib.save(im, os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_allsubs_mni_meanIm.nii.gz'))
+else:
+    #only with subs with equal nDirs within a category
+    fnames=""
+    for iSub in {1,  2,  3,  4,  6,  7,  8,  9, 10, 11, 12, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 33}:
+        subNum=f'{iSub:02d}'
+        fnames += (os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + str(subNum) + '_mni.nii.gz '))
+    runCmdMerge='fslmerge -t ' + os.path.join(slDir, 'sl'+ str(slSiz) +'_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_eqCatSubs_mni.nii.gz') +  ' ' + fnames
+    call(runCmdMerge,shell=True)
+    
 
 
 ##allrois - did searchlight within an roi/a set of rois
