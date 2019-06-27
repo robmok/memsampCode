@@ -34,7 +34,7 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -46,7 +46,7 @@ df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
 #%% plot bar / errobar plot
 
 #edit to load in EXCLUDE subs
-indSubs=np.ones(33,dtype=bool)
+#indSubs=np.ones(33,dtype=bool)
     
 #stdAll = df.iloc[0:33,df.loc['stats']:].std()/np.sqrt(33)
 stdAll = df.iloc[indSubs,:].sem()
@@ -66,6 +66,8 @@ ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.
 #stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0)
 #stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0)
 #stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0)
+#
+#stats.ttest_1samp(df['MDroi_area9_rh'].iloc[indSubs],0)
 
 #%% univariate scatter plots, violin plots
 

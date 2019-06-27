@@ -35,12 +35,12 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid, getConds2comp, compCovMat
+from memsamp_RM import crossEuclid, mNobis, getConds2comp, compCovMat
 
 imDat = 'cope' # cope or tstat images
 slSiz = 6 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
-distMeth = 'svm' # 'svm', 'euclid', 'mahal', 'xEuclid', 'xNobis'
+distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
 nCores = 24 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
@@ -143,7 +143,7 @@ for iSub in range(1,34):
     if (normMeth=='niNormalised')|(normMeth=='dCentred'):
         dat.cleaner(standardizeVox=True)
 
-    if distMeth == 'crossNobis': #get variance to compute covar matrix below
+    if distMeth in {'crossNobis','mNobis'}: #get variance to compute covar matrix below
         varIm = np.empty([0,np.size(dat.dat,axis=1)]) #only works since i know nVox
         varImSiz = np.empty((len(runs)),dtype='int')
         imgs = nib.load(dfCond['imPath'].iloc[0])
@@ -271,23 +271,29 @@ for iSub in range(1,34):
                             indTrl=indTrl[0]
                             for iTrl in indTrl: #prewhiten each trial to make mahal dist
                                 Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov[:,:,iRun])
-                                                
-                        #compute cov mat over all runs
-#                        var = X[len(y):,:] 
-#                        cov = compCovMat(var)
-#                        
-#                        for iRun in range(0,len(runs)):
-#                            ind = dat.sessions == iRun+1
-#                            indTrl= np.where(ind)
-#                            indTrl=indTrl[0]
-#                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
-#                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
+
                         return crossEuclid(Xdat_whitened,y,cv = cv.split(Xdat_whitened,dat.y,dat.sessions)).mean()                        
 
                 elif distMeth == 'crossEuclid':
                     def pipeline(X,y):
                         return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
-
+                    
+                elif distMeth == 'mNobis':
+                    def pipeline(X,y):
+                        Xdat_whitened = np.empty((len(y),np.size(X,axis=1)))
+                        cov = np.empty((np.size(X,axis=1),np.size(X,axis=1),len(runs)))
+                        Xdat = X[range(0,len(y)),:] #get fmri data
+                        #compute cov mat over all runs
+                        var = X[len(y):,:] 
+                        cov = compCovMat(var)
+                        for iRun in range(0,len(runs)):
+                            ind = dat.sessions == iRun+1
+                            indTrl= np.where(ind)
+                            indTrl=indTrl[0]
+                            for iTrl in indTrl: #prewhiten each trial to make mahal dist
+                                Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
+                        return mNobis(X,y)
+                    
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight
     

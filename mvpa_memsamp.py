@@ -28,14 +28,14 @@ roiDir=os.path.join(mainDir,'rois')
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
-from memsamp_RM import crossEuclid, compCovMat, getConds2comp
+from memsamp_RM import crossEuclid, mNobis, compCovMat, getConds2comp
 
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False 
 
 imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
-distMeth = 'svm' # 'svm', 'lda' 'crossEuclid', 'crossNobis'
+distMeth = 'mNobis' # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
 
@@ -43,7 +43,7 @@ fwhm = None # optional smoothing param - 1, or None
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = 'subjCat'   
+decodeFeature = 'subjCat-orth'   
 
 #%%
 # =============================================================================
@@ -183,18 +183,22 @@ for iSub in range(1,nSubs+1):
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
 
-        if distMeth == 'crossNobis': #get variance to compute covar matrix below
+        if distMeth in {'crossNobis','mNobis'}: #get variance to compute covar matrix below
             # compute each run's covariance matrix here, then apply it to fmri_masked_cleaned, then euclid below
             covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
             for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
                 varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
 #                covMat[:,:,iRun1-1] = compCovMat(apply_mask(varPath,maskROI))
                 covMat[:,:,iRun1-1] = compCovMat(apply_mask(varPath,maskROI,smoothing_fwhm=fwhm))
-            for iRun1 in runs:
-                trlInd = np.where(groups==iRun1)
-                trlInd = trlInd[0]
-                for iTrl in trlInd:
-                    fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun1-1])
+            if distMeth == 'crossNobis':
+                for iRun1 in runs:
+                    trlInd = np.where(groups==iRun1)
+                    trlInd = trlInd[0]
+                    for iTrl in trlInd:
+                        fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun1-1])
+            else: #average covMat over runs
+                for iTrl in range(0,len(fmri_masked_cleaned)):
+                    fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat.mean(axis=2))
             
     # =============================================================================
     #     #set up splits and run cv
@@ -277,6 +281,8 @@ for iSub in range(1,nSubs+1):
                     cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                 elif distMeth in {'crossEuclid','crossNobis'}:
                     cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                elif distMeth == 'mNobis':
+                    cvAccTmp[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)
 
             if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):                
                 catA90 = conds2comp[0][0]+90
@@ -311,6 +317,8 @@ for iSub in range(1,nSubs+1):
                         cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                     elif distMeth in {'crossEuclid','crossNobis'}:
                         cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                    elif distMeth == 'mNobis':
+                        cvAccTmp90[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)                    
                 cvAccTmp = cvAccTmp-cvAccTmp90
         
         if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): 

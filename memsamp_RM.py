@@ -119,7 +119,13 @@ def crossNobis(x,y,cv,var):
         dist[iRun] = np.dot(np.dot(trainDat,covMatAv),np.dot(testDat,covTest)) #first dim volumes (trials), second dim voxels    
     return dist
 
-
+def mNobis(x,y):
+    conds=np.unique(y) # two conds to compare
+    indA=y==conds[0]
+    indB=y==conds[1]
+    dat = np.nanmean(x[indA,],axis=0)-np.nanmean(x[indB,],axis=0)
+    dist = np.dot(dat,dat)
+    return dist
 
 def compCovMat(var):
     covTmp = LedoitWolf().fit(var)

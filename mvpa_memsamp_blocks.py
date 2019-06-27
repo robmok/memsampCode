@@ -36,7 +36,7 @@ reRun = False
 
 imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
-distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossEuclid', 'crossNobis' - didn't do mNobis here since there is a block loop which doesnt need the loop
 trainSetMeth = 'block' # 'trials' or 'block' - only block in this script
 fwhm = None # optional smoothing param - 1, or None
 
