@@ -158,7 +158,7 @@ for iSub in range(1,34):
     #set up the conditions you want to classify. if 12-way, no need
     if decodeFeature[0:6] == "objCat":
         conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-    elif decodeFeature == "subjCat": #subjective catgory bound based on responses
+    elif (decodeFeature=="subjCat")|(decodeFeature=="subjCatRaw-orth"): #subjective catgory bound based on responses
         conds2comp = [[subjCatAconds, subjCatBconds]]
     elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"): # subjCat-resp if done before was wrong - redo if want
         conds2comp = np.empty((1)) #len of 1 placeholder
