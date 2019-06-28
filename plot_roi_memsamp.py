@@ -34,11 +34,11 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'mNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -390,11 +390,11 @@ else:
     indSubs=np.ones(33,dtype=bool)
 
 #model
-modelRDM = np.zeros((12,12))
+catRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 
 #category
-modelRDM[0:6,6:12]=np.ones((6,6))
+catRDM[0:6,6:12]=np.ones((6,6))
 
 #data
 rdm = np.zeros((12,12)) 
@@ -417,9 +417,9 @@ for iRoi in roiList:
     i=0
     for iSub in useSubs[0]:    
         rdm[iu] = df[roi].iloc[iSub]
-        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+        rho[i], pval[i]=stats.spearmanr(rdm[iu],catRDM[iu])
 #        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
-        tau[i] = kendall_a(rdm[iu],modelRDM[iu])
+        tau[i] = kendall_a(rdm[iu],catRDM[iu])
         i=i+1
     t,p=stats.ttest_1samp(rho,0)
     print('roi: %s' % (iRoi))
@@ -446,7 +446,7 @@ else:
     indSubs=np.ones(33,dtype=bool)
 
 modelRDM = np.zeros((12,12))
-
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 
  #direction
 angDist=np.empty((66)) #number of upper diagonal cells
