@@ -7,22 +7,19 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-#motor
-#sl6 fwhmNone
-#motor svm
-sed -e s:"nCores = 22":"nCores = 4":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+
+#sl10 fwhmNone
+#subjCat cope, noNorm
+sed -e s:"slSiz = 6":"slSiz = 10":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'mNobis'":g \
+    -e s:"nCores = 22":"nCores = 4":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
-sed -e s:"nCores = 22":"nCores = 4":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"slSiz = 6":"slSiz = 8":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-
-sed -e s:"nCores = 22":"nCores = 4":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"slSiz = 6":"slSiz = 9":g \
+#subjCat-orth cope, noNorm
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCatRaw-orth'":g \
+    -e s:"slSiz = 6":"slSiz = 10":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'mNobis'":g \
+    -e s:"nCores = 22":"nCores = 4":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
