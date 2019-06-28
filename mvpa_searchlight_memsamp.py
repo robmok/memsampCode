@@ -158,9 +158,9 @@ for iSub in range(1,34):
     #set up the conditions you want to classify. if 12-way, no need
     if decodeFeature[0:6] == "objCat":
         conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-    elif decodeFeature[0:7] == "subjCat": #subjective catgory bound based on responses
+    elif decodeFeature == "subjCat": #subjective catgory bound based on responses
         conds2comp = [[subjCatAconds, subjCatBconds]]
-    elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
+    elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"): # subjCat-resp if done before was wrong - redo if want
         conds2comp = np.empty((1)) #len of 1 placeholder
     else: #stimulus decoding
         conds2comp = getConds2comp(decodeFeature)
@@ -245,7 +245,7 @@ for iSub in range(1,34):
                           'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                           '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + str(iPair) + '.nii.gz'))
                 del im
-            elif distMeth in {'crossEuclid', 'crossNobis'}:                
+            elif distMeth in {'crossEuclid', 'crossNobis','mNobis'}:                
                 if distMeth == 'crossNobis': #get variance to compute covar matrix below
                     dat.dat = np.append(dat.dat,varIm,axis=0) #append residual images to compute covar matrix
                     #use len(dat.y) for number of functional images. use varImSiz to index run-wise variance images (nTimepoints)
@@ -279,6 +279,7 @@ for iSub in range(1,34):
                         return crossEuclid(X,y,cv.split(dat.dat,dat.y,dat.sessions)).mean()
                     
                 elif distMeth == 'mNobis':
+                    dat.dat = np.append(dat.dat,varIm,axis=0) #append residual images to compute covar matrix
                     def pipeline(X,y):
                         Xdat_whitened = np.empty((len(y),np.size(X,axis=1)))
                         cov = np.empty((np.size(X,axis=1),np.size(X,axis=1),len(runs)))
@@ -292,7 +293,7 @@ for iSub in range(1,34):
                             indTrl=indTrl[0]
                             for iTrl in indTrl: #prewhiten each trial to make mahal dist
                                 Xdat_whitened[iTrl,:] = np.dot(Xdat[iTrl,],cov)
-                        return mNobis(X,y)
+                        return mNobis(Xdat_whitened,y)
                     
                 dat.pipeline = pipeline
                 im = cl.searchlightSphere(dat,slSiz,n_jobs=nCores) #run searchlight

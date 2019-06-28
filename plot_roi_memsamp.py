@@ -34,11 +34,11 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'crossNobis'
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -46,7 +46,7 @@ df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
 #%% plot bar / errobar plot
 
 #edit to load in EXCLUDE subs
-#indSubs=np.ones(33,dtype=bool)
+indSubs=np.ones(33,dtype=bool)
     
 #stdAll = df.iloc[0:33,df.loc['stats']:].std()/np.sqrt(33)
 stdAll = df.iloc[indSubs,:].sem()
@@ -68,6 +68,11 @@ ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.
 #stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0)
 #
 #stats.ttest_1samp(df['MDroi_area9_rh'].iloc[indSubs],0)
+
+#loaded in subjCat-orth first, saved to df1, then loaded in dir to compare. MT and PFC sig
+#stats.ttest_rel(df1['V2vd_rh'].iloc[indSubs],df['V2vd_rh'].iloc[indSubs]-.5)
+#stats.ttest_rel(df1['hMT_lh'].iloc[indSubs],df['hMT_lh'].iloc[indSubs]-.5)
+#stats.ttest_rel(df1['MDroi_area8c_lh'].iloc[indSubs],df['MDroi_area8c_lh'].iloc[indSubs]-.5)
 
 #%% univariate scatter plots, violin plots
 
@@ -374,7 +379,7 @@ plt.show()
 
 #%% model RDMs - category
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -386,6 +391,7 @@ else:
 
 #model
 modelRDM = np.zeros((12,12))
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 
 #category
 modelRDM[0:6,6:12]=np.ones((6,6))
@@ -423,7 +429,7 @@ for iRoi in roiList:
     rhoAll[roi]=rho
     tauAll[roi]=tau
     
-ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
+#ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.04,0.04))
 
 
