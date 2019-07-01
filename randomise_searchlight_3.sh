@@ -14,7 +14,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
 # motor - sl9, fwhmNone, cope
 trainSetMeth='trials'
-slSiz=8
+slSiz=9
 normMeth='noNorm'
 decodeFeature='motor'
 distMeth='svm'

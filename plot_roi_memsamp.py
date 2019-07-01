@@ -34,7 +34,7 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'mNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -245,9 +245,9 @@ roi='dlPFC_lh'
 #roi='V3a_lh'
     
 #decoding subjCat sig    
-#roi='V2vd_rh'
-#roi='hMT_lh'
-#roi='MDroi_area8c_lh'
+roi='V2vd_rh'
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
 
 
 #rdmModel category sig - crossnobis
@@ -260,7 +260,7 @@ iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores di
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
 #tstat (double check formula)
-rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
+#rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
 
 #make it a symmetric matrix 
 il = np.tril_indices(12,-1) 
@@ -287,7 +287,7 @@ plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 
 #%% #single sub RDMs
-iSub=5
+iSub=1
 
 rdm = np.zeros((12,12))
 rdm[iu] = df[roi].iloc[iSub]
