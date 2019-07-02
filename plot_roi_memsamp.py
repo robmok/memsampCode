@@ -34,7 +34,7 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -344,14 +344,17 @@ plt.show()
 
 #orientation
 angDist=np.empty((66)) #number of upper diagonal cells
-conds = np.arange(0,120,30)
-condsTmp = np.arange(30,90,30)
-condsTmp=condsTmp[::-1]
-conds = np.tile(np.append(conds,condsTmp),2)
+#conds = np.arange(0,120,30)
+#condsTmp = np.arange(30,90,30)
+#condsTmp=condsTmp[::-1]
+#conds = np.tile(np.append(conds,condsTmp),2)
+conds = np.arange(0,360,30)
+conds[conds>180]=conds[conds>180]-180
 i=0
 for iCond in range(0,len(conds)):
     for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-        angDist[i] = abs(conds[iCond]-compCond)
+#        angDist[i] = abs(conds[iCond]-compCond)
+        angDist[i] = abs(((conds[iCond]-compCond) + 90) % 180 - 90)
         i=i+1
 
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
@@ -431,7 +434,7 @@ for iRoi in roiList:
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.04,0.04))
 
 
-#%% model RDMs - angular distance - direction / ori 
+#%% model RDMs - angular distance - direction
 
 exclSubs = False
 if exclSubs:
@@ -446,34 +449,19 @@ else:
 modelRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 
- #direction
-angDist=np.empty((66)) #number of upper diagonal cells
-conds = np.arange(0,360,30)
-i=0
-for iCond in range(0,len(conds)):
-    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
-        i=i+1
+#direction
 
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-modelRDM[iu] = angDist
+#angDist=np.empty((66)) #number of upper diagonal cells
+#conds = np.arange(0,360,30)
+#i=0
+#for iCond in range(0,len(conds)):
+#    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+#        angDist[i] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+#        i=i+1
+#
+#iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+#modelRDM[iu] = angDist
 #modelRDM[il] = modelRDM.T[il]
-
-
-#orientation
-angDist=np.empty((66)) #number of upper diagonal cells
-conds = np.arange(0,120,30)
-condsTmp = np.arange(30,90,30)
-condsTmp=condsTmp[::-1]
-conds = np.tile(np.append(conds,condsTmp),2)
-i=0
-for iCond in range(0,len(conds)):
-    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-        angDist[i] = abs(conds[iCond]-compCond)
-        i=i+1
-
-iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-modelRDM[iu] = angDist
 
 #data
 rdm = np.zeros((12,12)) 
@@ -496,6 +484,74 @@ for iRoi in roiList:
     i=0
     for iSub in useSubs[0]:    
         rdm[iu] = df[roi].iloc[iSub]
+        #get direction conditions from ordering here, then compute circular dist
+        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
+        iC=0
+        for iCond in range(0,len(conds)):
+            for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+                angDist[iC] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
+                iC=iC+1
+        modelRDM[iu] = angDist        
+        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
+#        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
+        tau[i] = kendall_a(rdm[iu],modelRDM[iu])
+        i=i+1
+    t,p=stats.ttest_1samp(rho,0)
+    print('roi: %s' % (iRoi))
+    print('spearman: t=%.3f, p=%.4f' % (t,p))
+    t,p=stats.ttest_1samp(tau,0)
+    print('tau-b: t=%.3f, p=%.4f' % (t,p))
+    rhoAll[roi]=rho
+    tauAll[roi]=tau
+    
+#ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
+ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
+
+#%% model RDMs - angular distance - orientation
+
+modelRDM = np.zeros((12,12))
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+
+#angDist=np.empty((66)) #number of upper diagonal cells
+#conds = np.arange(0,360,30)
+#conds[conds>180]=conds[conds>180]-180
+#i=0
+#for iCond in range(0,len(conds)):
+#    for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+#        angDist[i] = abs(((conds[iCond]-compCond) + 90) % 180 - 90)
+#        i=i+1
+#
+#iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+#modelRDM[iu] = angDist
+
+#data
+rdm = np.zeros((12,12)) 
+rho=np.empty((sum(indSubs)))
+tau=np.empty((sum(indSubs)))
+pval=np.empty((sum(indSubs)))
+useSubs=np.where(indSubs)
+
+roiList=list(df)
+roiList.remove('subjCat')
+rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+for iRoi in roiList:
+    roi=iRoi
+    rdm = np.zeros((12,12)) 
+    rho=np.empty((sum(indSubs)))
+    tau=np.empty((sum(indSubs)))
+    pval=np.empty((sum(indSubs)))
+    i=0
+    for iSub in useSubs[0]:    
+        rdm[iu] = df[roi].iloc[iSub]
+        #get direction conditions from ordering here, then compute circular dist
+        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
+        iC=0
+        for iCond in range(0,len(conds)):
+            for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
+                angDist[iC] = abs(((conds[iCond]-compCond) + 90) % 180 - 90)
+                iC=iC+1
+        modelRDM[iu] = angDist        
         rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
 #        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
         tau[i] = kendall_a(rdm[iu],modelRDM[iu])

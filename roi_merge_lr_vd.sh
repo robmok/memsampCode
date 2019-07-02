@@ -92,18 +92,38 @@ while read subject; do
   # fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_rh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_rh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_rh.nii.gz
   # fslmaths ${roiDir}/${subject}_HIPP_BODY_TAIL_lrh.nii.gz -add ${roiDir}/${subject}_HIPP_HEAD_lrh.nii.gz -bin ${roiDir}/${subject}_HIPP_HEAD_BODY_TAIL_lrh.nii.gz
 
+  # # new merge many ROIs for SL
+  # #list the files to merge (txt is replaced over subs, not saved)
+  # rm ${roiDir}/sl_rois.txt
+  # #note - used MD ips here, not wang/kastner
+  # for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'  'V3d'  'hV4' 'MST' 'hMT' 'V3b' 'V3a' 'IPS0' 'HIPP_HEAD_BODY_TAIL'; do
+  #   echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz -add " >> ${roiDir}/sl_rois.txt #note the -n (for no new line) and space at the end of ""
+  #   echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz -add " >> ${roiDir}/sl_rois.txt
+  # done
+  # iRoi='MDroi_all' #last no '-add' - no lh/rh
+  # echo -n "${roiDir}/${subject}_${iRoi}.nii.gz " >> ${roiDir}/sl_rois.txt
+  # roiList=`cat ${roiDir}/sl_rois.txt`
+  # fslmaths ${roiList} -bin ${roiDir}/${subject}_allROIsSL.nii.gz
 
-# new merge many ROIs for SL
-#list the files to merge (txt is replaced over subs, not saved)
-rm ${roiDir}/sl_rois.txt
-#note - used MD ips here, not wang/kastner
-for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'  'V3d'  'hV4' 'MST' 'hMT' 'V3b' 'V3a' 'IPS0' 'HIPP_HEAD_BODY_TAIL'; do
-  echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz -add " >> ${roiDir}/sl_rois.txt #note the -n (for no new line) and space at the end of ""
-  echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz -add " >> ${roiDir}/sl_rois.txt
-done
-iRoi='MDroi_all' #last no '-add' - no lh/rh
-echo -n "${roiDir}/${subject}_${iRoi}.nii.gz " >> ${roiDir}/sl_rois.txt
-roiList=`cat ${roiDir}/sl_rois.txt`
-fslmaths ${roiList} -bin ${roiDir}/${subject}_allROIsSL.nii.gz
+
+  #make merged EVC rois
+  #list the files to merge (txt is replaced over subs, not saved)
+  rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt
+  for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'; do
+    echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz -add " >> ${roiDir}/visual_rois_lh.txt #note the -n (for no new line) and space at the end of ""
+    echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz -add " >> ${roiDir}/visual_rois_rh.txt
+  done
+  iRoi='V3d' #last no '-add'
+  echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz " >> ${roiDir}/visual_rois_lh.txt
+  echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/visual_rois_rh.txt
+
+  #run fslmaths - L/R/bilateral
+  roiList=`cat ${roiDir}/visual_rois_lh.txt`
+  fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_lh.nii.gz
+  roiList=`cat ${roiDir}/visual_rois_rh.txt`
+  fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_rh.nii.gz
+  fslmaths ${roiDir}/${subject}_EVC_lh.nii.gz -add ${roiDir}/${subject}_EVC_rh.nii.gz -bin ${roiDir}/${subject}_EVC_lrh.nii.gz
+
+
 
 done < ${fsfDir}/subject_list_full.txt

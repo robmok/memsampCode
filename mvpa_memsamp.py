@@ -31,7 +31,7 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, mNobis, compCovMat, getConds2comp
 
 #set to true if rerunning only a few rois, appending it to old df
-reRun = False 
+reRun = False
 
 imDat = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
@@ -59,7 +59,7 @@ rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V
         'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
 
 #reRunROIs
-#rois = ['mPFC_sph10']
+#rois = ['EVC_lh','EVC_rh','EVC_lrh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
