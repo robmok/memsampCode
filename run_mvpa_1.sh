@@ -7,20 +7,18 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-#EVC masks, subjCat-orth, subjCat-all
+
+# -e s:"reRun = False":"reRun = True":g \
+
+# trying smaller masks - no smoothing
 
 # subjCat-all, crossnobis
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    -e s:"#rois":"rois":g \
-    -e s:"reRun = False":"reRun = True":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# subjCat-all, crossnobis
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
-    -e s:"#rois":"rois":g \
-    -e s:"reRun = False":"reRun = True":g \
+# subjCat-orth
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

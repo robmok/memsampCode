@@ -9,21 +9,17 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # ori
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"#rois":"rois":g \
-    -e s:"reRun = False":"reRun = True":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# dir
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
-    -e s:"#rois":"rois":g \
-    -e s:"reRun = False":"reRun = True":g \
+# subjCat-all, mNobis
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'mNobis'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
 # subjCat-orth
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"#rois":"rois":g \
-    -e s:"reRun = False":"reRun = True":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'mNobis'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

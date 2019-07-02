@@ -9,16 +9,17 @@ fsfDir=${wd}/feat_design_files
 echo "Running roi_merge_lr_vd.sh"
 while read subject; do
   echo "Running ${subject}"
-  #make bilateral mask (left + right)
+  # #make bilateral mask (left + right)
   # for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'  'V3d'  'hV4' 'V01' 'V02' 'PHC1' 'PHC2' 'MST' 'hMT' 'L02' 'L01' 'V3b' 'V3a' 'IPS0' 'IPS1' 'IPS2' 'IPS3' 'IPS4' 'IPS5' 'SPL1' 'FEF'; do
   #   fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
   # done
-  # #make ventral-dorsal mask for V1 to V3 (ventral + dorsal)
-  # for iRoi in 'V1'  'V2' 'V3'; do
-  #   fslmaths ${roiDir}/${subject}_${iRoi}v_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_lh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_lh.nii.gz #left vd
-  #   fslmaths ${roiDir}/${subject}_${iRoi}v_rh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_rh.nii.gz #right vd
-  #   fslmaths ${roiDir}/${subject}_${iRoi}v_lrh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_lrh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_lrh.nii.gz #bilateral vd
-  # done
+  #make ventral-dorsal mask for V1 to V3 (ventral + dorsal)
+  for iRoi in 'V1'  'V2' 'V3'; do
+    fslmaths ${roiDir}/${subject}_${iRoi}v_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_lh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_lh.nii.gz #left vd
+    fslmaths ${roiDir}/${subject}_${iRoi}v_rh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_rh.nii.gz #right vd
+    # fslmaths ${roiDir}/${subject}_${iRoi}v_lrh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_lrh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_lrh.nii.gz #bilateral vd
+  done
+
   # #make visual and IPS merged rois
   # #list the files to merge (txt is replaced over subs, not saved)
   # rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt ${roiDir}/ips_rois_lh.txt ${roiDir}/ips_rois_rh.txt
@@ -67,8 +68,8 @@ while read subject; do
   # fslmaths ${roiDir}/${subject}_IPS3-5_lh.nii.gz -add ${roiDir}/${subject}_IPS3-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
   #
   # # also merge 1-5 in case (prob similar to MD ips roi)
-  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lh.nii.gz
-  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_rh.nii.gz
+  fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lh.nii.gz
+  fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_rh.nii.gz
   # fslmaths ${roiDir}/${subject}_IPS1-5_lh.nii.gz -add ${roiDir}/${subject}_IPS1-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
 
   # #MD regions
@@ -106,24 +107,24 @@ while read subject; do
   # fslmaths ${roiList} -bin ${roiDir}/${subject}_allROIsSL.nii.gz
 
 
-  #make merged EVC rois
-  #list the files to merge (txt is replaced over subs, not saved)
-  rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt
-  # for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'; do
-  for iRoi in 'V1v' 'V1d'  'V2v'; do
-    echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz -add " >> ${roiDir}/visual_rois_lh.txt #note the -n (for no new line) and space at the end of ""
-    echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz -add " >> ${roiDir}/visual_rois_rh.txt
-  done
-  iRoi='V2d' #last no '-add'
-  echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz " >> ${roiDir}/visual_rois_lh.txt
-  echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/visual_rois_rh.txt
-
-  #run fslmaths - L/R/bilateral
-  roiList=`cat ${roiDir}/visual_rois_lh.txt`
-  fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_lh.nii.gz
-  roiList=`cat ${roiDir}/visual_rois_rh.txt`
-  fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_rh.nii.gz
-  fslmaths ${roiDir}/${subject}_EVC_lh.nii.gz -add ${roiDir}/${subject}_EVC_rh.nii.gz -bin ${roiDir}/${subject}_EVC_lrh.nii.gz
+  # #make merged EVC rois
+  # #list the files to merge (txt is replaced over subs, not saved)
+  # rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt
+  # # for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'; do
+  # for iRoi in 'V1v' 'V1d'  'V2v'; do
+  #   echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz -add " >> ${roiDir}/visual_rois_lh.txt #note the -n (for no new line) and space at the end of ""
+  #   echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz -add " >> ${roiDir}/visual_rois_rh.txt
+  # done
+  # iRoi='V2d' #last no '-add'
+  # echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz " >> ${roiDir}/visual_rois_lh.txt
+  # echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/visual_rois_rh.txt
+  #
+  # #run fslmaths - L/R/bilateral
+  # roiList=`cat ${roiDir}/visual_rois_lh.txt`
+  # fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_lh.nii.gz
+  # roiList=`cat ${roiDir}/visual_rois_rh.txt`
+  # fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_EVC_lh.nii.gz -add ${roiDir}/${subject}_EVC_rh.nii.gz -bin ${roiDir}/${subject}_EVC_lrh.nii.gz
 
 
 

@@ -14,10 +14,13 @@ sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# subjCat-all, crossnobis
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'mNobis'":g \
-    -e s:"#rois":"rois":g \
-    -e s:"reRun = False":"reRun = True":g \
+# subjCat-orth
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+# dir
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
