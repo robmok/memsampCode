@@ -34,7 +34,7 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -107,21 +107,12 @@ else:
     indSubs=np.ones(33,dtype=bool)
     
 #df1 = pd.DataFrame(columns=df.columns,index=['mean', 'sem'])
-
 #for roi in df.columns.values[0:-1]:
-#
-#roi='dlPFC_lh'
-#roi='dlPFC_rh'
-#roi='MDroi_ips_lh'
-#roi='MDroi_ips_rh'
-#roi='V1vd_lh'
-#roi='V3a_lh'
 
 #subjCat sig
 roi='V2vd_rh'
 #roi='hMT_lh'
 #roi='MDroi_area8c_lh'
-
 
 ylims = [0.45, 0.55]
 
@@ -186,12 +177,6 @@ ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
 ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 
-
-#average values within the training example category (e.g. av cat A, but plot all values for cat B) - 
-
-
-
-
 #%% subjCat-all - plot 2
 
 #prototype - 6 conds each, for prototype is middle of conds 3&4
@@ -237,7 +222,7 @@ for iCond in 2,3,8,9: #range(0,11):
 
 #%% plot RDM
 #roi='dlPFC_rh'
-roi='dlPFC_lh'
+#roi='dlPFC_lh'
 #roi='MDroi_ips_lh'
 #roi='MDroi_ips_rh'
 #roi='V1vd_lh'
@@ -253,14 +238,13 @@ roi='MDroi_area8c_lh'
 #rdmModel category sig - crossnobis
 #roi='MDroi_area9_rh'
 
-
 rdm = np.zeros((12,12))
 
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 rdm[iu] = df[roi].iloc[0:33].mean(axis=0)
 
 #tstat (double check formula)
-#rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
+rdm[iu] = df[roi].iloc[0:33].mean(axis=0)/np.stack(df[roi].iloc[0:33]).std(axis=0)/np.sqrt(33)
 
 #make it a symmetric matrix 
 il = np.tril_indices(12,-1) 
@@ -277,17 +261,18 @@ mds = manifold.MDS(n_components=2, max_iter=3000, eps=1e-9, random_state=seed,
                    dissimilarity="precomputed", n_jobs=1)
 pos = mds.fit(rdm).embedding_
 
-ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
+#ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
+ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
 cnt = np.array((0.0,0.0,0.0))
 for icol in range(0,12):
-    ctuple[icol,:] = ctuple[icol,:]+cnt
+#    ctuple[icol,:] = ctuple[icol,:]+cnt
     cnt = cnt+np.array((0,-0.085,0))
 
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 
 #%% #single sub RDMs
-iSub=1
+iSub=0
 
 rdm = np.zeros((12,12))
 rdm[iu] = df[roi].iloc[iSub]
@@ -379,6 +364,11 @@ plt.show()
 
 #%% model RDMs - category
 
+#include subjects with unequal conds in categories (manually made their RDMs)
+inclUneqSubs = True
+uneqSubs=np.array((4, 12, 16, 26, 31))
+
+#exclude subs with unequal conds
 exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
@@ -392,9 +382,7 @@ else:
 #model
 catRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
-
-#category
-catRDM[0:6,6:12]=np.ones((6,6))
+catRDM[0:6,6:12]=np.ones((6,6)) #category
 
 #data
 rdm = np.zeros((12,12)) 
@@ -417,6 +405,16 @@ for iRoi in roiList:
     i=0
     for iSub in useSubs[0]:    
         rdm[iu] = df[roi].iloc[iSub]
+        
+        if inclUneqSubs&np.any(iSub==uneqSubs):
+            nCondA=len(df['subjCat'].loc[iSub][0])
+            nCondB=len(df['subjCat'].loc[iSub][1])
+            catRDM = np.zeros((12,12))
+            catRDM[0:nCondB,nCondA:12]=np.ones((nCondB,nCondB))
+        else:
+            catRDM = np.zeros((12,12))
+            catRDM[0:6,6:12]=np.ones((6,6))
+        
         rho[i], pval[i]=stats.spearmanr(rdm[iu],catRDM[iu])
 #        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
         tau[i] = kendall_a(rdm[iu],catRDM[iu])
@@ -460,7 +458,6 @@ for iCond in range(0,len(conds)):
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 modelRDM[iu] = angDist
 #modelRDM[il] = modelRDM.T[il]
-
 
 
 #orientation
@@ -512,7 +509,7 @@ for iRoi in roiList:
     tauAll[roi]=tau
     
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
-ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.05,0.05))
+ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
 
 #%%12-way-all
 
