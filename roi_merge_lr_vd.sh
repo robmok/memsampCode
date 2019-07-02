@@ -109,11 +109,12 @@ while read subject; do
   #make merged EVC rois
   #list the files to merge (txt is replaced over subs, not saved)
   rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt
-  for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'; do
+  # for iRoi in 'V1v' 'V1d'  'V2v' 'V2d'  'V3v'; do
+  for iRoi in 'V1v' 'V1d'  'V2v'; do
     echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz -add " >> ${roiDir}/visual_rois_lh.txt #note the -n (for no new line) and space at the end of ""
     echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz -add " >> ${roiDir}/visual_rois_rh.txt
   done
-  iRoi='V3d' #last no '-add'
+  iRoi='V2d' #last no '-add'
   echo -n "${roiDir}/${subject}_${iRoi}_lh.nii.gz " >> ${roiDir}/visual_rois_lh.txt
   echo -n "${roiDir}/${subject}_${iRoi}_rh.nii.gz " >> ${roiDir}/visual_rois_rh.txt
 
