@@ -52,14 +52,16 @@ decodeFeature = 'subjCat'
 nSubs=33                                                           #hpc - anterior, posterior, whole
 
 rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
-        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh'] 
-#        'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
-#        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'dlPFC_lh','dlPFC_rh','mPFC_sph10',
-#        'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
-#        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
+        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh',
+        'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
+        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'mPFC_sph10',
+        'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
+        'HIPP_HEAD_BODY_TAIL_lh','HIPP_HEAD_BODY_TAIL_rh', 'motor_lh', 'motor_rh']
+
+#removed 'dlPFC_lh','dlPFC_rh',
 
 #reRunROIs
-#rois = ['EVC_lh','EVC_rh','EVC_lrh']
+#rois = ['EVC_lh','EVC_rh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)

@@ -10,15 +10,21 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # -e s:"reRun = False":"reRun = True":g \
 
-# trying smaller masks - no smoothing
+# 12-way-all rerun
 
-# subjCat-all, crossnobis
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+# 12-way-all, crossnobis
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-# subjCat-orth
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
+# # subjCat-orth
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
+#
+# #12-way-all svm - no run for no smooth
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
+#     -e s:"distMeth = 'svm'":"distMeth = 'svm'":g \
+#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py

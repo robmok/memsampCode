@@ -22,9 +22,12 @@ codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode' #love
 
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
+roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.5'
+#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_nosmooth'
+
 # laptop
 #roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
-
+                                
 os.chdir(codeDir)
 from memsamp_RM import kendall_a
 
@@ -43,6 +46,8 @@ decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir'
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+
+subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 #%% plot bar / errobar plot
 
 #edit to load in EXCLUDE subs
@@ -233,6 +238,9 @@ for iCond in 2,3,8,9: #range(0,11):
 roi='V2vd_rh'
 roi='hMT_lh'
 roi='MDroi_area8c_lh'
+
+
+roi='V3vd_rh'
 
 
 #rdmModel category sig - crossnobis
@@ -485,8 +493,10 @@ for iRoi in roiList:
     for iSub in useSubs[0]:    
         rdm[iu] = df[roi].iloc[iSub]
         #get direction conditions from ordering here, then compute circular dist
-        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
+#        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
+        conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
         iC=0
+        angDist=np.empty((66)) #number of upper diagonal cells
         for iCond in range(0,len(conds)):
             for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
                 angDist[iC] = abs(((conds[iCond]-compCond) + 180) % 360 - 180)
@@ -509,6 +519,16 @@ ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0
 
 #%% model RDMs - angular distance - orientation
 
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
+        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
 modelRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 
@@ -545,8 +565,11 @@ for iRoi in roiList:
     for iSub in useSubs[0]:    
         rdm[iu] = df[roi].iloc[iSub]
         #get direction conditions from ordering here, then compute circular dist
-        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
+#        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
+        conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
+
         iC=0
+        angDist=np.empty((66)) #number of upper diagonal cells
         for iCond in range(0,len(conds)):
             for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
                 angDist[iC] = abs(((conds[iCond]-compCond) + 90) % 180 - 90)
@@ -592,11 +615,32 @@ indSubs=np.ones(33,dtype=bool)
 rois = list(df)
 dfMean = pd.DataFrame(columns=rois,index=range(0,12))
 dfSem  = pd.DataFrame(columns=rois,index=range(0,12))
-
+#tstat  = []
+#pval   = []
+df1=df.copy() #reorganise so in stimulus direction order
 for roi in rois:
-    dfMean[roi] = np.mean(np.asarray(np.stack(df[roi].iloc[indSubs])),axis=0)
-    dfSem[roi] = np.asarray(np.stack(df[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
-     
+    ind12way=np.empty(33,dtype=int)
+    indLen1=np.empty(33,dtype=int) #nDirs in first cat
+    for iSub in range(0,33):
+        ind=np.where(np.diff(subjCat[iSub][1])>30)
+        ind12way[iSub]=ind[0][0]+1
+        indLen1[iSub]=len(subjCat[iSub][0])
+        df1[roi].iloc[iSub]=np.append(np.append(df[roi].iloc[iSub][0:indLen1[iSub]],df[roi].iloc[iSub][indLen1[iSub]+ind12way[iSub]:]),df[roi].iloc[iSub][indLen1[iSub]:indLen1[iSub]+ind12way[iSub]])
+        #checking if manupulation is correct
+    #    print(np.append(subjCat[iSub][0],np.append(subjCat[iSub][1][ind12way[iSub]:],subjCat[iSub][1][0:ind12way[iSub]])))
+    #    print(np.diff(np.append(subjCat[iSub][0],np.append(subjCat[iSub][1][ind12way[iSub]:],subjCat[iSub][1][0:ind12way[iSub]]))))
+    
+    #    print(subjCat[iSub])
+    #    print(df[roi].iloc[iSub])
+    #    print(np.append(np.append(df[roi].iloc[iSub][0:indLen1[iSub]],df[roi].iloc[iSub][indLen1[iSub]+ind12way[iSub]:]),df[roi].iloc[iSub][indLen1[iSub]:indLen1[iSub]+ind12way[iSub]]))
+    
+    #compute mean sem - note edited to df1  here
+    dfMean[roi] = np.mean(np.asarray(np.stack(df1[roi].iloc[indSubs])),axis=0)
+    dfSem[roi] = np.asarray(np.stack(df1[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
+#    statsTmp=stats.ttest_1samp(np.asarray(np.stack(df1[roi].iloc[indSubs])),0.5)
+#    tstat.append(statsTmp.statistic)
+#    pval.append(statsTmp.pvalue)
+
     
 #ax=dfMean.iloc[0:33,:].T.plot(figsize=(20,5),kind="bar",yerr=dfSem.T,ylim=(.55,.65))
 
@@ -623,17 +667,17 @@ ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], 
 
 #plt.plot(np.stack(df[roi].iloc[0:33]).T)
   
-iSub=8
+iSub=2
 
 roi='V2vd_rh'
 plt.figure(figsize=(5,3))
-plt.plot(np.stack(df[roi].iloc[iSub]).T)
+plt.plot(np.stack(df1[roi].iloc[iSub]).T)
 roi='hMT_lh'
 plt.figure(figsize=(5,3))
-plt.plot(np.stack(df[roi].iloc[iSub]).T)
+plt.plot(np.stack(df1[roi].iloc[iSub]).T)
 roi='MDroi_area8c_lh'
 plt.figure(figsize=(5,3))
-plt.plot(np.stack(df[roi].iloc[iSub]).T)
+plt.plot(np.stack(df1[roi].iloc[iSub]).T)
 
 
 
@@ -641,21 +685,21 @@ plt.plot(np.stack(df[roi].iloc[iSub]).T)
 #%% univariate scatter plots, violin plots
 
 roi='V2vd_rh'
-dfPlt=pd.DataFrame(np.asarray(np.stack(df[roi].iloc[indSubs])))
+dfPlt=pd.DataFrame(np.asarray(np.stack(df1[roi].iloc[indSubs])))
 ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
 ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
 ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
 
 roi='hMT_lh'
-dfPlt=pd.DataFrame(np.asarray(np.stack(df[roi].iloc[indSubs])))
+dfPlt=pd.DataFrame(np.asarray(np.stack(df1[roi].iloc[indSubs])))
 ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
 ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
 ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
 
 roi='MDroi_area8c_lh'
-dfPlt=pd.DataFrame(np.asarray(np.stack(df[roi].iloc[indSubs])))
+dfPlt=pd.DataFrame(np.asarray(np.stack(df1[roi].iloc[indSubs])))
 ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
 ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
