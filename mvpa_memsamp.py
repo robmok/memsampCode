@@ -114,7 +114,7 @@ for iSub in range(1,nSubs+1):
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
     #get subjective category based on responses
-    if decodeFeature[0:7] == 'subjCat':
+    if (decodeFeature[0:7]=='subjCat')|(decodeFeature=='dir-all'):
         #flip responses for runs - need double check if keymap is what i think it is. looks ok
         ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
         ind2=dfCond['key']==6
