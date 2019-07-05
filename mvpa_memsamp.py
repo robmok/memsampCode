@@ -223,6 +223,11 @@ for iSub in range(1,nSubs+1):
             conds2comp = getConds2comp(decodeFeature,condsTmp)
         elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
             conds2comp = np.empty((1)) #len of 1 placeholder
+        elif decodeFeature == "dir-all":
+            oppDirs = np.array(([subjCatAconds, abs(subjCatAconds-180)]))
+            conds2comp = []
+            for iDirPairs in range(0,np.size(oppDirs,1)):
+                conds2comp.append(oppDirs[:,iDirPairs])
         else: #stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         
@@ -323,7 +328,7 @@ for iSub in range(1,nSubs+1):
                         cvAccTmp90[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)                    
                 cvAccTmp = cvAccTmp-cvAccTmp90
         
-        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): 
+        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): 
             cvAcc = cvAccTmp.mean() #mean over pairs
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
         else:
@@ -338,7 +343,7 @@ if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decod
 else: 
     chance = 0 #for crossvalidated distances
 
-if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): #stores several values in each cell, so can't do t-test here
+if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
         dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
 
