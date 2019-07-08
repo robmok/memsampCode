@@ -105,8 +105,8 @@ exclSubs = True
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
-        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
 else:
     indSubs=np.ones(33,dtype=bool)
@@ -384,8 +384,8 @@ exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
-        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
 else:
     indSubs=np.ones(33,dtype=bool)
@@ -448,8 +448,8 @@ exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
-        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
 else:
     indSubs=np.ones(33,dtype=bool)
@@ -523,8 +523,8 @@ exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(df['subjCat'].iloc[iSub][0])
-        nDirInCat[1,iSub]=len(df['subjCat'].iloc[iSub][1])
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
 else:
     indSubs=np.ones(33,dtype=bool)
@@ -682,6 +682,71 @@ plt.plot(np.stack(df1[roi].iloc[iSub]).T)
 
 
 
+
+#%% univariate scatter plots, violin plots
+
+roi='V2vd_rh'
+dfPlt=pd.DataFrame(np.asarray(np.stack(df1[roi].iloc[indSubs])))
+ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
+ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+
+roi='hMT_lh'
+dfPlt=pd.DataFrame(np.asarray(np.stack(df1[roi].iloc[indSubs])))
+ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
+ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+
+roi='MDroi_area8c_lh'
+dfPlt=pd.DataFrame(np.asarray(np.stack(df1[roi].iloc[indSubs])))
+ax = sns.catplot(data=dfPlt,height=8,aspect=2, kind="swarm",zorder=1)
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+ax2 = sns.catplot(data=dfPlt,height=8,aspect=2, kind="violin", inner=None,zorder=2)
+ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o',zorder=2)
+
+#%%dir-all
+
+exclSubs = True
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+#
+rois = list(df)
+dfMean = pd.DataFrame(columns=rois,index=range(0,6))
+dfSem  = pd.DataFrame(columns=rois,index=range(0,6))
+df1=df.copy()
+for roi in rois:
+    #compute mean sem
+    dfMean[roi] = np.mean(np.asarray(np.stack(df1[roi].iloc[indSubs])),axis=0)
+    dfSem[roi] = np.asarray(np.stack(df1[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
+
+    
+#ax=dfMean.iloc[0:33,:].T.plot(figsize=(20,5),kind="bar",yerr=dfSem.T,ylim=(.55,.65))
+
+roi='V1vd_lh' # up and down; median bit more flat
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+roi='V1vd_rh' # U shaped; median U shaped
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+
+
+roi='V2vd_rh'
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+roi='hMT_lh'
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
+roi='MDroi_area8c_lh'
+plt.figure(figsize=(5,3))
+ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
 #%% univariate scatter plots, violin plots
 
