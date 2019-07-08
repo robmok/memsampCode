@@ -9,7 +9,15 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
 # ori
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+#     -e s:"reRun = False":"reRun = True":g \
+#     -e s:"#rois":"rois":g \
+#     -e s:"#mainDir":"mainDir":g \
+#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
+
+# ori
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
     -e s:"reRun = False":"reRun = True":g \
     -e s:"#rois":"rois":g \
     -e s:"#mainDir":"mainDir":g \
