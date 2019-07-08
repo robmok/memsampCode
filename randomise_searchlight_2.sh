@@ -12,29 +12,33 @@ vSmooth=5
 
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
-# motor - sl8, fwhmNone, cope
-trainSetMeth='trials'
-slSiz=8
-normMeth='noNorm'
-decodeFeature='motor'
-distMeth='svm'
-fwhm='None'
-imDat='cope' # cope or tstat images
-threshMeth='cMass' #vox, tfce, cSize, cMass
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
+#allROIs tfce - eqSubs
 
-# motor - sl8, fwhmNone, cope
+# subjCat-orth - sl6, fwhmNone, cope
 trainSetMeth='trials'
-slSiz=8
+slSiz=6
 normMeth='noNorm'
-decodeFeature='motor'
+decodeFeature='subjCat-orth'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
-threshMeth='vox' #vox, tfce, cSize, cMass
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5  -x
+threshMeth='tfce' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_eqCatSubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_eqCatSubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -T
+
+# subjCat-orth - sl9, fwhmNone, cope
+trainSetMeth='trials'
+slSiz=9
+normMeth='noNorm'
+decodeFeature='subjCat-orth'
+distMeth='svm'
+fwhm='None'
+imDat='cope' # cope or tstat images
+threshMeth='tfce' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_eqCatSubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_eqCatSubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -T
+
+
 
 
 

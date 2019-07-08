@@ -19,8 +19,8 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
 # #with mask:
 # threshMeth='cMass' #vox, tfce, cSize, cMass
-# randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
-# -o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -C ${tThresh}
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -C ${tThresh}
 #
 # threshMeth='vox' #vox, tfce, cSize, cMass
 # randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
@@ -32,29 +32,36 @@ vSmooth=5
 
 #sl6/9 - allROIs subjCat, subjCat-orth, ori, 12-way
 
-# motor - sl6, fwhmNone, cope
-trainSetMeth='trials'
-slSiz=6
-normMeth='noNorm'
-decodeFeature='motor'
-distMeth='svm'
-fwhm='None'
-imDat='cope' # cope or tstat images
-threshMeth='cMass' #vox, tfce, cSize, cMass
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5 -C ${tThresh}
 
-# motor - sl6, fwhmNone, cope
+
+#allROIs tfce - allsubs
+
+# subjCat-orth - sl6, fwhmNone, cope
 trainSetMeth='trials'
 slSiz=6
 normMeth='noNorm'
-decodeFeature='motor'
+decodeFeature='subjCat-orth'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
-threshMeth='vox' #vox, tfce, cSize, cMass
+threshMeth='tfce' #vox, tfce, cSize, cMass
 randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni.nii.gz -1 -v 5  -x
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -T
+
+# subjCat-orth - sl9, fwhmNone, cope
+trainSetMeth='trials'
+slSiz=9
+normMeth='noNorm'
+decodeFeature='subjCat-orth'
+distMeth='svm'
+fwhm='None'
+imDat='cope' # cope or tstat images
+threshMeth='tfce' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v 5 -T
+
+
+
 
 # # subjCat - sl6, fwhmNone, cope
 # trainSetMeth='trials'
