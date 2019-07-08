@@ -224,7 +224,7 @@ for iSub in range(1,nSubs+1):
         elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
             conds2comp = np.empty((1)) #len of 1 placeholder
         elif decodeFeature == "dir-all":
-            oppDirs = np.array(([subjCatAconds, abs(subjCatAconds-180)]))
+            oppDirs = np.array(([subjCatAconds, abs((subjCatAconds-180) % 360)]))
             conds2comp = []
             for iDirPairs in range(0,np.size(oppDirs,1)):
                 conds2comp.append(oppDirs[:,iDirPairs])
