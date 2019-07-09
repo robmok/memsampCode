@@ -14,8 +14,8 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 #mainDir='/Users/robertmok/Documents/Postdoc_ucl/' 
 
 imDat    = 'cope' # cope or tstat images
-normMeth = 'demeaned_stdNorm' #  'noNorm', 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'dCentred'
-distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
+normMeth = 'noNorm' #  'noNorm', 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'dCentred'
+distMeth = 'mNobis' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
