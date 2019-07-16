@@ -8,7 +8,7 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #IPS1 to IPS5 and SPL1
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     -e s:"reRun = False":"reRun = True":g \
     -e s:"#rois":"rois":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py

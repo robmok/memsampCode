@@ -11,7 +11,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # -e s:"reRun = False":"reRun = True":g \
 
 #IPS1 to IPS5 and SPL1
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
     -e s:"reRun = False":"reRun = True":g \
     -e s:"#rois":"rois":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py

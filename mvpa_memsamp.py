@@ -61,7 +61,7 @@ rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V
 #removed 'dlPFC_lh','dlPFC_rh',
 
 #reRunROIs
-#rois = ['V2vd_lh','V2vd_rh','hMT_lh','hMT_rh','MDroi_area8c_lh','MDroi_area8c_rh', 'SPL1_lh','SPL1_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh']
+#rois = ['SPL1_lh','SPL1_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
