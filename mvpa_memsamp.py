@@ -52,7 +52,7 @@ decodeFeature = 'subjCat'
 nSubs=33                                                           #hpc - anterior, posterior, whole
 
 rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
-        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh',
+        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh','SPL1_lh','SPL1_rh',
         'MDroi_ips_lh','MDroi_ips_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'mPFC_sph10',
         'HIPP_HEAD_lh','HIPP_HEAD_rh','HIPP_BODY_TAIL_lh','HIPP_BODY_TAIL_rh',
@@ -62,6 +62,7 @@ rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V
 
 #reRunROIs
 #rois = ['SPL1_lh','SPL1_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh']
+#rois = ['V2vd_rh','hMT_lh','MDroi_area8c_lh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
@@ -212,7 +213,7 @@ for iSub in range(1,nSubs+1):
         elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth"): #subjective catgory bound based on responses
             conds2comp = [[subjCatAconds, subjCatBconds]] 
         elif decodeFeature=="subjCat-orth-ctrl":
-            conds2comp = [subjCatAconds, subjCatBconds]  
+            conds2comp = [subjCatAconds, subjCatBconds]
             catA90 = conds2comp[0]+90
             catB90 = conds2comp[1]+90
             catA90[catA90>359]=catA90[catA90>359]-360
@@ -237,14 +238,13 @@ for iSub in range(1,nSubs+1):
             cv   = LeaveOneGroupOut()
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
-            clf  = LinearSVC(C=.1)
+#            clf  = LinearSVC(C=.1)
             if distMeth == 'svm':
                 clf   = LinearSVC(C=.1)
             elif distMeth == 'lda':
                 clf = LinearDiscriminantAnalysis()
                 clf.fit(fmri_masked_cleaned, y) 
             cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
-            
             print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
             print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
             y_indexed = y #for computing chance
