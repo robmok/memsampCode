@@ -2,7 +2,7 @@
 # Rois
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
-# mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
@@ -10,17 +10,14 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # -e s:"reRun = False":"reRun = True":g \
 
-#IPS1 to IPS5 and SPL1
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+
+#rerunning basic to check solid
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
     -e s:"reRun = False":"reRun = True":g \
     -e s:"#rois":"rois":g \
+    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-
-# #rerunning basic to check solid
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
 
 # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
 #     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
