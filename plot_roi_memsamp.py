@@ -41,7 +41,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-resp' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -66,9 +66,9 @@ stdAll = df.iloc[indSubs,:].sem()
 
 
 #ax=df.iloc[indSubs,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
-ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
+#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
 #ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
-#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
+ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
 
 #ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
 #ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[indSubs,:], yerr=stdAll, fmt='-o')
@@ -76,9 +76,9 @@ ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5
 
 # without excluding, V2 p=0.1 MT: p=0.02715; area8c_lhp= 0.00855  - NOTE: pvals are 2-tailed; should be 1, so halve them
 # after excluding, V2 p=0.3449, MT: p=0.0346, area8c_lh: p=0.00337 
-stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0.5)
-stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0.5)
-#stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0)
+stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0)
+stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0)
+stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0)
 #
 #stats.ttest_1samp(df['MDroi_area9_rh'].iloc[indSubs],0)
 
