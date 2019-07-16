@@ -10,14 +10,29 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # -e s:"reRun = False":"reRun = True":g \
 
+#rerunning
+sed -e s:"#mainDir":"mainDir":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
 
-#rerunning basic to check solid
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
     -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"#mainDir":"mainDir":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+#re-run svms all ROIs
+# - subjCat, subjCat-orth, subjCat-all, 12-way, 12-way-all, ori, dir
+
+
+
+
+
+
 
 # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
 #     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
