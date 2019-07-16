@@ -17,6 +17,12 @@ sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"#mainDir":"mainDir":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+
 #
 # #IPS1 to IPS5 and SPL1
 # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
