@@ -12,16 +12,8 @@ roiDirOut=${mainDir}/'rois'
 #apply a bit of smoothing then binarize to make some masks continuous / bigger
 
 for iRoi in {1..25}; do
-  fslmaths ${roiDir}/maxprob_vol_lh.nii.gz -thr ${iRoi} -uthr ${iRoi} -bin -s 0.25 -bin ${roiDirOut}/roi${iRoi}_lh_25.nii.gz
-  fslmaths ${roiDir}/maxprob_vol_rh.nii.gz -thr ${iRoi} -uthr ${iRoi} -bin -s 0.25 -bin ${roiDirOut}/roi${iRoi}_rh_25.nii.gz
-done
-
-#trying no smoothing (smaller ROIs)
-
-#next try 0.5 smoothing (larger ROIs)
-for iRoi in {1..25}; do
-  fslmaths ${roiDir}/maxprob_vol_lh.nii.gz -thr ${iRoi} -uthr ${iRoi} -bin -s 0.5 -bin ${roiDirOut}/roi${iRoi}_lh.nii.gz
-  fslmaths ${roiDir}/maxprob_vol_rh.nii.gz -thr ${iRoi} -uthr ${iRoi} -bin -s 0.5 -bin ${roiDirOut}/roi${iRoi}_rh.nii.gz
+  fslmaths ${roiDir}/maxprob_vol_lh.nii.gz -thr ${iRoi} -uthr ${iRoi} -bin -s 0.25 -bin ${roiDirOut}/roi${iRoi}_lh.nii.gz
+  fslmaths ${roiDir}/maxprob_vol_rh.nii.gz -thr ${iRoi} -uthr ${iRoi} -bin -s 0.25 -bin ${roiDirOut}/roi${iRoi}_rh.nii.gz
 done
 
 
