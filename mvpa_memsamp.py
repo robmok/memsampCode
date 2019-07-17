@@ -49,10 +49,10 @@ decodeFeature = 'subjCat'
 # =============================================================================
 # Set up decoding accuracy dataframe 
 # =============================================================================
-nSubs=33                                                           #hpc - anterior, posterior, whole
+nSubs=33                                                           
 
 rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V3a_rh',
-        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS0_lh','IPS0_rh','IPS1-5_lh','IPS1-5_rh',
+        'V3b_lh','V3b_rh', 'hMT_lh','hMT_rh', 'IPS1-5_lh','IPS1-5_rh',
         'SPL1_lh','SPL1_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'motor_lh', 'motor_rh']
 
