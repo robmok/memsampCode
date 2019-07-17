@@ -15,6 +15,8 @@ sns.set(style="ticks", color_codes=True)
 #import bootstrapped.bootstrap as bs
 #import bootstrapped.stats_functions as bs_stats
 import scipy.stats as stats
+from statsmodels.stats.multitest import fdrcorrection as fdr
+#from statsmodels.stats.multitest import multipletests as multest
 
 
 codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode' #love06
@@ -37,18 +39,18 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 
 subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
-#%% plot bar / errobar plot
+#%% plot bar / errorbar plot
 
 exclSubs = True
 if exclSubs:
@@ -415,8 +417,11 @@ roiList.remove('subjCat')
 rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
 tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
 
-for iRoi in roiList:
-    roi=iRoi
+rhoP=np.empty((len(roiList)))
+tauP=np.empty((len(roiList)))
+
+iRoi=0
+for roi in roiList:
     rdm = np.zeros((12,12)) 
     rho=np.empty((sum(indSubs)))
     tau=np.empty((sum(indSubs)))
@@ -437,18 +442,23 @@ for iRoi in roiList:
         rho[i], pval[i]=stats.spearmanr(rdm[iu],catRDM[iu])
 #        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
         tau[i] = kendall_a(rdm[iu],catRDM[iu])
-        i=i+1
+        i+=1
     t,p=stats.ttest_1samp(rho,0)
-    print('roi: %s' % (iRoi))
+    rhoP[iRoi]=p
+    print('roi: %s' % (roi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
+    tauP[iRoi]=p
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
     rhoAll[roi]=rho
     tauAll[roi]=tau
+    iRoi+=1
     
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.04,0.04))
 
+print(fdr(tauP[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - direction
 
@@ -491,8 +501,8 @@ roiList=list(df)
 roiList.remove('subjCat')
 rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
 tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-for iRoi in roiList:
-    roi=iRoi
+iRoi=0
+for roi in roiList:
     rdm = np.zeros((12,12)) 
     rho=np.empty((sum(indSubs)))
     tau=np.empty((sum(indSubs)))
@@ -515,15 +525,21 @@ for iRoi in roiList:
         tau[i] = kendall_a(rdm[iu],modelRDM[iu])
         i=i+1
     t,p=stats.ttest_1samp(rho,0)
-    print('roi: %s' % (iRoi))
+    rhoP[iRoi]=p
+    print('roi: %s' % (roi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
+    tauP[iRoi]=p
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
     rhoAll[roi]=rho
     tauAll[roi]=tau
+    iRoi+=1
     
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
+
+print(fdr(tauP[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - orientation
 
@@ -551,52 +567,22 @@ iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores di
 #
 #iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 #modelRDM[iu] = angDist
-
-#data
-rdm = np.zeros((12,12)) 
-rho=np.empty((sum(indSubs)))
-tau=np.empty((sum(indSubs)))
-pval=np.empty((sum(indSubs)))
-useSubs=np.where(indSubs)
-
-roiList=list(df)
-roiList.remove('subjCat')
-rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-for iRoi in roiList:
-    roi=iRoi
-    rdm = np.zeros((12,12)) 
-    rho=np.empty((sum(indSubs)))
-    tau=np.empty((sum(indSubs)))
-    pval=np.empty((sum(indSubs)))
-    i=0
-    for iSub in useSubs[0]:    
-        rdm[iu] = df[roi].iloc[iSub]
-        #get direction conditions from ordering here, then compute circular dist
-#        conds=np.append(df['subjCat'].loc[iSub][0],df['subjCat'].loc[iSub][1],axis=0)
-        conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
-
-        iC=0
-        angDist=np.empty((66)) #number of upper diagonal cells
-        for iCond in range(0,len(conds)):
-            for compCond in conds[len(conds)-len(conds[iCond:len(conds)])+1:len(conds)]:
-                angDist[iC] = abs(((conds[iCond]-compCond) + 90) % 180 - 90)
-                iC=iC+1
-        modelRDM[iu] = angDist        
-        rho[i], pval[i]=stats.spearmanr(rdm[iu],modelRDM[iu])
-#        tau[i], pval[i]=stats.kendalltau(rdm[iu],modelRDM[iu])
-        tau[i] = kendall_a(rdm[iu],modelRDM[iu])
-        i=i+1
     t,p=stats.ttest_1samp(rho,0)
-    print('roi: %s' % (iRoi))
+    rhoP[iRoi]=p
+    print('roi: %s' % (roi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
+    tauP[iRoi]=p
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
     rhoAll[roi]=rho
     tauAll[roi]=tau
+    iRoi+=1
     
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
+
+print(fdr(tauP[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%%12-way-all
 

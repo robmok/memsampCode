@@ -42,16 +42,16 @@ decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '_goodone.pkl')))
-df.loc['stats']
+                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+print(df.loc['stats'])
 
 
 pvals=np.empty((len(list(df))-1))
 for iRoi in range(0,len(list(df))-1):
     pvals[iRoi]= df.loc['stats'][iRoi].pvalue
 
-fdr(pvals/2,alpha=0.05,method='indep',is_sorted=False)
-multest(pvals/2, alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
+print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
 
 
 #pSorted=np.sort(pvals)
