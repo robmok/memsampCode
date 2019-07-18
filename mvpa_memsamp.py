@@ -106,7 +106,16 @@ for iSub in range(1,nSubs+1):
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
-        
+    
+    # only select 2 out of 3/4 runs that share the same motor response (no counterbalancing)
+    if (decodeFeature=='subjCat-motor')|(decodeFeature=='subjCat-orth-motor'):
+        if sum(dfCond['keymap']==0)>sum(dfCond['keymap']==1):
+            dfCond=dfCond[dfCond['keymap']==0]
+        elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
+            dfCond=dfCond[dfCond['keymap']==1]
+        else: #if 4 runs, just select one set
+            dfCond=dfCond[dfCond['keymap']==0]
+                
     #get objective category
     catAconds=np.array((range(120,271,30))) 
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
@@ -207,7 +216,7 @@ for iSub in range(1,nSubs+1):
         #set up the conditions you want to classify. if 12-way, no need
         if (decodeFeature=="objCat")|(decodeFeature=="objCat-orth"):
             conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-        elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth"): #subjective catgory bound based on responses
+        elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth")|(decodeFeature=="subjCat-motor")|(decodeFeature=="subjCat-orth-motor"): #subjective catgory bound based on responses
             conds2comp = [[subjCatAconds, subjCatBconds]] 
         elif decodeFeature=="subjCat-orth-ctrl":
             conds2comp = [subjCatAconds, subjCatBconds]
@@ -288,7 +297,7 @@ for iSub in range(1,nSubs+1):
                 elif distMeth == 'mNobis':
                     cvAccTmp[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)
 
-            if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):                
+            if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-orth-motor"):                
                 catA90 = conds2comp[0][0]+90
                 catB90 = conds2comp[0][1]+90
                 catA90[catA90>359]=catA90[catA90>359]-360
@@ -335,7 +344,7 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
-if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")):
+if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")&(decodeFeature!="subjCat-orth-motor")):
     chance = 1/len(np.unique(y_indexed))
 else: 
     chance = 0 #for crossvalidated distances

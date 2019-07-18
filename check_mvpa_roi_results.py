@@ -37,7 +37,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
@@ -51,7 +51,11 @@ for iRoi in range(0,len(list(df))-1):
     pvals[iRoi]= df.loc['stats'][iRoi].pvalue
 
 print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
-#multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
+multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+
+#first bunch for ori/12-way
+#print(fdr(pvals[0:16]/2,alpha=0.05,method='indep',is_sorted=False))
+#multest(pvals[0:16]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
 
 #pSorted=np.sort(pvals)
