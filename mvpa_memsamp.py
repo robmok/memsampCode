@@ -58,7 +58,7 @@ rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V
 
 
 #reRunROIs
-#rois = ['SPL1_lh','SPL1_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh']
+#rois = ['IPS0_lh','IPS0_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh']
 #rois = ['V2vd_rh','hMT_rh','hMT_lh','MDroi_area8c_lh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
@@ -114,7 +114,7 @@ for iSub in range(1,nSubs+1):
         elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
             dfCond=dfCond[dfCond['keymap']==1]
         else: #if 4 runs, just select one set
-            dfCond=dfCond[dfCond['keymap']==0]
+            dfCond=dfCond[dfCond['keymap']==1]
                 
     #get objective category
     catAconds=np.array((range(120,271,30))) 

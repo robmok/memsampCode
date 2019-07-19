@@ -9,6 +9,7 @@ Created on Fri Mar 15 12:10:41 2019
 import os
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 
 from statsmodels.stats.multitest import fdrcorrection as fdr
 from statsmodels.stats.multitest import multipletests as multest
@@ -18,18 +19,7 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi'
 # laptop
 #mainDir='/Users/robertmok/Documents/Postdoc_ucl/' 
 
-#subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
-#exclSubs = True
-#if exclSubs:
-#    nDirInCat=np.empty((2,33))
-#    for iSub in range(0,33):
-#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-#else:
-#    indSubs=np.ones(33,dtype=bool)
-#    
-
+subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' #  'noNorm', 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'dCentred'
@@ -61,3 +51,42 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 #pSorted=np.sort(pvals)
 #fdr(pSorted[0:22]/2,alpha=0.05,method='indep',is_sorted=True)
 #multest(pSorted[0:22]/2, alpha=0.05, method='bonferroni', is_sorted=True, returnsorted=False)
+
+
+#%% exclude subs
+
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+        
+#    indSubs[:]=True # reset if don't include excl above
+#    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
+
+newStats = pd.DataFrame(columns=list(df))
+chance = .5 #0, 0.5, 1/12
+for roi in list(df):
+    newStats[roi]=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
+print(newStats.T)
+
+
+pvals=newStats.iloc[1].values
+#print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+
+#print(fdr(pvals[0:len(pvals)-11]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(multest(pvals[0:len(pvals)-11]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
+
+
+#12-way (0:12 for visRois, 0:16 incl some IPS but note not same for all)
+#print(fdr(pvals[0:12]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(multest(pvals[0:12]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
+#ori
+print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
+print(multest(pvals[0:6]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))

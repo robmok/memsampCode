@@ -39,11 +39,11 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -52,13 +52,16 @@ df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
 subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 #%% plot bar / errorbar plot
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
         nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
         nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+        
+#    indSubs[:]=True # reset if don't include excl above
+#    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -68,9 +71,9 @@ stdAll = df.iloc[indSubs,:].sem()
 
 
 #ax=df.iloc[indSubs,:].mean().plot(figsize=(15,5),kind="bar",yerr=stdAll)
-#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
+ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(.5,.525))
 #ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(1/12,0.097))
-ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
+#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.01,.05)) #subjCat-orth
 
 #ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
 #ax = plt.errorbar(range(0,np.size(df,axis=1)),df.iloc[indSubs,:], yerr=stdAll, fmt='-o')
@@ -78,9 +81,9 @@ ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),kind="bar",yerr=stdAll,ylim=(-.
 
 # without excluding, V2 p=0.1 MT: p=0.02715; area8c_lhp= 0.00855  - NOTE: pvals are 2-tailed; should be 1, so halve them
 # after excluding, V2 p=0.3449, MT: p=0.0346, area8c_lh: p=0.00337 
-stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0)
-stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0)
-stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0)
+print(stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0))
+print(stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0))
+print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0))
 #
 #stats.ttest_1samp(df['MDroi_area9_rh'].iloc[indSubs],0)
 
@@ -390,13 +393,16 @@ inclUneqSubs = True
 uneqSubs=np.array((4, 12, 16, 26, 31))
 
 #exclude subs with unequal conds
-exclSubs = False
+exclSubs = True
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
         nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
         nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+    
+    indSubs[:]=1 # reset if don't include excl above
+    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - better for pfc (p=0.008, without excluding unequal)
 else:
     indSubs=np.ones(33,dtype=bool)
 
@@ -457,7 +463,7 @@ for roi in roiList:
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.04,0.04))
 
-print(fdr(tauP[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+print(fdr(tauP[0:len(rhoP)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - direction
@@ -538,7 +544,7 @@ for roi in roiList:
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
 
-print(fdr(tauP[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+print(fdr(tauP[0:len(rhoP)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - orientation
@@ -581,7 +587,7 @@ iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores di
 #ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
 ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
 
-print(fdr(tauP[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+print(fdr(tauP[0:len(rhoP)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%%12-way-all

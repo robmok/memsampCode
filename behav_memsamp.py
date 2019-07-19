@@ -53,6 +53,7 @@ import os
 import glob
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 eventsDir=os.path.join(mainDir,'orig_events')
@@ -114,14 +115,47 @@ for iSub in range(9,34):
         respCatPr[iCond] = np.divide(dat.loc[dat['direction']==iCond,'resp'].sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
         respPr[iCond] = np.divide((dat.loc[dat['direction']==iCond,'key']==6).sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
         
+        
     #subjective catgory bound based on responses
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
     
-    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
-    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
-    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
-    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
+#    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
+#    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
+#    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
+#    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
+
+
+
+    #plot respPr for different (counterbalanced) motor response runs
+    respPr1 = pd.Series(index=conds)
+    respPr2 = pd.Series(index=conds)
+    respPr3 = pd.Series(index=conds)
+    respPr4 = pd.Series(index=conds)
+    for iCond in conds:        
+        respPr1[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
+        respPr2[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
+        
+        #respPr3 is with 1 block, respPr4 with 2 (except 4 block subs)
+        if sum(dat['keymap']==0)>sum(dat['keymap']==1):            
+            respPr3[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
+            respPr4[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
+        elif sum(dat['keymap']==0)<sum(dat['keymap']==1):
+            respPr3[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
+            respPr4[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
+        else: #if 4 runs, just select one set - subs 9,12,16,26
+            respPr3[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
+            respPr4[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
+        
+        
+#    plt.plot(pd.concat([respPr1,respPr2],axis=1))
+    plt.plot(pd.concat([respPr3,respPr4],axis=1))
+    plt.show()
+
+# subs who have a flat resp line ~0.5 for one of the motor resp conds - 1 (worse for the 2 runs!), 16, 31
+
+
+
 
 #    if ((respPr>0.4)&(respPr<0.6)).any():
 #        print("sub %s, %d ambig" % (subNum,((respPr>0.4)&(respPr<0.6)).sum()))
@@ -140,8 +174,6 @@ for iSub in range(9,34):
     
 # see a few weird outliers where one direction is the opposite - check how many, and how much > 0.5
     # - is this true or just an error?
-
-
 
 
 #%%
