@@ -24,6 +24,7 @@ codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode' #love
 
 roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
+roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.25'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.5'
 #roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_nosmooth'
 
@@ -35,15 +36,15 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+                                '_fwhm' + str(fwhm) + '_' + imDat + '_goodone.pkl')))
 
 subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 #%% plot bar / errorbar plot
@@ -90,8 +91,168 @@ df.iloc[indSubs,:].mean().plot(yerr=stdAll, fmt='o')
 
 #g = sns.catplot(data=df.iloc[0:33,:],height=4,aspect=4, kind="box")
 
-g = sns.catplot(data=df.iloc[indSubs,:],height=4,aspect=4.2, kind="violin", inner=None)
-sns.swarmplot(color="k", size=3, data=df.iloc[0:33,:], ax=g.ax);
+g = sns.catplot(data=df.iloc[indSubs,:],height=4,aspect=4.2*2, kind="violin", inner=None)
+sns.swarmplot(color="k", size=3, data=df.iloc[indSubs,:], ax=g.ax);
+
+
+#%% plotting within area, across decoders
+
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+#    indSubs[:]=True # reset if don't include excl above
+#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
+decodeFeature = 'subjCat-orth'
+dfSubjCat=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_goodone.pkl')))
+decodeFeature = '12-way'
+df12way=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+decodeFeature = 'ori'
+dfOri=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+decodeFeature = 'dir'
+dfDir=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth  
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+dfHeader=['subjCat-orth','12-way','ori','dir']
+
+
+#subjCat-orth
+#seaborn - but errorbars are bootstrapped CIs (larger)
+#roi='MDroi_area8c_lh'
+#svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+#svm_area8c.columns=dfHeader
+#g = sns.catplot(data=svm_area8c.iloc[indSubs,:],height=6,aspect=1, kind="bar")
+#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_area8c.iloc[indSubs,:], ax=g.ax);
+#g.fig.suptitle('area8c_lh')
+#g.set_ylim=(-0.125,0.15)
+#plt.show()
+
+##subjCat-orth
+##matplotlib
+#roi='MDroi_area8c_lh'
+#svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+#svm_area8c.columns=dfHeader
+#ax=svm_area8c.mean().plot(figsize=(5,6),kind="bar",yerr=svm_area8c.sem(),ylim=(-0.125,0.15), title='area8c_lh')
+#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_area8c.iloc[indSubs,:])
+#plt.show()
+
+
+#combining - seaborn colours, sem errorbars
+roi='MDroi_area8c_lh'
+svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_area8c.columns=dfHeader
+g = sns.catplot(data=svm_area8c.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.3, size=3, data=svm_area8c.iloc[indSubs,:], ax=g.ax);
+plt.show()
+
+roi='hMT_lh'
+svm_MT = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_MT.columns=dfHeader
+g = sns.catplot(data=svm_MT.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+svm_MT.mean().plot(yerr=svm_MT.sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.3, size=3, data=svm_MT.iloc[indSubs,:], ax=g.ax);
+plt.show()
+
+roi='V2vd_rh'
+svm_V2_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_V2_rh.columns=dfHeader
+g = sns.catplot(data=svm_V2_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+svm_V2_rh.mean().plot(yerr=svm_V2_rh.sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.3, size=3, data=svm_V2_rh.iloc[indSubs,:], ax=g.ax);
+plt.show()
+
+
+roi='V1vd_rh'
+svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_V1_rh.columns=dfHeader
+g = sns.catplot(data=svm_V1_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.3, size=3, data=svm_V1_rh.iloc[indSubs,:], ax=g.ax);
+plt.show()
+
+roi='V1vd_lh'
+svm_V1_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_V1_lh.columns=dfHeader
+g = sns.catplot(data=svm_V1_lh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+svm_V1_lh.mean().plot(yerr=svm_V1_lh.sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.3, size=3, data=svm_V1_lh.iloc[indSubs,:], ax=g.ax);
+plt.show()
+
+
+
+
+
+
+
+
+
+#
+#roi='hMT_lh'
+#svm_MT = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+#svm_MT.columns=dfHeader
+##ax=svm_MT.mean().plot(figsize=(5,5),kind="bar",yerr=svm_MT.sem(),ylim=(-0.04,0.04), title='hMT_lh')
+#g = sns.catplot(data=svm_MT.iloc[indSubs,:],height=6,aspect=1, kind="bar")
+#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_MT.iloc[indSubs,:], ax=g.ax);
+#g.fig.suptitle('hMT_lh')
+#g.set_ylim=(-0.125,0.15)
+#plt.show()
+#
+#roi='V2vd_rh'
+#svm_V2_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+#svm_V2_rh.columns=dfHeader
+##ax=svm_V2_lh.mean().plot(figsize=(5,5),kind="bar",yerr=svm_V2_rh.sem(),ylim=(-0.04,0.04), title='V2_rh')
+#g = sns.catplot(data=svm_V2_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar")
+#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_V2_rh.iloc[indSubs,:], ax=g.ax);
+#g.fig.suptitle('V2_rh')
+#g.set_ylim=(-0.125,0.15)
+#plt.show()
+#
+#roi='V1vd_rh'
+#svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+#svm_V1_rh.columns=dfHeader
+##ax=svm_V1_rh.mean().plot(figsize=(5,5),kind="bar",yerr=svm_V1_rh.sem(),ylim=(-0.04,0.04), title='V1_rh')
+#g = sns.catplot(data=svm_V1_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar")
+#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_V1_rh.iloc[indSubs,:], ax=g.ax);
+#g.fig.suptitle('V1_rh')
+#g.set_ylim=(-0.125,0.15)
+#plt.show()
+#
+##roi='V1vd_lh'
+##svm_V1_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+##                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+##svm_V1_lh.columns=dfHeader
+###ax=svm_V1_lh.mean().plot(figsize=(5,5),kind="bar",yerr=svm_V1_lh.sem(),ylim=(-0.04,0.04), title='V1_lh')
+##g = sns.catplot(data=svm_V1_lh.iloc[indSubs,:],height=6,aspect=1, kind="bar")
+##sns.stripplot(color="k", alpha=0.3, size=3, data=svm_V1_lh.iloc[indSubs,:], ax=g.ax);
+##g.fig.suptitle('V1_lh')
+##plt.show()
+
+
+
+# ATM no SPL1 for subjCat-orth or 12-way, need to add this into the df
+
+
+
+
 
 #%% subjCat-all - organise
 
@@ -332,21 +493,24 @@ plt.show()
 #%% model RDMs - category
 
 #include subjects with unequal conds in categories (manually made their RDMs)
-inclUneqSubs = False
+inclUneqSubs = True
 uneqSubs=np.array((4, 12, 16, 26, 31))
 
 #exclude subs with unequal conds
 exclSubs = False
 if exclSubs:
+#    inclUneqSubs = False
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
         nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
         nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
     
-    #ATM this config (or no excluding at all) best
-    indSubs[:]=1 # reset if include unequal conds
-    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    # very similar in any way - p~0.02.  
+            #area9rh: excl uneq p=.0238, excl uneq+excl below p=.0261 , include uneq p=0.0207, include unEq+exclude below p=0.0228/0.0261
+            #SPL1rh excl uneq p=.166, excl uneq+excl below p=.38 , include uneq p=.0784, include unEq+exclude below p=.38 
+#    indSubs[:]=1 # reset if include unequal conds
+#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
 else:
     indSubs=np.ones(33,dtype=bool)
 
@@ -364,11 +528,11 @@ pval = np.empty((sum(indSubs)))
 useSubs=np.where(indSubs)
 roiList=list(df)
 roiList.remove('subjCat')
-rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+rhoCat = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+tauCat = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
 
-rhoP=np.empty((len(roiList)))
-tauP=np.empty((len(roiList)))
+rhoPcat=np.empty((len(roiList)))
+tauPcat=np.empty((len(roiList)))
 
 iRoi=0
 for roi in roiList:
@@ -394,21 +558,23 @@ for roi in roiList:
         tau[i] = kendall_a(rdm[iu],catRDM[iu])
         i+=1
     t,p=stats.ttest_1samp(rho,0)
-    rhoP[iRoi]=p
+    rhoPcat[iRoi]=p
     print('roi: %s' % (roi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
-    tauP[iRoi]=p
+    tauPcat[iRoi]=p
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
-    rhoAll[roi]=rho
-    tauAll[roi]=tau
+    rhoCat[roi]=rho
+    tauCat[roi]=tau
     iRoi+=1
     
-#ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
-ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.04,0.04))
+#ax=rhoCat.mean().plot(figsize=(20,5),kind="bar",yerr=rhoCat.sem(),ylim=(-0.075,0.075))
+ax=tauCat.mean().plot(figsize=(20,5),kind="bar",yerr=tauCat.sem(),ylim=(-0.04,0.04))
 
-print(fdr(tauP[0:len(tauP)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+print(fdr(tauPcat[0:len(tauPcat)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
+
+#print(fdr(tauPcat[11:len(tauPcat)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 
 #%% model RDMs - angular distance - direction
 
@@ -435,10 +601,10 @@ useSubs=np.where(indSubs)
 
 roiList=list(df)
 roiList.remove('subjCat')
-rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-rhoP=np.empty((len(roiList)))
-tauP=np.empty((len(roiList)))
+rhoDir = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+tauDir = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+rhoPdir=np.empty((len(roiList)))
+tauPdir=np.empty((len(roiList)))
 iRoi=0
 for roi in roiList:
     rdm = np.zeros((12,12)) 
@@ -463,20 +629,20 @@ for roi in roiList:
         tau[i] = kendall_a(rdm[iu],modelRDM[iu])
         i=i+1
     t,p=stats.ttest_1samp(rho,0)
-    rhoP[iRoi]=p
+    rhoPdir[iRoi]=p
     print('roi: %s' % (roi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
-    tauP[iRoi]=p
+    tauPdir[iRoi]=p
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
-    rhoAll[roi]=rho
-    tauAll[roi]=tau
+    rhoDir[roi]=rho
+    tauDir[roi]=tau
     iRoi+=1
     
-#ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
-ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
+#ax=rhoDir.mean().plot(figsize=(20,5),kind="bar",yerr=rhoDir.sem(),ylim=(-0.075,0.075))
+ax=tauDir.mean().plot(figsize=(20,5),kind="bar",yerr=tauDir.sem(),ylim=(-0.065,0.065))
 
-print(fdr(tauP[0:len(tauP)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+print(fdr(tauPdir[0:len(tauPdir)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - orientation
@@ -502,10 +668,10 @@ useSubs=np.where(indSubs)
 
 roiList=list(df)
 roiList.remove('subjCat')
-rhoAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-tauAll = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
-rhoP=np.empty((len(roiList)))
-tauP=np.empty((len(roiList)))
+rhoOri = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+tauOri = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
+rhoPori=np.empty((len(roiList)))
+tauPori=np.empty((len(roiList)))
 iRoi=0
 for roi in roiList:
     rdm = np.zeros((12,12)) 
@@ -531,23 +697,38 @@ for roi in roiList:
         tau[i] = kendall_a(rdm[iu],modelRDM[iu])
         i=i+1
     t,p=stats.ttest_1samp(rho,0)
-    rhoP[iRoi]=p
+    rhoPori[iRoi]=p
     print('roi: %s' % (roi))
     print('spearman: t=%.3f, p=%.4f' % (t,p))
     t,p=stats.ttest_1samp(tau,0)
-    tauP[iRoi]=p
+    tauPori[iRoi]=p
     print('tau-b: t=%.3f, p=%.4f' % (t,p))
-    rhoAll[roi]=rho
-    tauAll[roi]=tau
+    rhoOri[roi]=rho
+    tauOri[roi]=tau
     iRoi+=1
     
-#ax=rhoAll.mean().plot(figsize=(20,5),kind="bar",yerr=rhoAll.sem(),ylim=(-0.075,0.075))
-ax=tauAll.mean().plot(figsize=(20,5),kind="bar",yerr=tauAll.sem(),ylim=(-0.065,0.065))
+#ax=rhoOri.mean().plot(figsize=(20,5),kind="bar",yerr=rhoOri.sem(),ylim=(-0.075,0.075))
+ax=tauOri.mean().plot(figsize=(20,5),kind="bar",yerr=tauOri.sem(),ylim=(-0.065,0.065))
 
-#print(fdr(tauP[0:len(tauP)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(fdr(tauPori[0:len(tauPori)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
-print(fdr(tauP[0:12]/2,alpha=0.05,method='indep',is_sorted=False))
+print(fdr(tauPori[0:12]/2,alpha=0.05,method='indep',is_sorted=False))
+
+
+#%% plotting within area, across models
+
+modelR_area9=pd.concat([tauCat['MDroi_area9_rh'],tauDir['MDroi_area9_rh'],tauOri['MDroi_area9_rh']],axis=1)
+modelR_SPL1=pd.concat([tauCat['SPL1_rh'],tauDir['SPL1_rh'],tauOri['SPL1_rh']],axis=1)
+modelR_v2=pd.concat([tauCat['V2vd_lh'],tauDir['V2vd_lh'],tauOri['V2vd_lh']],axis=1)
+
+ax=modelR_area9.mean().plot(figsize=(5,5),kind="bar",yerr=modelR_area9.sem(),ylim=(-0.04,0.04))
+plt.show()
+ax=modelR_SPL1.mean().plot(figsize=(5,5),kind="bar",yerr=modelR_SPL1.sem(),ylim=(-0.04,0.04))
+plt.show()
+ax=modelR_v2.mean().plot(figsize=(5,5),kind="bar",yerr=modelR_v2.sem(),ylim=(-0.04,0.04))
+plt.show()
+
 
 #%%12-way-all
 

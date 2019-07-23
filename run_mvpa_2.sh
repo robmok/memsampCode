@@ -12,10 +12,6 @@ sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth-motor'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
 
 
 #

@@ -113,7 +113,7 @@ for iSub in range(1,nSubs+1):
         elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
             dfCond=dfCond[dfCond['keymap']==1]
         else: #if 4 runs, just select one set
-            dfCond=dfCond[dfCond['keymap']==0]
+            dfCond=dfCond[dfCond['keymap']==1]
                 
     #get objective category
     catAconds=np.array((range(120,271,30))) 
