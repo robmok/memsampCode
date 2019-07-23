@@ -67,7 +67,7 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
-for iSub in range(9,34):
+for iSub in range(1,34):
 #    iSub=1 #temp
     subNum=f'{iSub:02d}'
     fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
