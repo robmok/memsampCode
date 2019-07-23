@@ -197,12 +197,6 @@ plt.show()
 
 
 
-
-
-
-
-
-#
 #roi='hMT_lh'
 #svm_MT = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
 #                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)

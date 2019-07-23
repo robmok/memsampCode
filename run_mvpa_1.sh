@@ -9,10 +9,8 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # -e s:"reRun = False":"reRun = True":g \
 
-#trying svms C=1, rois 0.25
-#love06
-#ori, dir, #subjCat-motor, subjCat-orth-motor
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 

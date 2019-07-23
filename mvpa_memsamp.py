@@ -244,7 +244,7 @@ for iSub in range(1,nSubs+1):
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
             if distMeth == 'svm':
-                clf   = LinearSVC(C=1)
+                clf   = LinearSVC(C=.1)
             elif distMeth == 'lda':
                 clf = LinearDiscriminantAnalysis()
                 clf.fit(fmri_masked_cleaned, y) 
@@ -284,7 +284,7 @@ for iSub in range(1,nSubs+1):
                 cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                 cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
                 if distMeth == 'svm':
-                    clf   = LinearSVC(C=1)
+                    clf   = LinearSVC(C=.1)
                     cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                 elif distMeth == 'lda':
                     clf = LinearDiscriminantAnalysis()
@@ -320,7 +320,7 @@ for iSub in range(1,nSubs+1):
                     cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                     cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
                     if distMeth == 'svm':
-                        clf   = LinearSVC(C=1)
+                        clf   = LinearSVC(C=.1)
                         cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                     elif distMeth == 'lda':
                         clf = LinearDiscriminantAnalysis()
