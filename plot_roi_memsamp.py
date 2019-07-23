@@ -56,7 +56,7 @@ if exclSubs:
         nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
 #    indSubs[:]=True # reset if don't include excl above
-#    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -332,7 +332,7 @@ plt.show()
 #%% model RDMs - category
 
 #include subjects with unequal conds in categories (manually made their RDMs)
-inclUneqSubs = True
+inclUneqSubs = False
 uneqSubs=np.array((4, 12, 16, 26, 31))
 
 #exclude subs with unequal conds
@@ -344,8 +344,9 @@ if exclSubs:
         nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
     
-    indSubs[:]=1 # reset if don't include excl above
-    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - better for pfc (p=0.008, without excluding unequal)
+    #ATM this config (or no excluding at all) best
+    indSubs[:]=1 # reset if include unequal conds
+    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
 else:
     indSubs=np.ones(33,dtype=bool)
 
@@ -780,3 +781,14 @@ plt.show()
 #ax=rhoHighAll.mean().plot(figsize=(15,5),kind="bar",yerr=rhoHighAll.sem(),ylim=(-0.075,0.075))
 ax=tauHighAll.mean().plot(figsize=(15,5),kind="bar",yerr=tauHighAll.sem(),ylim=(0,0.175))
 plt.show()
+
+
+#stats.spearmanr(rdm1[iu],rdm3[iu])
+#np.sqrt(scipy.spatial.distance.euclidean(stats.rankdata(rdm1[iu]),stats.rankdata(rdm3[iu])))
+
+
+#plot low and high togeher - rearrange:
+#https://stackoverflow.com/questions/48754179/how-to-pick-pairs-of-columns-plot-them-against-each-other-in-a-bar-chart-pandas
+
+
+pd.concat(tauLowAll,tauHighAll)

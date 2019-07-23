@@ -2,38 +2,32 @@
 # Rois
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
-mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+# mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-
 # -e s:"reRun = False":"reRun = True":g \
 
-#rerunning
-sed -e s:"#mainDir":"mainDir":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-    -e s:"#mainDir":"mainDir":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
+#trying svms C=1, rois 0.25
 
+#love06
+#ori, dir, #subjCat-motor, subjCat-orth-motor
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"#mainDir":"mainDir":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-motor'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+
+
 
 
 #re-run svms all ROIs
 # - subjCat, subjCat-orth, subjCat-all, 12-way, 12-way-all, ori, dir
-
-
-
-
-
 
 
 # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \

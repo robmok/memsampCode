@@ -56,7 +56,6 @@ rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V
         'SPL1_lh','SPL1_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'motor_lh', 'motor_rh']
 
-
 #reRunROIs
 #rois = ['IPS0_lh','IPS0_rh','IPS1-2_lh','IPS1-2_rh','IPS3-5_lh','IPS3-5_rh']
 #rois = ['V2vd_rh','hMT_rh','hMT_lh','MDroi_area8c_lh']
@@ -70,7 +69,7 @@ if decodeFeature == "subjCat-all":
 # load in trial log and append image paths
 # =============================================================================
 
-for iSub in range(1,nSubs+1):
+for iSub in range(9,nSubs+1):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
@@ -114,7 +113,7 @@ for iSub in range(1,nSubs+1):
         elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
             dfCond=dfCond[dfCond['keymap']==1]
         else: #if 4 runs, just select one set
-            dfCond=dfCond[dfCond['keymap']==1]
+            dfCond=dfCond[dfCond['keymap']==0]
                 
     #get objective category
     catAconds=np.array((range(120,271,30))) 
@@ -244,9 +243,8 @@ for iSub in range(1,nSubs+1):
             cv   = LeaveOneGroupOut()
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
-#            clf  = LinearSVC(C=.1)
             if distMeth == 'svm':
-                clf   = LinearSVC(C=.1)
+                clf   = LinearSVC(C=1)
             elif distMeth == 'lda':
                 clf = LinearDiscriminantAnalysis()
                 clf.fit(fmri_masked_cleaned, y) 
@@ -286,7 +284,7 @@ for iSub in range(1,nSubs+1):
                 cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                 cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
                 if distMeth == 'svm':
-                    clf   = LinearSVC(C=.1)
+                    clf   = LinearSVC(C=1)
                     cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                 elif distMeth == 'lda':
                     clf = LinearDiscriminantAnalysis()
@@ -322,7 +320,7 @@ for iSub in range(1,nSubs+1):
                     cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                     cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
                     if distMeth == 'svm':
-                        clf   = LinearSVC(C=.1)
+                        clf   = LinearSVC(C=1)
                         cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                     elif distMeth == 'lda':
                         clf = LinearDiscriminantAnalysis()
