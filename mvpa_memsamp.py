@@ -69,7 +69,7 @@ if decodeFeature == "subjCat-all":
 # load in trial log and append image paths
 # =============================================================================
 
-for iSub in range(9,nSubs+1):
+for iSub in range(1,nSubs+1):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
