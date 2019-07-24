@@ -56,6 +56,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
+behavDir=os.path.join(mainDir,'behav')
 eventsDir=os.path.join(mainDir,'orig_events')
 #codeDir=os.path.join(mainDir,'memsampCode')
 #os.chdir(codeDir)
@@ -67,144 +68,111 @@ eventsDir=os.path.join(mainDir,'orig_events')
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
+accA = np.empty(33)
+accB = np.empty(33)
+acc  = np.empty(33)
+objAcc = np.empty(33)
 for iSub in range(1,34):
 #    iSub=1 #temp
     subNum=f'{iSub:02d}'
     fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*." + 'tsv')
     datafiles = sorted(glob.glob(fnames))
     
-    dat=pd.DataFrame()
+    dfCond=pd.DataFrame()
     for iFile in datafiles:   
     #    iFile = datafiles[0] #temp
         df=pd.read_csv(iFile, sep="\t")
-        dat = dat.append(df)
+        dfCond = dfCond.append(df)
         
-    #get objective category - turns out don't need this, direction is scored to be the same for each sub (see rawdirection is different)
-#    if dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),'category'].all():
-#        catAconds=np.array((range(120,271,30))) 
-#        catBconds=np.append(np.array((range(0,91,30))),[300,330])
-#        print("cat rule 1")
-#    elif dat.loc[((dat['direction']==210)|(dat['direction']==0))&(dat['cat']==1),'category'].all():
-#        catAconds=np.append(np.array((range(210,331,30))),0)
-#        catBconds=np.array((range(30,181,30))) 
-#        print("cat rule 2")
-#    else: 
-#        print("Error determining category rule")
-
-    #turns out don't need this, direction is scored to be the same for each sub (see rawdirection is different)
     catAconds=np.array((range(120,271,30))) 
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
     #get response and determine subjective category bound
     #flip - need double check if keymap is what i think it is. looks ok
-    ind1=dat['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
-    ind2=dat['key']==6
-    ind3=dat['key']==1
-    dat.loc[ind1&ind2,'key']=5
-    dat.loc[ind1&ind3,'key']=6
-    dat.loc[ind1&ind2,'key']=1
-    
-    #could also check aresp?
-    
-    #get 1) accuracy for each condition and 2)subjective category
-    conds=dat.direction.unique()
+    ind1=dfCond['keymap']==1 #if dfCond['keymap'] == 1: #flip, if 0, no need flip
+    ind2=dfCond['key']==6
+    ind3=dfCond['key']==1
+    dfCond.loc[ind1&ind2,'key']=5
+    dfCond.loc[ind1&ind3,'key']=6
+    dfCond.loc[ind1&ind2,'key']=1
+    #get subjective category
+    conds=dfCond.direction.unique()
     conds.sort()
-    respCatPr = pd.Series(index=conds)
     respPr = pd.Series(index=conds)
     for iCond in conds:
-        respCatPr[iCond] = np.divide(dat.loc[dat['direction']==iCond,'resp'].sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
-        respPr[iCond] = np.divide((dat.loc[dat['direction']==iCond,'key']==6).sum(),len(dat.loc[dat['direction']==iCond])) #this count nans (prob no resp) as incorrect
-        
-        
-    #subjective catgory bound based on responses
+        respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
+    
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+    #unless:   
+    if iSub==5: #move 240 and 270 to catA
+        subjCatAconds = np.append(subjCatAconds,[240,270])
+        subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+    elif iSub==10: #move 270 to cat B
+        subjCatBconds = np.sort(np.append(subjCatBconds,270))
+        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+    elif iSub == 17:#move 30 to cat B
+        subjCatBconds = np.sort(np.append(subjCatBconds,30))
+        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+    elif iSub==24: #move 120 to cat A
+        subjCatAconds = np.sort(np.append(subjCatAconds,120))
+        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+    elif iSub==27:#move 270 to cat A
+        subjCatAconds = np.sort(np.append(subjCatAconds,270))
+        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+
+    respA=np.empty(0) 
+    respB=np.empty(0) 
+    for iCond in subjCatAconds:
+        respA = np.append(respA, dfCond.loc[dfCond['direction']==iCond,'key'].values)
+    for iCond in subjCatBconds:
+        respB = np.append(respB, dfCond.loc[dfCond['direction']==iCond,'key'].values)        
+        
+    accA[iSub-1]=sum(respA==6)/len(respA)
+    accB[iSub-1]=sum(respB==1)/len(respB)
+    acc[iSub-1]=(sum(respA==6)+sum(respB==1))/(len(respA)+len(respB))
     
-#    print("sub-%s, objective catA:  %s" % (subNum,np.array2string(catAconds)))
-#    print("sub-%s, subjective catA: %s" % (subNum,np.array2string(subjCatAconds)))
-#    print("sub-%s, objective catB:  %s" % (subNum,np.array2string(catBconds)))
-#    print("sub-%s, subjective catB: %s" % (subNum,np.array2string(subjCatBconds)))
+    objAcc[iSub-1]=np.nansum(dfCond['resp'])/len(dfCond['resp'])
 
 
+np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
 
-    #plot respPr for different (counterbalanced) motor response runs
-    respPr1 = pd.Series(index=conds)
-    respPr2 = pd.Series(index=conds)
-    respPr3 = pd.Series(index=conds)
-    respPr4 = pd.Series(index=conds)
-    for iCond in conds:        
-        respPr1[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
-        respPr2[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
-        
-        #respPr3 is with 1 block, respPr4 with 2 (except 4 block subs)
-        if sum(dat['keymap']==0)>sum(dat['keymap']==1):            
-            respPr3[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
-            respPr4[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
-        elif sum(dat['keymap']==0)<sum(dat['keymap']==1):
-            respPr3[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
-            respPr4[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
-        else: #if 4 runs, just select one set - subs 9,12,16,26
-            respPr3[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==0),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==0)]))
-            respPr4[iCond] = np.divide((dat.loc[(dat['direction']==iCond)&(dat['keymap']==1),'key']==6).sum(),len(dat.loc[(dat['direction']==iCond)&(dat['keymap']==1)]))
-        
-        
-#    plt.plot(pd.concat([respPr1,respPr2],axis=1))
-    plt.plot(pd.concat([respPr3,respPr4],axis=1))
-    plt.show()
-
-# subs who have a flat resp line ~0.5 for one of the motor resp conds - 1 (worse for the 2 runs!), 16, 31
+#x=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
+#locals().update(x) #load in each variable into workspace
 
 
+    # plot respPr for different (counterbalanced) motor response runs - checking if people are not switching responses
+    # subs who have a flat resp line ~0.5 for one of the motor resp conds - 1 (worse for the 2 runs!), 16, 31
 
-
-#    if ((respPr>0.4)&(respPr<0.6)).any():
-#        print("sub %s, %d ambig" % (subNum,((respPr>0.4)&(respPr<0.6)).sum()))
-#
-#
-#        print(respPr[(respPr>0.4)&(respPr<0.6)])
-
-#    print("sub-%s" % subNum)
-#    print(respPr)
-
-#in subj-01, in run 1, there is one more in one cat than the other....
-    # - how to decide when more than one in the other? 
-    # - inspect how many have this - and how much (~.5?) are there nans?
-    # - how to decide if ~ 0.5?
-        # if around this, then revert to prior (obj)?
-    
-# see a few weird outliers where one direction is the opposite - check how many, and how much > 0.5
-    # - is this true or just an error?
-
-
-#%%
-#print(respPr>0.5) # get subjective cat
-
-
-#    plt.plot(respPr)
-#    plt.show()
-#    plt.plot(respCatPr)
+#    respPr1 = pd.Series(index=conds)
+#    respPr2 = pd.Series(index=conds)
+#    respPr3 = pd.Series(index=conds)
+#    respPr4 = pd.Series(index=conds)
+#    for iCond in conds:        
+#        respPr1[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0)]))
+#        respPr2[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1)]))
+#        
+#        #respPr3 is with 1 block, respPr4 with 2 (except 4 block subs)
+#        if sum(dfCond['keymap']==0)>sum(dfCond['keymap']==1):            
+#            respPr3[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1)]))
+#            respPr4[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0)]))
+#        elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
+#            respPr3[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0)]))
+#            respPr4[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1)]))
+#        else: #if 4 runs, just select one set - subs 9,12,16,26
+#            respPr3[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==0)]))
+#            respPr4[iCond] = np.divide((dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1),'key']==6).sum(),len(dfCond.loc[(dfCond['direction']==iCond)&(dfCond['keymap']==1)]))
+#        
+#        
+##    plt.plot(pd.concat([respPr1,respPr2],axis=1))
+#    plt.plot(pd.concat([respPr3,respPr4],axis=1))
 #    plt.show()
 
 
-#%%
-
-#dat.loc[dat['direction']==iCond,['rawdirection', 'rawcategory']]
-
-
-#dat.loc[((dat['direction']==120)|(dat['direction']==270))&(dat['cat']==1),['category', 'key','resp','correct']] #resp and correct are same if cat=1
-#dat.loc[((dat['direction']==120)|(dat['direction']==270)),['cat','category', 'key','resp','correct']] #shows diff between resp and correct
-        
-
-#  print("cond %s, sum %d, len %d" % (iCond, dat.loc[dat['direction']==iCond,'resp'].sum(), len(dat.loc[dat['direction']==iCond,'resp'])))
-#  print(dat.loc[dat['direction']==iCond,'resp'])
-
-
-#    print(respCatPr) #sub-01 getting it most except 120/300 (most incorrect) - i.e. up-down rule
 
 
 
 
-        
 
 
 

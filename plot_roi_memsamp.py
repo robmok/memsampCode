@@ -18,17 +18,19 @@ import scipy.stats as stats
 from statsmodels.stats.multitest import fdrcorrection as fdr
 #from statsmodels.stats.multitest import multipletests as multest
 
+mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 
-codeDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/memsampCode' #love06
+codeDir=os.path.join(mainDir,'memsampCode')
 #codeDir='/Users/robertmok/Documents/Postdoc_ucl/memsampCode' #laptop
 
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/'
-#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/bilateral'
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.25'
-#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.5'
-#roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_nosmooth'
+roiDir=os.path.join(mainDir,'mvpa_roi')
+#roiDir=os.path.join(mainDir,'mvpa_roi/bilateral')
+roiDir=os.path.join(mainDir,'mvpa_roi/rois_0.25')
+#roiDir=os.path.join(mainDir,'mvpa_roi/rois_0.5')
+#roiDir=os.path.join(mainDir,'mvpa_roi/rois_nosmooth')
 
-figDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/figs_mvpa_roi'
+figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
+behavDir=os.path.join(mainDir,'behav')
 
 # laptop
 #roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
@@ -48,7 +50,12 @@ df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 
+#load in subjCat
 subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
+#load in behav acc
+behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
+locals().update(behav) #load in each variable into workspace
+
 #%% plot bar / errorbar plot
 
 exclSubs = False
@@ -198,6 +205,41 @@ svm_V1_rh.mean().plot(yerr=svm_V1_rh.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), t
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
+plt.show()
+
+#%% behav corr svm
+
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+#    indSubs[:]=True # reset if don't include excl above
+#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
+roiList=list(df)
+rAcc=pd.DataFrame(columns=roiList,index=range(0,2))
+rAccA=pd.DataFrame(columns=roiList,index=range(0,2))
+rAccB=pd.DataFrame(columns=roiList,index=range(0,2))
+rObjAcc=pd.DataFrame(columns=roiList,index=range(0,2))
+for roi in roiList:
+    rAcc[roi][0], rAcc[roi][1]=stats.pearsonr(acc[indSubs],df[roi].iloc[indSubs])
+    rAccA[roi][0], rAccA[roi][1]=stats.pearsonr(accA[indSubs],df[roi].iloc[indSubs])
+    rAccB[roi][0], rAccB[roi][1]=stats.pearsonr(accB[indSubs],df[roi].iloc[indSubs])
+    rObjAcc[roi][0], rObjAcc[roi][1]=stats.pearsonr(objAcc[indSubs],df[roi].iloc[indSubs])
+
+
+plt.scatter(df['V1vd_rh'].iloc[indSubs],acc[indSubs])
+plt.show()
+plt.scatter(df['hMT_lh'].iloc[indSubs],acc[indSubs])
+plt.show()
+plt.scatter(df['MDroi_area8c_lh'].iloc[indSubs],acc[indSubs])
+plt.show()
+plt.scatter(df['MDroi_area9_rh'].iloc[indSubs],acc[indSubs])
 plt.show()
 
 #%% subjCat-all - organise
@@ -744,6 +786,35 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barStripPlotByModel_RDM_' + roi + '.pdf'))
 plt.show()
 
+#%% behav corr RDM
+
+exclSubs = False # MDroi_area9_rh - false p=0.0768; true p=0.0575 (two-tailed, divide by 2)
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+#    indSubs[:]=True # reset if don't include excl above
+#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
+roiList=list(df)
+roiList.remove('subjCat')
+rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+for roi in roiList:
+    rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauCat[roi].iloc[indSubs])
+    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauCat[roi].iloc[indSubs])
+    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauCat[roi].iloc[indSubs])
+    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauCat[roi].iloc[indSubs])
+
+
+plt.scatter(tauCat['MDroi_area9_rh'].iloc[indSubs],acc[indSubs])
+plt.show()
 
 #%%12-way-all
 
