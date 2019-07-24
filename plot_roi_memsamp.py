@@ -99,7 +99,7 @@ sns.swarmplot(color="k", size=3, data=df.iloc[indSubs,:], ax=g.ax);
 
 #%% plotting within area, across decoders
 
-saveFigs = True
+saveFigs = False
 
 exclSubs = False
 if exclSubs:
@@ -157,7 +157,7 @@ svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader
 g = sns.catplot(data=svm_area8c.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_area8c.mean().plot(yerr=svm_area8c.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -170,7 +170,7 @@ svm_MT = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_MT.columns=dfHeader
 g = sns.catplot(data=svm_MT.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_MT.mean().plot(yerr=svm_MT.sem(),ylim=(-0.125,0.15), title='hMT_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_MT.mean().plot(yerr=svm_MT.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='hMT_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT.iloc[indSubs,:], ax=g.ax);
 plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 if saveFigs:
@@ -182,7 +182,7 @@ svm_V2_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_V2_rh.columns=dfHeader
 g = sns.catplot(data=svm_V2_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_V2_rh.mean().plot(yerr=svm_V2_rh.sem(),ylim=(-0.125,0.15), title='V2vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_V2_rh.mean().plot(yerr=svm_V2_rh.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='V2vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V2_rh.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -194,7 +194,7 @@ svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_V1_rh.columns=dfHeader
 g = sns.catplot(data=svm_V1_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-0.125,0.15), title='V1vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_V1_rh.mean().plot(yerr=svm_V1_rh.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='V1vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -321,6 +321,9 @@ for iCond in 2,3,8,9: #range(0,11):
 
 #%% plot RDM
     
+saveFigs = False
+fntSiz = 14
+    
 exclSubs = True
 if exclSubs:
     nDirInCat=np.empty((2,33))
@@ -350,9 +353,12 @@ il = np.tril_indices(12,-1)
 rdm[il] = rdm.T[il]
 
 #RDM plot
-ax = plt.figure(figsize=(25,4))
-ax = plt.imshow(rdm,cmap='viridis')
+plt.figure(figsize=(25,4))
+plt.imshow(rdm,cmap='viridis')
+plt.title(roi,fontsize=fntSiz)
 plt.colorbar()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_RDM' + roi + '.pdf'))
 plt.show()
 
 #MDS
@@ -365,19 +371,23 @@ pos = mds.fit(rdm).embedding_
 #MDS plot
 ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.title(roi,fontsize=fntSiz)
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDScat_' + roi + '.pdf'))
 plt.show()
 
 #MDS plot with gradation by direction condition
 ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
 cnt = np.array((0.0,0.0,0.0))
-for icol in range(0,12):
-    ctuple[icol,:] = ctuple[icol,:]+cnt
-    cnt = cnt+np.array((0,-0.085,0))
+ctuple[:,1] = [.6,.8,1,1,.8,.6,.4,.2,0,0,.2,.4]
 
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.title(roi,fontsize=fntSiz)
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDSdir_' + roi + '.pdf'))
 plt.show()
 #%% #single sub RDMs
-iSub=1
+iSub=0
 
 rdm = np.zeros((12,12))
 rdm[iu] = df[roi].iloc[iSub]
@@ -388,7 +398,9 @@ ax = plt.imshow(rdm,cmap='viridis')
 plt.colorbar()
 plt.show()
 
-ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
+#ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
+ctuple[:,1] = [.6,.8,1,1,.8,.6,.4,.2,0,0,.2,.4]
+
 pos = mds.fit(rdm).embedding_
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
@@ -445,6 +457,8 @@ if saveFigs:
 plt.show()
 
 #%% model RDMs - category
+saveFigs = False
+fontsize = 14
 
 #include subjects with unequal conds in categories (manually made their RDMs)
 inclUneqSubs = True
@@ -524,13 +538,18 @@ for roi in roiList:
     
 #ax=rhoCat.mean().plot(figsize=(20,5),kind="bar",yerr=rhoCat.sem(),ylim=(-0.075,0.075))
 ax=tauCat.mean().plot(figsize=(20,5),kind="bar",yerr=tauCat.sem(),ylim=(-0.04,0.04))
-
+ax.set_title('Category RDM correlation (tau-A)',fontsize=fntSiz)
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barplotByROI_RDMcat.pdf'))
+    
 print(fdr(tauPcat[0:len(tauPcat)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #print(fdr(tauPcat[11:len(tauPcat)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 
 #%% model RDMs - angular distance - direction
+saveFigs = False
+fontsize = 14
 
 exclSubs = False
 if exclSubs:
@@ -595,11 +614,16 @@ for roi in roiList:
     
 #ax=rhoDir.mean().plot(figsize=(20,5),kind="bar",yerr=rhoDir.sem(),ylim=(-0.075,0.075))
 ax=tauDir.mean().plot(figsize=(20,5),kind="bar",yerr=tauDir.sem(),ylim=(-0.065,0.065))
-
+ax.set_title('Direction RDM correlation (tau-A)',fontsize=fntSiz)
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barplotByROI_RDMdir.pdf'))
+    
 print(fdr(tauPdir[0:len(tauPdir)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - orientation
+saveFigs = False
+fontsize = 14
 
 exclSubs = False
 if exclSubs:
@@ -663,7 +687,10 @@ for roi in roiList:
     
 #ax=rhoOri.mean().plot(figsize=(20,5),kind="bar",yerr=rhoOri.sem(),ylim=(-0.075,0.075))
 ax=tauOri.mean().plot(figsize=(20,5),kind="bar",yerr=tauOri.sem(),ylim=(-0.065,0.065))
-
+ax.set_title('Orientation RDM correlation (tau-A)',fontsize=fntSiz)
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barplotByROI_RDMori.pdf'))
+    
 #print(fdr(tauPori[0:len(tauPori)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
@@ -672,17 +699,49 @@ print(fdr(tauPori[0:12]/2,alpha=0.05,method='indep',is_sorted=False))
 
 #%% plotting within area, across models
 
-#edit column names
+saveFigs = False
+fntsiz = 14
 
-modelR_area9=pd.concat([tauCat['MDroi_area9_rh'],tauDir['MDroi_area9_rh'],tauOri['MDroi_area9_rh']],axis=1)
-modelR_SPL1=pd.concat([tauCat['SPL1_rh'],tauDir['SPL1_rh'],tauOri['SPL1_rh']],axis=1)
-modelR_v2=pd.concat([tauCat['V2vd_lh'],tauDir['V2vd_lh'],tauOri['V2vd_lh']],axis=1)
+modelR_area9=pd.concat([tauCat['MDroi_area9_rh'],tauOri['MDroi_area9_rh'],tauDir['MDroi_area9_rh']],axis=1)
+modelR_SPL1=pd.concat([tauCat['SPL1_rh'],tauOri['SPL1_rh'],tauDir['SPL1_rh']],axis=1)
+modelR_v2=pd.concat([tauCat['V2vd_lh'],tauOri['V2vd_lh'],tauDir['V2vd_lh']],axis=1)
 
-ax=modelR_area9.mean().plot(figsize=(5,5),kind="bar",yerr=modelR_area9.sem(),ylim=(-0.04,0.04))
+dfHeader=['category','ori','dir']
+modelR_area9.columns = dfHeader
+modelR_SPL1.columns = dfHeader
+modelR_v2.columns = dfHeader
+
+#bar
+#ax=modelR_area9.iloc[indSubs,:].mean().plot(figsize=(5,5),kind="bar",yerr=modelR_area9.iloc[indSubs,:].sem(),ylim=(-0.04,0.04))
+#plt.show()
+#ax=modelR_SPL1.iloc[indSubs,:].mean().plot(figsize=(5,5),kind="bar",yerr=modelR_SPL1.iloc[indSubs,:].sem(),ylim=(-0.04,0.04))
+#plt.show()
+#ax=modelR_v2.iloc[indSubs,:].mean().plot(figsize=(5,5),kind="bar",yerr=modelR_v2.iloc[indSubs,:].sem(),ylim=(-0.04,0.04))
+#plt.show()
+
+#bar strip plots
+roi='MDroi_area9_rh'
+g = sns.catplot(data=modelR_area9.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+modelR_area9.iloc[indSubs,:].mean().plot(yerr=modelR_area9.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title=roi,elinewidth=2.5,fmt='k,',alpha=0.8,fontsize=fntsiz)
+sns.stripplot(color="k", alpha=0.2, size=3, data=modelR_area9.iloc[indSubs,:], ax=g.ax);
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barStripPlotByModel_RDM_' + roi + '.pdf'))
 plt.show()
-ax=modelR_SPL1.mean().plot(figsize=(5,5),kind="bar",yerr=modelR_SPL1.sem(),ylim=(-0.04,0.04))
+
+roi='SPL1_rh'
+g = sns.catplot(data=modelR_SPL1.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+modelR_SPL1.iloc[indSubs,:].mean().plot(yerr=modelR_SPL1.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title=roi,elinewidth=2.5,fmt='k,',alpha=0.8,fontsize=fntsiz)
+sns.stripplot(color="k", alpha=0.2, size=3, data=modelR_SPL1.iloc[indSubs,:], ax=g.ax);
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barStripPlotByModel_RDM_' + roi + '.pdf'))
 plt.show()
-ax=modelR_v2.mean().plot(figsize=(5,5),kind="bar",yerr=modelR_v2.sem(),ylim=(-0.04,0.04))
+
+roi='V2vd_lh'
+g = sns.catplot(data=modelR_v2.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+modelR_v2.iloc[indSubs,:].mean().plot(yerr=modelR_v2.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title=roi, elinewidth=2.5,fmt='k,',alpha=0.8,fontsize=fntsiz)
+sns.stripplot(color="k", alpha=0.2, size=3, data=modelR_v2.iloc[indSubs,:], ax=g.ax);
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barStripPlotByModel_RDM_' + roi + '.pdf'))
 plt.show()
 
 
@@ -861,7 +920,7 @@ ax2 = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi],
 #%% Noise ceilings for RDMs - category
 
 #exclude subs with unequal conds - for catgory noise ceiling
-exclSubs = True
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -869,8 +928,8 @@ if exclSubs:
         nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
     indSubs=nDirInCat[0,:]==nDirInCat[1,:]
     
-    indSubs[:]=1 # reset if don't include excl above
-    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - better for pfc (p=0.008, without excluding unequal)
+#    indSubs[:]=1 # reset if don't include excl above
+#    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - better for pfc (p=0.008, without excluding unequal)
 else:
     indSubs=np.ones(33,dtype=bool)
 
