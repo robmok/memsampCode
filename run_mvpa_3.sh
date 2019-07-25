@@ -7,20 +7,10 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-motor'":g \
+#all
+#lda - dir-all
+sed -e s:"#mainDir":"mainDir":g \
+    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir-all'":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-#     -e s:"reRun = False":"reRun = True":g \
-#     -e s:"#rois":"rois":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir-all'":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py

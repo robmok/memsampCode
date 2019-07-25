@@ -8,44 +8,29 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # -e s:"reRun = False":"reRun = True":g \
+# -e s:"#rois":"rois":g \
 
+#love06
+#SPL1
+#crossNobis, subjCat, subjCat-orth, objCat, objCat-orth, ori, dir
+#mNobis - subjCat-orth, subjCat-all
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+sed -e s:"reRun = False":"reRun = True":g \
+    -e s:"#rois":"rois":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+    -e s:"reRun = False":"reRun = True":g \
+    -e s:"#rois":"rois":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
 
-
-#re-run svms all ROIs
-# - subjCat, subjCat-orth, subjCat-all, 12-way, 12-way-all, ori, dir
-
-
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-resp'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-#
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-
-# 12-way-all rerun
-
-# # 12-way-all, crossnobis
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-
-# # subjCat-orth
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-#
-# #12-way-all svm - no run for no smooth
-# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way-all'":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'svm'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
+    -e s:"reRun = False":"reRun = True":g \
+    -e s:"#rois":"rois":g \
+    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py

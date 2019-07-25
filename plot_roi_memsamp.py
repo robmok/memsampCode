@@ -40,7 +40,7 @@ from memsamp_RM import kendall_a
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -259,8 +259,15 @@ else:
 
 #subjCat sig
 roi='V2vd_rh'
-#roi='hMT_lh'
-#roi='MDroi_area8c_lh'
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
+
+#RDM cat sig
+roi='MDroi_area9_rh'
+
+#12-way sig
+roi='V2vd_rh'
+#roi='hMT_rh'
 
 ylims = [0.45, 0.55]
 
@@ -277,26 +284,26 @@ for iSub in range(0,nSubs):
     rdmAll[:,:,iSub] = rdm
 
 rdmMean = rdmAll[:,:,indSubs].mean(axis=2)
-rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(np.count_nonzero(indSubs))
-
-#% subjCat-all - plot 1
-ax = plt.figure(figsize=(8,4))
-ctuple=np.array((0.1,0.3,0.5))
-for iCond in range(0,nCond//2):
-    ax = plt.figure(figsize=(4,3))
-    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
-    ctuple = ctuple+0.05
-    ylim1, ylim2 = plt.ylim()
-    plt.ylim(ylims[0],ylims[1])
-
-ax = plt.figure(figsize=(8,4))
-ctuple=np.array((0.5,0.3,0.1))
-for iCond in range(nCond//2,nCond):
-    ax = plt.figure(figsize=(4,3))
-    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
-    ctuple = ctuple+0.05
-    ylim1, ylim2 = plt.ylim()
-    plt.ylim(ylims[0],ylims[1])
+rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
+#
+##% subjCat-all - plot 1
+#ax = plt.figure(figsize=(8,4))
+#ctuple=np.array((0.1,0.3,0.5))
+#for iCond in range(0,nCond//2):
+#    ax = plt.figure(figsize=(4,3))
+#    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
+#    ctuple = ctuple+0.05
+#    ylim1, ylim2 = plt.ylim()
+#    plt.ylim(ylims[0],ylims[1])
+#
+#ax = plt.figure(figsize=(8,4))
+#ctuple=np.array((0.5,0.3,0.1))
+#for iCond in range(nCond//2,nCond):
+#    ax = plt.figure(figsize=(4,3))
+#    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
+#    ctuple = ctuple+0.05
+#    ylim1, ylim2 = plt.ylim()
+#    plt.ylim(ylims[0],ylims[1])
     
 #average values, ignoring the current training category (values 0)
 rdmAll[rdmAll==0]=np.nan #so can nanmean
@@ -305,7 +312,7 @@ ylims = [0.45, 0.55]
 ctuple=np.array((0.1,0.3,0.5))
 #rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
 rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
-rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)
+rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 
 ax = plt.figure(figsize=(4,3))
 ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
@@ -315,7 +322,7 @@ plt.ylim(ylims[0],ylims[1])
 ctuple=np.array((0.5,0.3,0.1))
 #rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
 rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
-rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)
+rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 
 ax = plt.figure(figsize=(4,3))
 ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
@@ -816,6 +823,36 @@ for roi in roiList:
 plt.scatter(tauCat['MDroi_area9_rh'].iloc[indSubs],acc[indSubs])
 plt.show()
 
+
+roiList=list(df)
+roiList.remove('subjCat')
+rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+for roi in roiList:
+    rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauOri[roi].iloc[indSubs])
+    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauOri[roi].iloc[indSubs])
+    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauOri[roi].iloc[indSubs])
+    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauOri[roi].iloc[indSubs])
+
+
+plt.scatter(tauOri['V1vd_lh'].iloc[indSubs],acc[indSubs])
+plt.show()
+
+
+#roiList=list(df)
+#roiList.remove('subjCat')
+#rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+#rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+#rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+#rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
+#for roi in roiList:
+#    rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauDir[roi].iloc[indSubs])
+#    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauDir[roi].iloc[indSubs])
+#    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauDir[roi].iloc[indSubs])
+#    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauDir[roi].iloc[indSubs])
+        
 #%%12-way-all
 
 # test the shape: 
