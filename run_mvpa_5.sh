@@ -53,12 +53,3 @@ sed -e s:"#mainDir":"mainDir":g \
     -e s:"#rois":"rois":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-
-#SPL1
-#lda - subjCat, subjCat-orth, objCat, subjCat-all, ori, dir, 12-way
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
