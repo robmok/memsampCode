@@ -24,10 +24,6 @@ codeDir=os.path.join(mainDir,'memsampCode')
 #codeDir='/Users/robertmok/Documents/Postdoc_ucl/memsampCode' #laptop
 
 roiDir=os.path.join(mainDir,'mvpa_roi')
-#roiDir=os.path.join(mainDir,'mvpa_roi/bilateral')
-roiDir=os.path.join(mainDir,'mvpa_roi/rois_0.25')
-#roiDir=os.path.join(mainDir,'mvpa_roi/rois_0.5')
-#roiDir=os.path.join(mainDir,'mvpa_roi/rois_nosmooth')
 
 figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
 behavDir=os.path.join(mainDir,'behav')
@@ -44,7 +40,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
