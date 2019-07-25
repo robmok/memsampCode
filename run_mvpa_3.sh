@@ -9,8 +9,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #all
 #lda - dir-all
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir-all'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir-all'":g \
     -e s:"distMeth = 'svm'":"distMeth = 'lda'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
