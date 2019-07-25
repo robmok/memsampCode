@@ -43,12 +43,9 @@ Compute subjective catgeories - compute Pr respond category 0 for each dir
 
 
 
-
 #later:  read in subjective categories
 
 """
-      
-
 import os
 import glob
 import numpy as np
@@ -136,9 +133,6 @@ for iSub in range(1,34):
 
 
 np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
-
-#x=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
-#locals().update(x) #load in each variable into workspace
 
 
     # plot respPr for different (counterbalanced) motor response runs - checking if people are not switching responses
