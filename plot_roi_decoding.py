@@ -19,6 +19,7 @@ sns.set(style="ticks", color_codes=True)
 import scipy.stats as stats
 from statsmodels.stats.multitest import fdrcorrection as fdr
 #from statsmodels.stats.multitest import multipletests as multest
+from numpy.polynomial.polynomial import polyfit
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 
@@ -37,11 +38,11 @@ os.chdir(codeDir)
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -100,10 +101,10 @@ if saveFigs:
 
 #%% univariate scatter plots, violin plots
 
-ax = sns.catplot(data=df.iloc[indSubs,:],height=4,aspect=4, kind="swarm")
+ax = sns.catplot(data=df.iloc[indSubs,:],height=3.5,aspect=4.25, kind="swarm")
 df.iloc[indSubs,:].mean().plot(yerr=stdAll, fmt='o')
 
-g = sns.catplot(data=df.iloc[indSubs,:],height=4,aspect=4.2*2, kind="violin", inner=None)
+g = sns.catplot(data=df.iloc[indSubs,:],height=3,aspect=5, kind="violin", inner=None)
 sns.swarmplot(color="k", size=3, data=df.iloc[indSubs,:], ax=g.ax);
 
 #%% plotting within area, across decoders
@@ -124,7 +125,7 @@ else:
     
 decodeFeature = 'subjCat-orth'
 dfSubjCat=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
-                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_goodone.pkl')))
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 decodeFeature = '12-way'
 df12way=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
                                         + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
@@ -161,38 +162,50 @@ dfHeader=['subjCat-orth','12-way','ori','dir']
 
 
 #combining - seaborn colours, sem errorbars
-roi='MDroi_area8c_lh'
+roi='MDroi_area8c_lh' #category
 svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader
-g = sns.catplot(data=svm_area8c.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_area8c.mean().plot(yerr=svm_area8c.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
-sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c.iloc[indSubs,:], ax=g.ax);
+g = sns.catplot(data=svm_area8c,height=6,aspect=1, kind="bar", ci=None)
+svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), title='area8c_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
 
-roi='hMT_lh'
-svm_MT = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+roi='hMT_lh' #category
+svm_MT_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
-svm_MT.columns=dfHeader
-g = sns.catplot(data=svm_MT.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_MT.mean().plot(yerr=svm_MT.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='hMT_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
-sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT.iloc[indSubs,:], ax=g.ax);
+svm_MT_lh.columns=dfHeader
+g = sns.catplot(data=svm_MT_lh,height=6,aspect=1, kind="bar", ci=None)
+svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15), title='hMT_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_lh, ax=g.ax);
 plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
-roi='V2vd_rh'
+roi='hMT_rh' #12-way (ori is p=0.04, one-tailed, uncorrected)
+svm_MT_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_MT_rh.columns=dfHeader
+g = sns.catplot(data=svm_MT_rh,height=6,aspect=1, kind="bar", ci=None)
+svm_MT_rh.mean().plot(yerr=svm_MT_rh.sem(),ylim=(-.115,.15), title='hMT_lh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_rh, ax=g.ax);
+plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
+plt.show()
+
+roi='V2vd_rh' # category and 12-way
 svm_V2_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_V2_rh.columns=dfHeader
-g = sns.catplot(data=svm_V2_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_V2_rh.mean().plot(yerr=svm_V2_rh.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='V2vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
-sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V2_rh.iloc[indSubs,:], ax=g.ax);
+g = sns.catplot(data=svm_V2_rh,height=6,aspect=1, kind="bar", ci=None)
+svm_V2_rh.mean().plot(yerr=svm_V2_rh.sem(),ylim=(-.115,.15), title='V2vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V2_rh, ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
@@ -202,14 +215,17 @@ roi='V1vd_rh'
 svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_V1_rh.columns=dfHeader
-g = sns.catplot(data=svm_V1_rh.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
-svm_V1_rh.mean().plot(yerr=svm_V1_rh.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title='V1vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
-sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh.iloc[indSubs,:], ax=g.ax);
+g = sns.catplot(data=svm_V1_rh,height=6,aspect=1, kind="bar", ci=None)
+svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1), title='V1vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh, ax=g.ax);
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
 #%% behav corr svm
+
+mrkSiz=7
+fntSiz=14
 
 exclSubs = False
 if exclSubs:
@@ -230,16 +246,74 @@ rAccB=pd.DataFrame(columns=roiList,index=range(0,2))
 rObjAcc=pd.DataFrame(columns=roiList,index=range(0,2))
 for roi in roiList:
     rAcc[roi][0], rAcc[roi][1]=stats.pearsonr(acc[indSubs],df[roi].iloc[indSubs])
-    rAccA[roi][0], rAccA[roi][1]=stats.pearsonr(accA[indSubs],df[roi].iloc[indSubs])
-    rAccB[roi][0], rAccB[roi][1]=stats.pearsonr(accB[indSubs],df[roi].iloc[indSubs])
-    rObjAcc[roi][0], rObjAcc[roi][1]=stats.pearsonr(objAcc[indSubs],df[roi].iloc[indSubs])
+#    rAccA[roi][0], rAccA[roi][1]=stats.pearsonr(accA[indSubs],df[roi].iloc[indSubs])
+#    rAccB[roi][0], rAccB[roi][1]=stats.pearsonr(accB[indSubs],df[roi].iloc[indSubs])
+#    rObjAcc[roi][0], rObjAcc[roi][1]=stats.pearsonr(objAcc[indSubs],df[roi].iloc[indSubs])
 
+roi = 'MDroi_area9_rh'
+x=np.array(df[roi].iloc[indSubs],dtype=float)
+y=acc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+ax.set_xlabel('Decoding Accuracy (normalized)')
+ax.set_ylabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.975, 0.075, legTxt, transform=ax.transAxes, fontsize=14,
+        horizontalalignment='right', bbox=props)
+fig.tight_layout()
 
-plt.scatter(df['V1vd_rh'].iloc[indSubs],acc[indSubs])
-plt.show()
-plt.scatter(df['hMT_lh'].iloc[indSubs],acc[indSubs])
-plt.show()
-plt.scatter(df['MDroi_area8c_lh'].iloc[indSubs],acc[indSubs])
-plt.show()
-plt.scatter(df['MDroi_area9_rh'].iloc[indSubs],acc[indSubs])
-plt.show()
+roi = 'MDroi_area8c_lh'
+x=np.array(df[roi].iloc[indSubs],dtype=float)
+y=acc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+ax.set_xlabel('Decoding Accuracy (normalized)')
+ax.set_ylabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.975, 0.075, legTxt, transform=ax.transAxes, fontsize=14,
+        horizontalalignment='right', bbox=props)
+fig.tight_layout()
+
+roi = 'hMT_lh'
+x=np.array(df[roi].iloc[indSubs],dtype=float)
+y=acc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+ax.set_xlabel('Decoding Accuracy (normalized)')
+ax.set_ylabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.975, 0.075, legTxt, transform=ax.transAxes, fontsize=14,
+        horizontalalignment='right', bbox=props)
+fig.tight_layout()
+
+roi = 'V1vd_rh'
+x=np.array(df[roi].iloc[indSubs],dtype=float)
+y=acc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+ax.set_xlabel('Decoding Accuracy (normalized)')
+ax.set_ylabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.975, 0.075, legTxt, transform=ax.transAxes, fontsize=14,
+        horizontalalignment='right', bbox=props)
+fig.tight_layout()
