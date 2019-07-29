@@ -250,7 +250,7 @@ for roi in roiList:
 #    rAccB[roi][0], rAccB[roi][1]=stats.pearsonr(accB[indSubs],df[roi].iloc[indSubs])
 #    rObjAcc[roi][0], rObjAcc[roi][1]=stats.pearsonr(objAcc[indSubs],df[roi].iloc[indSubs])
 
-roi = 'MDroi_area9_rh'
+roi = 'MDroi_area8c_lh'
 x=np.array(df[roi].iloc[indSubs],dtype=float)
 y=acc[indSubs]
 b, m = polyfit(x,y, 1) 
@@ -267,7 +267,7 @@ ax.text(0.975, 0.075, legTxt, transform=ax.transAxes, fontsize=14,
         horizontalalignment='right', bbox=props)
 fig.tight_layout()
 
-roi = 'MDroi_area8c_lh'
+roi = 'MDroi_area9_rh'
 x=np.array(df[roi].iloc[indSubs],dtype=float)
 y=acc[indSubs]
 b, m = polyfit(x,y, 1) 
@@ -275,6 +275,8 @@ xAx=np.linspace(min(x),max(x))
 fig, ax = plt.subplots(figsize=(5,3.5))
 ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
 ax.scatter(x,y,s=mrkSiz)
+#ax.grid(color='grey', linestyle='-.', linewidth=0.5, alpha=0.5) #add gridlines
+#ax.set_facecolor((.9,.9,.9)) #make old matplotlib grey bg colour
 ax.set_xlabel('Decoding Accuracy (normalized)')
 ax.set_ylabel('Behavioral Accuracy')
 ax.set_title(roi,fontsize=fntSiz)

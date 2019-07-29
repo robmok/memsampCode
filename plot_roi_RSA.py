@@ -496,7 +496,6 @@ else:
     indSubs=np.ones(33,dtype=bool)
     
 roiList=list(df)
-roiList.remove('subjCat')
 rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
@@ -508,12 +507,27 @@ for roi in roiList:
     rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauCat[roi].iloc[indSubs])
 
 
-plt.scatter(tauCat['MDroi_area9_rh'].iloc[indSubs],acc[indSubs])
-plt.show()
+roi = 'MDroi_area9_rh'
+x=acc[indSubs]
+y=tauCat[roi].iloc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+#ax.grid(color='grey', linestyle='-.', linewidth=0.5, alpha=0.5) #add gridlines
+#ax.set_facecolor((.9,.9,.9)) #make old matplotlib grey bg colour
+ax.set_ylabel('RDM correlation (tau-A)')
+ax.set_xlabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc_RDM[roi][0]), 'p = %.4f' % (rAcc_RDM[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+fig.tight_layout()
 
 
 roiList=list(df)
-roiList.remove('subjCat')
 rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
@@ -524,9 +538,24 @@ for roi in roiList:
     rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauOri[roi].iloc[indSubs])
     rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauOri[roi].iloc[indSubs])
 
-
-plt.scatter(tauOri['V1vd_lh'].iloc[indSubs],acc[indSubs])
-plt.show()
+roi='V1vd_lh'
+x=acc[indSubs]
+y=tauOri[roi].iloc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=tuple([0.7,0.7,0.7]),linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+#ax.grid(color='grey', linestyle='-.', linewidth=0.5, alpha=0.5) #add gridlines
+#ax.set_facecolor((.9,.9,.9)) #make old matplotlib grey bg colour
+ax.set_ylabel('RDM correlation (tau-A)')
+ax.set_xlabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc_RDM[roi][0]), 'p = %.4f' % (rAcc_RDM[roi][1]))) #here should be one-tailed, so taken /2 away
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+fig.tight_layout()
 
 
 #roiList=list(df)
