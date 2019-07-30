@@ -37,7 +37,7 @@ os.chdir(codeDir)
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
@@ -54,8 +54,11 @@ behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
 locals().update(behav) #load in each variable into workspace
 
 #%% subjCat-all - organise
+plt.style.use('seaborn-darkgrid')
 
-exclSubs = True
+saveFigs = True
+
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -70,15 +73,21 @@ else:
 
 #subjCat sig
 roi='V2vd_rh'
-roi='hMT_lh'
-roi='MDroi_area8c_lh'
+#roi='hMT_lh'
+#roi='MDroi_area8c_lh'
 
 #RDM cat sig
-roi='MDroi_area9_rh'
+#roi='MDroi_area9_rh'
 
 #12-way sig
-roi='V2vd_rh'
+#roi='V2vd_rh'
 #roi='hMT_rh'
+
+#dir sig
+#roi='SPL1_rh'
+
+#ori sig
+#roi='V1vd_lh'
 
 ylims = [0.45, 0.55]
 
@@ -119,26 +128,45 @@ rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
 #average values, ignoring the current training category (values 0)
 rdmAll[rdmAll==0]=np.nan #so can nanmean
 
-ylims = [0.45, 0.55]
+#ylims = [0.45, 0.55]
+#ctuple=np.array((0.1,0.3,0.5))
+##rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
+#rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
+#rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+#
+#ax = plt.figure(figsize=(4,3))
+#ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
+#ylim1, ylim2 = plt.ylim()
+#plt.ylim(ylims[0],ylims[1])
+#
+#ctuple=np.array((0.5,0.3,0.1))
+##rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
+#rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
+#rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+#
+#ax = plt.figure(figsize=(4,3))
+#ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
+#ylim1, ylim2 = plt.ylim()
+#plt.ylim(ylims[0],ylims[1])
+
+
+#all dirs
 ctuple=np.array((0.1,0.3,0.5))
-#rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
-rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
-rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
-
+rdmMeanAll = np.nanmean(rdmAll[:,:,indSubs],axis=0).mean(axis=1)
+rdmSEAll = np.nanstd(np.nanmean(rdmAll[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 ax = plt.figure(figsize=(4,3))
-ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
+ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
 ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
+plt.title(roi,fontsize=fntSiz)
 
-ctuple=np.array((0.5,0.3,0.1))
-#rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
-rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
-rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '_toedit.pdf'))
+plt.show()
 
-ax = plt.figure(figsize=(4,3))
-ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
-ylim1, ylim2 = plt.ylim()
-plt.ylim(ylims[0],ylims[1])
+
+t,p=stats.ttest_1samp(np.nanmean(rdmAll[:,:,indSubs],axis=0).T,0.5)
+print(p)
 
 #%% subjCat-all - plot 2
 #prototype - 6 conds each, for prototype is middle of conds 3&4

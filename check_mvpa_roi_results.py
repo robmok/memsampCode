@@ -27,12 +27,12 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + ' old.pkl')))
+                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 print(df.loc['stats'])
 
 
@@ -55,7 +55,7 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 
 #%% exclude subs
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
