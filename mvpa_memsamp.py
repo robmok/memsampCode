@@ -43,7 +43,7 @@ fwhm = None # optional smoothing param - 1, or None
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = 'subjCat'   
+decodeFeature = 'subjCat-minus-motor'   
 
 #%%
 # =============================================================================
@@ -117,6 +117,9 @@ for iSub in range(1,nSubs+1):
     #get objective category
     catAconds=np.array((range(120,271,30))) 
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
+
+    if decodeFeature == 'subjCat-minus-motor':
+        dfCondResp = dfCond['key']
 
     #get subjective category based on responses
     if (decodeFeature[0:7]=='subjCat')|(decodeFeature=='dir-all'):
@@ -214,7 +217,7 @@ for iSub in range(1,nSubs+1):
         #set up the conditions you want to classify. if 12-way, no need
         if (decodeFeature=="objCat")|(decodeFeature=="objCat-orth"):
             conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
-        elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth")|(decodeFeature=="subjCat-motor")|(decodeFeature=="subjCat-orth-motor"): #subjective catgory bound based on responses
+        elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth")|(decodeFeature=="subjCat-motor")|(decodeFeature=="subjCat-orth-motor")|(decodeFeature=="subjCat-minus-motor"): #subjective catgory bound based on responses
             conds2comp = [[subjCatAconds, subjCatBconds]] 
         elif decodeFeature=="subjCat-orth-ctrl":
             conds2comp = [subjCatAconds, subjCatBconds]
@@ -294,7 +297,7 @@ for iSub in range(1,nSubs+1):
                 elif distMeth == 'mNobis':
                     cvAccTmp[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)
 
-            if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-orth-motor"):                
+            if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-orth-motor")|(decodeFeature=="subjCat-minus-motor"):                
                 catA90 = conds2comp[0][0]+90
                 catB90 = conds2comp[0][1]+90
                 catA90[catA90>359]=catA90[catA90>359]-360
@@ -303,13 +306,19 @@ for iSub in range(1,nSubs+1):
                 cvAccTmp90 = np.empty(len(conds2comp))
                 for iPair in range(0,len(conds2comp)):
                     ytmp=y.copy()
-                    condInd=np.empty(0,dtype=int) 
-                    for iVal in conds2comp[iPair][0]:
-                        ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
-                        condInd=np.append(condInd, np.where(y==iVal)) # index all conds
-                    for iVal in conds2comp[iPair][1]:
-                        ytmp[np.where(y==iVal)]=1
-                        condInd=np.append(condInd, np.where(y==iVal)) 
+                    if decodeFeature=="motor":
+                        condInd = np.append(np.where(dfCondResp['key']==1),np.where(dfCondResp['key']==6)) #dfCond edited to dfCondResp since in subjCat-minus-motor dfCond, 'key' is flipped
+                        ytmp[np.where(dfCond['key']==1)]=0 # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
+                        ytmp[np.where(dfCond['key']==6)]=1  
+                        cvAccTmp90 = np.empty((1)) #just keep this naming
+                    else:
+                        condInd=np.empty(0,dtype=int) 
+                        for iVal in conds2comp[iPair][0]:
+                            ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
+                            condInd=np.append(condInd, np.where(y==iVal)) # index all conds
+                        for iVal in conds2comp[iPair][1]:
+                            ytmp[np.where(y==iVal)]=1
+                            condInd=np.append(condInd, np.where(y==iVal)) 
                 
                     fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
                     y_indexed = ytmp[condInd]
@@ -341,10 +350,10 @@ for iSub in range(1,nSubs+1):
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
-if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")&(decodeFeature!="subjCat-orth-motor")):
+if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")&(decodeFeature!="subjCat-orth-motor")&(decodeFeature!="subjCat-minus-motor")):
     chance = 1/len(np.unique(y_indexed))
 else: 
-    chance = 0 #for crossvalidated distances
+    chance = 0 #for crossvalidated distances or subtractions (e.g. subjCat-orth)
 
 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:

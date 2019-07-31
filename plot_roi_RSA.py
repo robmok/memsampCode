@@ -140,6 +140,8 @@ pos = mds.fit(rdm).embedding_
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 #%% Visualise RDM models
+plt.rcdefaults()
+
 saveFigs = False
 
 modelRDM = np.zeros((12,12))
@@ -363,7 +365,7 @@ print(fdr(tauPdir[0:len(tauPdir)-2]/2,alpha=0.05,method='indep',is_sorted=False)
 #print(multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 
 #%% model RDMs - angular distance - orientation
-saveFigs = True
+saveFigs = False
 fontsize = 14
 
 exclSubs = False
@@ -514,9 +516,9 @@ rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 for roi in roiList:
     rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauCat[roi].iloc[indSubs])
-    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauCat[roi].iloc[indSubs])
-    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauCat[roi].iloc[indSubs])
-    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauCat[roi].iloc[indSubs])
+#    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauCat[roi].iloc[indSubs])
+#    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauCat[roi].iloc[indSubs])
+#    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauCat[roi].iloc[indSubs])
 
 
 roi = 'MDroi_area9_rh'
@@ -548,9 +550,9 @@ rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 for roi in roiList:
     rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauOri[roi].iloc[indSubs])
-    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauOri[roi].iloc[indSubs])
-    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauOri[roi].iloc[indSubs])
-    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauOri[roi].iloc[indSubs])
+#    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauOri[roi].iloc[indSubs])
+#    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauOri[roi].iloc[indSubs])
+#    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauOri[roi].iloc[indSubs])
 
 roi='V1vd_lh'
 x=acc[indSubs]
