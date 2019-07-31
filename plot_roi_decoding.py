@@ -42,7 +42,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-minus-motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -58,7 +58,7 @@ locals().update(behav) #load in each variable into workspace
 #plt.rcdefaults()
 plt.style.use('seaborn-darkgrid')
 
-saveFigs = True
+saveFigs = False
 
 exclSubs = False
 if exclSubs:
@@ -75,7 +75,7 @@ else:
 stdAll = df.iloc[indSubs,:].sem()
 
 #barplot
-if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth"):
+if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-minus-motor"):
     chance = 0
 elif decodeFeature == "12-way":
     chance = 1/12
