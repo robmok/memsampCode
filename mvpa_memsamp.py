@@ -43,7 +43,7 @@ fwhm = None # optional smoothing param - 1, or None
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = 'subjCat-minus-motor'   
+decodeFeature = 'subjCat'   
 
 #%%
 # =============================================================================
