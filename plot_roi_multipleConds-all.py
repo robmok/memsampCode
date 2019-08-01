@@ -9,6 +9,7 @@ Plotting '-all' conditions: 12-way-all, subjCat-all, dir-all
 """
 
 import os
+import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -29,6 +30,7 @@ roiDir=os.path.join(mainDir,'mvpa_roi')
 
 figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
 behavDir=os.path.join(mainDir,'behav')
+eventsDir=os.path.join(mainDir,'orig_events')
 
 # laptop
 #roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
@@ -56,7 +58,7 @@ locals().update(behav) #load in each variable into workspace
 #%% subjCat-all - organise
 plt.style.use('seaborn-darkgrid')
 
-saveFigs = True
+saveFigs = False
 
 exclSubs = False
 if exclSubs:
@@ -150,7 +152,48 @@ rdmAll[rdmAll==0]=np.nan #so can nanmean
 #plt.ylim(ylims[0],ylims[1])
 
 
-#all dirs
+#%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
+
+#indices to rearrange so the directions are the same across subs (since subjCat-all is arranged )
+condInd=np.empty((12,33))
+for iSub in range(33):
+    conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
+    condInd[:,iSub]=np.argsort(conds)
+
+#load in behav data to rotate the direction conditions around (since 'direction' is coded so its same for all subs [rotated around], and 'rawdirection' is the actual direction presented, or something similar)
+# make index for which subjects needs to flipped
+ind=np.full((33),True)
+for iSub in range(1,34):
+    subNum=f'{iSub:02d}'
+    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+    iFile = sorted(glob.glob(fnames))
+    df=pd.read_csv(iFile[0], sep="\t")
+    if np.any((df['direction']==0)&(df['rawdirection']==135)):
+        ind[iSub] = False
+
+
+# next: arrange the directions first (with sorted indices) - using inds in step 1 above, then flip - using inds in step 2 above
+
+
+
+
+
+#rdm stuff
+nCond=12
+nSubs=33
+rdmAll = np.zeros((nCond,nCond,nSubs))
+rdm = np.zeros((nCond,nCond))
+iu = np.triu_indices(nCond,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+il = np.tril_indices(nCond,-1) #to make symmetric rdm
+for iSub in range(0,nSubs):
+    rdm[iu] = df[roi].iloc[iSub]
+    rdm[il] = rdm.T[il]
+    rdmAll[:,:,iSub] = rdm
+rdmAll[rdmAll==0]=np.nan #so can nanmean
+
+
+#average across conds...++
+
 ctuple=np.array((0.1,0.3,0.5))
 rdmMeanAll = np.nanmean(rdmAll[:,:,indSubs],axis=0).mean(axis=1)
 rdmSEAll = np.nanstd(np.nanmean(rdmAll[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
@@ -160,9 +203,9 @@ ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 plt.title(roi,fontsize=fntSiz)
 
-if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '_toedit.pdf'))
-plt.show()
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '_toedit.pdf'))
+#plt.show()
 
 
 t,p=stats.ttest_1samp(np.nanmean(rdmAll[:,:,indSubs],axis=0).T,0.5)

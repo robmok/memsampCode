@@ -18,7 +18,6 @@ Created on Tue Dec  4 13:36:03 2018
           
 #dir and dir1 scoring mirrors resp and resp1, but for the cue.(read more to see logic behin this)
 
-
 #RM notes
 
 Figure out category bound
@@ -31,19 +30,11 @@ THEN
 
 Note down: objective category bound, face/scene for each category
 
-
-
-
-
 Compute subjective catgeories - compute Pr respond category 0 for each dir 
     
 - resp - 1 if the subject responded according to the currently dominant category
 - key - the key they pressed - note it flipped between blocks
 
-
-
-
-#later:  read in subjective categories
 
 """
 import os
@@ -132,7 +123,18 @@ for iSub in range(1,34):
     objAcc[iSub-1]=np.nansum(dfCond['resp'])/len(dfCond['resp'])
 
 
-np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
+#np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
+
+
+    if np.any((dfCond['direction']==0)&(dfCond['rawdirection']==135)):
+        print('sub-%s: a' % subNum)
+    elif np.any((dfCond['direction']==0)&(dfCond['rawdirection']==45)):
+        print('sub-%s: b' % subNum)
+    else:
+        print('???')
+
+
+
 
 
     # plot respPr for different (counterbalanced) motor response runs - checking if people are not switching responses
@@ -161,12 +163,3 @@ np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=ac
 ##    plt.plot(pd.concat([respPr1,respPr2],axis=1))
 #    plt.plot(pd.concat([respPr3,respPr4],axis=1))
 #    plt.show()
-
-
-
-
-
-
-
-
-
