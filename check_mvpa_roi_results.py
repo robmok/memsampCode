@@ -14,7 +14,7 @@ import scipy.stats as stats
 from statsmodels.stats.multitest import fdrcorrection as fdr
 from statsmodels.stats.multitest import multipletests as multest
 
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi'
+roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.25'
 
 # laptop
 #mainDir='/Users/robertmok/Documents/Postdoc_ucl/' 
@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-minus-motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
@@ -51,6 +51,17 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 #pSorted=np.sort(pvals)
 #fdr(pSorted[0:22]/2,alpha=0.05,method='indep',is_sorted=True)
 #multest(pSorted[0:22]/2, alpha=0.05, method='bonferroni', is_sorted=True, returnsorted=False)
+
+
+#missed last subject in calculating tstats in mvpa
+chance=0
+indSubs=np.ones(33,dtype=bool)
+print(stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],chance))
+print(stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],chance))
+print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],chance))
+
+print(stats.ttest_1samp(df['V1vd_rh'].iloc[indSubs],chance))
+print(stats.ttest_1samp(df['V1vd_lh'].iloc[indSubs],chance))
 
 
 #%% exclude subs

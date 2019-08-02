@@ -11,26 +11,13 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # -e s:"#rois":"rois":g \
 
 #love06
-#SPL1
-#crossNobis, subjCat, subjCat-orth, objCat, objCat-orth, ori, dir
-#mNobis - subjCat-orth, subjCat-all
-
-# sed -e s:"reRun = False":"reRun = True":g \
-#     -e s:"#rois":"rois":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+# motor
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
+# motor lock2resp
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+    -e s:"lock2resp = False":"lock2resp = True":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

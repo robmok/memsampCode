@@ -39,6 +39,8 @@ distMeth = 'svm' # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only su
 trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
 fwhm = None # optional smoothing param - 1, or None
 
+lock2resp = False # if loading in lock2resp glms (to get motor effect)
+
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
@@ -97,9 +99,14 @@ for iSub in range(1,nSubs+1):
         for iCond in conds:
             for iTrial in range(1,8): #calculate cope number
                 #make a list and append to it
-                imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
-                                           + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
+                if not lock2resp: 
+                    imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
+                                               + str(iRun) +'_trial_T1_fwhm0.feat',
+                                               'stats',imDat + (str(copeNum)) + '.nii.gz'))
+                else: #lock2resp glm - to get motor effects
+                    imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
+                                               + str(iRun) +'_trial_T1_lock2resp_fwhm0.feat',
+                                               'stats',imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
@@ -114,6 +121,10 @@ for iSub in range(1,nSubs+1):
         else: #if 4 runs, just select one set
             dfCond=dfCond[dfCond['keymap']==1]
                 
+    if lock2resp: #remove trials without responses
+        indResp = np.where(~np.isnan(dfCond['rt']))
+        dfCond=dfCond.iloc[indResp[0]]
+            
     #get objective category
     catAconds=np.array((range(120,271,30))) 
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
@@ -357,18 +368,20 @@ else:
 
 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
-        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
+        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs],chance) #compute t-test, append to df
 
+fnameSave = os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
+                                      distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                                      '_fwhm' + str(fwhm) + '_' + imDat)
+if lock2resp:
+    fnameSave = fnameSave + '_lock2resp'
+    
 # if re-running / adding, load in first, append new dat to df, then save
 if reRun == True:
-    dfTmp=pd.read_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
-                                      distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                      '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+    dfTmp=pd.read_pickle(fnameSave + '.pkl')
     for roi in rois:
         dfTmp[roi]=dfDecode[roi]
     dfDecode=dfTmp
 
 #save df
-dfDecode.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
-                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+dfDecode.to_pickle(fnameSave + '.pkl')
