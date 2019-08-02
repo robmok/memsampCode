@@ -15,9 +15,3 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
-
-# motor lock2resp
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
