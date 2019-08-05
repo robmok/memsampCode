@@ -56,6 +56,4 @@ print(dfFinal.loc['stats'])
 
 #%%
 #save
-dfFinal.to_pickle(os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' 
-                               + distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl'))
+dfFinal.to_pickle(fname + '.pkl')

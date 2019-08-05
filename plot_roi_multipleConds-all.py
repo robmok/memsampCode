@@ -58,6 +58,8 @@ locals().update(behav) #load in each variable into workspace
 #%% subjCat-all - organise
 plt.style.use('seaborn-darkgrid')
 
+fntSiz=14
+
 saveFigs = False
 
 exclSubs = False
@@ -74,9 +76,9 @@ else:
 #for roi in df.columns.values[0:-1]:
 
 #subjCat sig
-roi='V2vd_rh'
+#roi='V2vd_rh'
 #roi='hMT_lh'
-#roi='MDroi_area8c_lh'
+roi='MDroi_area8c_lh'
 
 #RDM cat sig
 #roi='MDroi_area9_rh'
@@ -130,53 +132,58 @@ rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
 #average values, ignoring the current training category (values 0)
 rdmAll[rdmAll==0]=np.nan #so can nanmean
 
-#ylims = [0.45, 0.55]
-#ctuple=np.array((0.1,0.3,0.5))
-##rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
-#rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
-#rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
-#
-#ax = plt.figure(figsize=(4,3))
-#ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
-#ylim1, ylim2 = plt.ylim()
-#plt.ylim(ylims[0],ylims[1])
-#
-#ctuple=np.array((0.5,0.3,0.1))
-##rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
-#rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
-#rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
-#
-#ax = plt.figure(figsize=(4,3))
-#ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
-#ylim1, ylim2 = plt.ylim()
-#plt.ylim(ylims[0],ylims[1])
+ylims = [0.45, 0.55]
+ctuple=np.array((0.1,0.3,0.5))
+#rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
+rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
+rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanA, yerr=rdmSEA, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+
+ctuple=np.array((0.5,0.3,0.1))
+#rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
+rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
+rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+
+#average across conds
+
+ctuple=np.array((0.1,0.3,0.5))
+rdmMeanAll = np.nanmean(rdmAll[:,:,indSubs],axis=0).mean(axis=1)
+rdmSEAll = np.nanstd(np.nanmean(rdmAll[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+plt.title(roi,fontsize=fntSiz)
 
 #%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
+plt.style.use('seaborn-darkgrid')
 
-#indices to rearrange so the directions are the same across subs (since subjCat-all is arranged )
-condInd=np.empty((12,33))
-for iSub in range(33):
-    conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
-    condInd[:,iSub]=np.argsort(conds)
+#subjCat sig
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
 
-#load in behav data to rotate the direction conditions around (since 'direction' is coded so its same for all subs [rotated around], and 'rawdirection' is the actual direction presented, or something similar)
-# make index for which subjects needs to flipped
-ind=np.full((33),True)
-for iSub in range(1,34):
-    subNum=f'{iSub:02d}'
-    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
-    iFile = sorted(glob.glob(fnames))
-    df=pd.read_csv(iFile[0], sep="\t")
-    if np.any((df['direction']==0)&(df['rawdirection']==135)):
-        ind[iSub] = False
+#RDM cat sig
+#roi='MDroi_area9_rh'
 
+#12-way sig
+#roi='hMT_rh'
 
-# next: arrange the directions first (with sorted indices) - using inds in step 1 above, then flip - using inds in step 2 above
+#ori sig
+#roi='EVC_lh'
 
-
-
-
+#other
+#roi='EVC_rh'
+#roi='V3a_lh'
+#roi='V3a_rh'
 
 #rdm stuff
 nCond=12
@@ -191,12 +198,34 @@ for iSub in range(0,nSubs):
     rdmAll[:,:,iSub] = rdm
 rdmAll[rdmAll==0]=np.nan #so can nanmean
 
+#get indices to rearrange so the directions are the same across subs (since subjCat-all is arranged )
+condInd=np.empty((12,33),dtype=int)
+for iSub in range(33):
+    conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
+    condInd[:,iSub]=np.argsort(conds)
 
-#average across conds...++
+#load in behav data to rotate the direction conditions around (since 'direction' is coded so its same for all subs [rotated around], and 'rawdirection' is the actual direction presented, or something similar)
+# make index for which subjects needs to flipped
+ind=np.full((33),True)
+for iSub in range(1,34):
+    subNum=f'{iSub:02d}'
+    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+    iFile = sorted(glob.glob(fnames))
+    dfBehav=pd.read_csv(iFile[0], sep="\t")
+    if np.any((dfBehav['direction']==0)&(dfBehav['rawdirection']==135)):
+        ind[iSub] = False
 
+# arrange the directions first (with sorted indices) - using inds in step 1 above, then flip - using inds in step 2 above
+rdmArr = np.zeros((nCond,nCond,nSubs))
+for iSub in range(33):
+    rdmArr[:,:,iSub] = rdmAll[condInd[:,iSub],:,iSub] 
+    rdmArr[:,:,iSub] = rdmArr[:,condInd[:,iSub],iSub]
+
+
+#average across conds
 ctuple=np.array((0.1,0.3,0.5))
-rdmMeanAll = np.nanmean(rdmAll[:,:,indSubs],axis=0).mean(axis=1)
-rdmSEAll = np.nanstd(np.nanmean(rdmAll[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+rdmMeanAll = np.nanmean(rdmArr[:,:,indSubs],axis=0).mean(axis=1)
+rdmSEAll = np.nanstd(np.nanmean(rdmArr[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 ax = plt.figure(figsize=(4,3))
 ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
 ylim1, ylim2 = plt.ylim()
@@ -208,7 +237,7 @@ plt.title(roi,fontsize=fntSiz)
 #plt.show()
 
 
-t,p=stats.ttest_1samp(np.nanmean(rdmAll[:,:,indSubs],axis=0).T,0.5)
+t,p=stats.ttest_1samp(np.nanmean(rdmArr[:,:,indSubs],axis=0).T,0.5)
 print(p)
 
 #%% subjCat-all - plot 2

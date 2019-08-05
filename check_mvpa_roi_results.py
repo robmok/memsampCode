@@ -34,7 +34,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
                       str(fwhm) + '_' + imDat)
 
-#if looking at motor, uncomment:
+##if looking at motor, uncomment:
 #fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
@@ -65,16 +65,18 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 #print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],chance))
 #print(stats.ttest_1samp(df['EVC_rh'].iloc[indSubs],chance))
 #print(stats.ttest_1samp(df['EVC_lh'].iloc[indSubs],chance))
-#
+
+
+
 
 
 # recomputing tstat and pvals and savings to df
-#chance=0
+#chance=0.5
 #for roi in list(df):
 #    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
 #
 #print(df.loc['stats'])
-#df.to_pickle(fname)
+#df.to_pickle(fname + '.pkl')
 
 #%% exclude subs
 
