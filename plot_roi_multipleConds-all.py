@@ -167,6 +167,8 @@ plt.title(roi,fontsize=fntSiz)
 #%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
 plt.style.use('seaborn-darkgrid')
 
+ylims = [0.475, 0.525]
+
 #subjCat sig
 roi='hMT_lh'
 roi='MDroi_area8c_lh'
