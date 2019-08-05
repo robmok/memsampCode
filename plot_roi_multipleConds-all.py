@@ -216,10 +216,18 @@ for iSub in range(1,34):
         ind[iSub] = False
 
 # arrange the directions first (with sorted indices) - using inds in step 1 above, then flip - using inds in step 2 above
-rdmArr = np.zeros((nCond,nCond,nSubs))
+rdmArr1 = np.zeros((nCond,nCond,nSubs))
 for iSub in range(33):
-    rdmArr[:,:,iSub] = rdmAll[condInd[:,iSub],:,iSub] 
-    rdmArr[:,:,iSub] = rdmArr[:,condInd[:,iSub],iSub]
+    rdmArr1[:,:,iSub] = rdmAll[condInd[:,iSub],:,iSub] 
+    rdmArr1[:,:,iSub] = rdmArr1[:,condInd[:,iSub],iSub]
+
+#flip half the subs - check
+rdmArr = rdmArr1.copy()
+rdmArr[0:6,:,ind]  = rdmArr1[6:12,:,ind]
+rdmArr[:,6:12,ind] = rdmArr1[:,0:6,ind]
+
+
+
 
 
 #average across conds
