@@ -59,7 +59,7 @@ rois = ['V1vd_lh','V1vd_rh', 'V2vd_lh','V2vd_rh','V3vd_lh','V3vd_rh','V3a_lh','V
         'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'motor_lh', 'motor_rh']
 
 #reRunROIs
-#rois = ['SPL1_lh','SPL1_rh']
+#rois = ['EVC_lh','EVC_rh']
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)

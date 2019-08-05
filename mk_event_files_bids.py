@@ -45,8 +45,6 @@ for iSub in subs:
         
         # Variables I want: Onset, duration, trial_type, response_time 
         # variable names: cuetime, feedtime, direction, category, rt, correct, aresp
-        # extract cue conditions (time, motionDir), and separately the feedback (time, category); then merge the dataframes after
-        #onset, duration, trial_type, response_time 
         trials1=dat[['cuetime', 'direction']] #'category', 'rt', 'correct' - # empty rts sometime, bids doesnt like empty tsv cells
         if lock2resp:
             trials1['cuetime']=np.nansum([trials1['cuetime'],dat['rt']],axis=0) #RTs for FSL locking to response (nansum to ignore no resp, note these below)
@@ -62,7 +60,6 @@ for iSub in subs:
         trials2.insert(1, 'duration', 1) #feedback duration
         trials2.insert(2, 'trial_type', 'feedback')
         trials2.columns = trials2.columns.str.replace('feedtime', 'onset')
-        #trials2.columns = trials1.columns.str.replace('rt','response_time')
         trials=pd.concat([trials1, trials2])
         trials['onset']=trials['onset']*2.8 #change volume timing into seconds
         
@@ -180,7 +177,6 @@ for iSub in subs:
         cuetiming=tmp[['onset','duration']]
         cuetiming.insert(2, 'value', 1) #stim value
         fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFileLoc[0]))[0] + "_" + str(int(iCond)) + ".txt")
-        #cuetiming.to_csv(fname1,sep='\t', header=False, index=False)
         #to save without extra line, split into two and save last line without extra line
         cuetiming1=cuetiming.iloc[0:len(cuetiming)-1]
         cuetiming2=cuetiming.iloc[len(cuetiming)-1]
@@ -223,7 +219,6 @@ for iSub in subs:
         cuetiming=tmp[['onset','duration']]
         cuetiming.insert(2, 'value', 1) #stim value
         fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFileLoc[0]))[0] + "_" + str(int(iCond)) + ".txt")
-        #cuetiming.to_csv(fname1,sep='\t', header=False, index=False)
         #save without extra line, split into two and save last line without extra line
         cuetiming1=cuetiming.iloc[0:len(cuetiming)-1]
         cuetiming2=cuetiming.iloc[len(cuetiming)-1]

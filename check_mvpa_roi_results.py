@@ -14,7 +14,7 @@ import scipy.stats as stats
 from statsmodels.stats.multitest import fdrcorrection as fdr
 from statsmodels.stats.multitest import multipletests as multest
 
-roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi/rois_0.25'
+roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi'
 
 # laptop
 #mainDir='/Users/robertmok/Documents/Postdoc_ucl/' 
@@ -27,12 +27,17 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
-df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
-                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
+                      '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
+                      str(fwhm) + '_' + imDat)
+
+#if looking at motor, uncomment:
+#fname = fname + '_lock2resp'
+
+df=pd.read_pickle(fname + '.pkl')
 print(df.loc['stats'])
 
 
@@ -54,19 +59,26 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 
 
 #missed last subject in calculating tstats in mvpa
-chance=0
-indSubs=np.ones(33,dtype=bool)
-print(stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],chance))
-print(stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],chance))
-print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],chance))
+#chance=0.5
+#indSubs=np.ones(33,dtype=bool)
+#print(stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],chance))
+#print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],chance))
+#print(stats.ttest_1samp(df['EVC_rh'].iloc[indSubs],chance))
+#print(stats.ttest_1samp(df['EVC_lh'].iloc[indSubs],chance))
+#
 
-print(stats.ttest_1samp(df['V1vd_rh'].iloc[indSubs],chance))
-print(stats.ttest_1samp(df['V1vd_lh'].iloc[indSubs],chance))
 
+# recomputing tstat and pvals and savings to df
+#chance=0
+#for roi in list(df):
+#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
+#
+#print(df.loc['stats'])
+#df.to_pickle(fname)
 
 #%% exclude subs
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):

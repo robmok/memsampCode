@@ -7,8 +7,8 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-# motor lock2resp
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
+    -e s:"reRun = False":"reRun = True":g \
+    -e s:"#rois":"rois":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

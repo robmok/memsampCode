@@ -45,6 +45,8 @@ standardScript="memsamp_run-01_block_fwhm6"
 # -e s:"cue_block":"cue_lock2resp_block":g \ #event file name
 # -e s:"block_fwhm":"block_lock2resp_fwhm":g \ # output directory name
 
+standardScript="memsamp_run-01_block_lock2resp_fwhm6" #now contrasts only include response and feedback
+
 cd ${wd}
 while read subject; do
    for iRun in {1..3}; do
@@ -79,4 +81,4 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_run-0${iRun}_block_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list_full.txt #while read subject; do
+done < ${fsfDir}/subject_list_4.txt #while read subject; do

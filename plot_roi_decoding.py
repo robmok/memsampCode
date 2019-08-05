@@ -42,11 +42,16 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-minus-motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
-df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
-                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
+                      '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
+                      str(fwhm) + '_' + imDat)
+
+#if looking at motor, uncomment:
+fname = fname + '_lock2resp'
+
+df=pd.read_pickle(fname + '.pkl')
 
 #load in subjCat
 subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
