@@ -33,17 +33,44 @@ vSmooth=5
 #allROIs vSmooth=10 cMass
 vSmooth=10
 
-# subjCat-orth - sl6, fwhmNone, cope
+#motor lock2resp (note edited randomise line), no mask
+
+#cMass
 trainSetMeth='trials'
-slSiz=12
+slSiz=6
 normMeth='noNorm'
-decodeFeature='subjCat-orth'
+decodeFeature='motor'
 distMeth='svm'
 fwhm='None'
 imDat='cope' # cope or tstat images
 threshMeth='cMass' #vox, tfce, cSize, cMass
-randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_allsubs_mni.nii.gz \
--o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_allsubs_mni_allROIsSL.nii.gz -m ${roiDir}/allROIsSL_final.nii.gz -1 -v ${vSmooth} -C ${tThresh}
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_lock2resp_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_lock2resp_allsubs_mni_allROIsSL.nii.gz -1 -v ${vSmooth} -C ${tThresh}
+
+#vox
+trainSetMeth='trials'
+slSiz=6
+normMeth='noNorm'
+decodeFeature='motor'
+distMeth='svm'
+fwhm='None'
+imDat='cope' # cope or tstat images
+threshMeth='vox' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_lock2resp_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_lock2resp_allsubs_mni_allROIsSL.nii.gz -1 -v ${vSmooth} -x
+
+#tfce
+trainSetMeth='trials'
+slSiz=6
+normMeth='noNorm'
+decodeFeature='motor'
+distMeth='svm'
+fwhm='None'
+imDat='cope' # cope or tstat images
+threshMeth='tfce' #vox, tfce, cSize, cMass
+randomise -i ${slDir}/sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_lock2resp_allsubs_mni.nii.gz \
+-o ${slDir}/randomise_${threshMeth}_sl${slSiz}_${decodeFeature}Decoding_${distMeth}_${normMeth}_${trainSetMeth}_fwhm${fwhm}_${imDat}_vs${vSmooth}_lock2resp_allsubs_mni_allROIsSL.nii.gz -1 -v ${vSmooth} -T
+
 
 
 
