@@ -12,7 +12,7 @@ standardScript='memsamp_block_cope1_3rdlvl'
 # done
 
 #lock2resp
-for iCope in {1..13}; do
+for iCope in {1..2}; do
     sed -e s:cope1.feat/stats/cope1.nii.gz:cope${iCope}.feat/stats/cope1.nii.gz:g \
         -e s:cope1_fwhm6:cope${iCope}_fwhm6:g \
         -e s:_fwhm:_lock2resp_fwhm:g \
