@@ -167,6 +167,20 @@ plt.title(roi,fontsize=fntSiz)
 #%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
 plt.style.use('seaborn-darkgrid')
 
+fntSiz=14
+
+saveFigs = False
+
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+
 ylims = [0.475, 0.525]
 
 #subjCat sig
@@ -228,11 +242,22 @@ rdmArr = rdmArr1.copy()
 rdmArr[0:6,:,ind]  = rdmArr1[6:12,:,ind]
 rdmArr[:,6:12,ind] = rdmArr1[:,0:6,ind]
 
+##with above? looks wrong...
+#rdmArr[:,0:6,ind]  = rdmArr1[:,6:12,ind]
+#rdmArr[6:12,:,ind] = rdmArr1[0:6,:,ind]
+
+
+#?
+#rdmArr[0:6,0:6,ind]  = rdmArr1[6:12,6:12,ind]
+#rdmArr[6:12,6:12,ind] = rdmArr1[0:6,0:6,ind]
+#rdmArr[0:6,6:12,ind]  = rdmArr1[6:12,0:6,ind]
+#rdmArr[6:12,0:6,ind]  = rdmArr1[0:6,6:12,ind]
 
 
 
+#average across conds - do i need to average only across half the matrix?
 
-#average across conds
+
 ctuple=np.array((0.1,0.3,0.5))
 rdmMeanAll = np.nanmean(rdmArr[:,:,indSubs],axis=0).mean(axis=1)
 rdmSEAll = np.nanstd(np.nanmean(rdmArr[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
@@ -242,6 +267,9 @@ ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 plt.title(roi,fontsize=fntSiz)
 
+
+
+
 #if saveFigs:
 #    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '_toedit.pdf'))
 #plt.show()
@@ -249,6 +277,90 @@ plt.title(roi,fontsize=fntSiz)
 
 t,p=stats.ttest_1samp(np.nanmean(rdmArr[:,:,indSubs],axis=0).T,0.5)
 print(p)
+
+
+#%% plot RDMs for visualisation
+
+plt.rcdefaults()
+
+saveFigs = False
+fntSiz = 14
+    
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
+#decoding subjCat sig    
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
+
+#rdmModel category sig - crossnobis
+#roi='MDroi_area9_rh'
+
+rdm = np.zeros((12,12))
+
+rdmArr[np.isnan(rdmArr)]=0 # back to zero for mds
+rdm = rdmArr.mean(axis=2)
+#tstat (double check formula)
+rdm = rdmArr.mean(axis=2)/rdmArr.std(axis=2)/np.sqrt(sum(indSubs))
+
+
+
+
+
+#making it symmetric with the bottom half - still need to check whats up with upptriangle
+iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+il = np.tril_indices(12,-1) 
+rdm[iu] = rdm.T[iu]
+
+
+
+
+
+
+
+
+#RDM plot
+plt.figure(figsize=(25,4))
+plt.imshow(rdm,cmap='viridis',interpolation='none')
+plt.title(roi,fontsize=fntSiz)
+plt.colorbar()
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_RDM' + roi + '.pdf'))
+plt.show()
+
+#MDS
+from sklearn import manifold
+seed = np.random.RandomState(seed=3)
+mds = manifold.MDS(n_components=2, max_iter=3000, eps=1e-9, random_state=seed,
+                   dissimilarity="precomputed", n_jobs=1)
+pos = mds.fit(rdm).embedding_
+
+#MDS plot
+ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
+plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.title(roi,fontsize=fntSiz)
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDScat_' + roi + '.pdf'))
+plt.show()
+
+#MDS plot with gradation by direction condition
+ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
+cnt = np.array((0.0,0.0,0.0))
+ctuple[:,1] = [.6,.8,1,1,.8,.6,.4,.2,0,0,.2,.4]
+
+plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.title(roi,fontsize=fntSiz)
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDSdir_' + roi + '.pdf'))
+plt.show()
+
 
 #%% subjCat-all - plot 2
 #prototype - 6 conds each, for prototype is middle of conds 3&4

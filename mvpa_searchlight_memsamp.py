@@ -43,10 +43,13 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 22 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 24 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
+
+lock2resp = False # if loading in lock2resp glms (to get motor effect)
+
 
 # subjCat, subjCatRaw-orth, objCat, objCatRaw-orth # subtract these SL images from one another later to create subjCat-orth
 
@@ -80,15 +83,24 @@ for iSub in range(1,34):
         imPath=[]
         for iCond in conds:
             for iTrial in range(1,8): #calculate cope number
-                #make a list and append to it
-                imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
-                                           + str(iRun) +'_trial_T1_fwhm0.feat',
-                                           'stats',imDat + (str(copeNum)) + '.nii.gz'))
+                #make a list and append to it                
+                if not lock2resp: 
+                    imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
+                                               + str(iRun) +'_trial_T1_fwhm0.feat',
+                                               'stats',imDat + (str(copeNum)) + '.nii.gz'))
+                else: #lock2resp glm - to get motor effects
+                    imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
+                                               + str(iRun) +'_trial_T1_lock2resp_fwhm0.feat',
+                                               'stats',imDat + (str(copeNum)) + '.nii.gz'))
                 copeNum=copeNum+1
         df2['imPath']=pd.Series(imPath,index=df2.index)
         dfCond = dfCond.append(df2) #append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
+    if lock2resp: #remove trials without responses
+        indResp = np.where(~np.isnan(dfCond['rt']))
+        dfCond=dfCond.iloc[indResp[0]]
+        
     #get objective category
     catAconds=np.array((range(120,271,30))) 
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
@@ -310,9 +322,12 @@ for iSub in range(1,34):
 
     #save each subject's image
     if not decodeFeature == "12-way-all": 
-        nib.save(im, os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
+        fnameSave = os.path.join(mainDir, 'mvpa_searchlight', 'sl'+ str(slSiz) + '_' + decodeFeature + 
                                   'Decoding_' + distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                  '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum + '.nii.gz'))
+                                  '_fwhm' + str(fwhm) + '_' + imDat + '_sub-' + subNum)
+        if lock2resp:
+            fnameSave = fnameSave + '_lock2resp'
+        nib.save(im, fnameSave + '.nii.gz')
     del im
     
 
