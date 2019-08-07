@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -35,7 +35,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
                       str(fwhm) + '_' + imDat)
 
 ##if looking at motor, uncomment:
-#fname = fname + '_lock2resp'
+fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
 print(df.loc['stats'])

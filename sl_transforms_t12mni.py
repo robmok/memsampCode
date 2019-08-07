@@ -21,7 +21,7 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
-slSiz = 9 #searchlight size
+slSiz = 8 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
