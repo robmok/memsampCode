@@ -12,18 +12,29 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #motor
 #sl6 fwhmNone
 #motor svm
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-  < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
-python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+#     -e s:"lock2resp = False":"lock2resp = True":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+#
+# sed -e s:"#mainDir":"mainDir":g \
+#     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
+#     -e s:"lock2resp = False":"lock2resp = True":g \
+#     -e s:"slSiz = 6":"slSiz = 9":g \
+#   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+# python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 
 sed -e s:"#mainDir":"mainDir":g \
     -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
     -e s:"lock2resp = False":"lock2resp = True":g \
-    -e s:"slSiz = 6":"slSiz = 9":g \
+    -e s:"slSiz = 6":"slSiz = 8":g \
   < ${codeDir}/mvpa_searchlight_memsamp.py > ${tmpScrDir}/mvpa_searchlight_memsamp1.py
 python ${tmpScrDir}/mvpa_searchlight_memsamp1.py
+
+
+
+
 
 # #sl8 fwhm1
 # #subjCat cope, noNorm
