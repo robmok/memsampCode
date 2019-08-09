@@ -42,14 +42,14 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
                       str(fwhm) + '_' + imDat)
 
 #if looking at motor, uncomment:
-fname = fname + '_lock2resp'
+#fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
 
@@ -120,7 +120,7 @@ sns.swarmplot(color="k", size=3, data=df.iloc[indSubs,:], ax=g.ax);
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
 
-saveFigs = True
+saveFigs = False
 
 exclSubs = False
 if exclSubs:
@@ -213,25 +213,13 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
-roi='V2vd_rh' # category and 12-way
-svm_V2_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
-                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
-svm_V2_rh.columns=dfHeader
-g = sns.catplot(data=svm_V2_rh,height=5,aspect=1, kind="bar", ci=None)
-svm_V2_rh.mean().plot(yerr=svm_V2_rh.sem(),ylim=(-.115,.15), title='V2vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
-sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V2_rh, ax=g.ax);
-plt.tight_layout()
-if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
-plt.show()
 
-
-roi='V1vd_rh'
+roi='EVC_rh'
 svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_V1_rh.columns=dfHeader
 g = sns.catplot(data=svm_V1_rh,height=5,aspect=1, kind="bar", ci=None)
-svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1), title='V1vd_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1), title='EVC_rh',elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh, ax=g.ax);
 plt.tight_layout()
 if saveFigs:
@@ -282,7 +270,7 @@ ax.scatter(x,y,s=mrkSiz)
 ax.set_xlabel('Behavioral Accuracy')
 ax.set_ylabel('Decoding Accuracy (normalized)')
 ax.set_title(roi,fontsize=fntSiz)
-legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.2f' % (rAcc[roi][1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
@@ -302,7 +290,7 @@ ax.scatter(x,y,s=mrkSiz)
 ax.set_xlabel('Behavioral Accuracy')
 ax.set_ylabel('Decoding Accuracy (normalized)')
 ax.set_title(roi,fontsize=fntSiz)
-legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.2f' % (rAcc[roi][1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
@@ -322,7 +310,7 @@ ax.scatter(x,y,s=mrkSiz)
 ax.set_xlabel('Behavioral Accuracy')
 ax.set_ylabel('Decoding Accuracy (normalized)')
 ax.set_title(roi,fontsize=fntSiz)
-legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.2f' % (rAcc[roi][1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
@@ -330,7 +318,7 @@ fig.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
 
-roi = 'V1vd_rh'
+roi = 'EVC_rh'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -341,7 +329,7 @@ ax.scatter(x,y,s=mrkSiz)
 ax.set_xlabel('Behavioral Accuracy')
 ax.set_ylabel('Decoding Accuracy (normalized)')
 ax.set_title(roi,fontsize=fntSiz)
-legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.4f' % (rAcc[roi][1]/2)))
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.2f' % (rAcc[roi][1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)

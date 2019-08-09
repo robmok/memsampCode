@@ -9,6 +9,7 @@ RSA analyses, plotting RDMs
 """
 
 import os
+import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -29,6 +30,7 @@ roiDir=os.path.join(mainDir,'mvpa_roi')
 
 figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
 behavDir=os.path.join(mainDir,'behav')
+eventsDir=os.path.join(mainDir,'orig_events')
 
 # laptop
 #roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
@@ -197,7 +199,8 @@ plt.show()
 
 saveFigs = False
 fontsize = 14
-plt.style.use('seaborn-darkgrid')
+plt.rcdefaults()
+#plt.style.use('seaborn-darkgrid')
 
 #include subjects with unequal conds in categories (manually made their RDMs)
 inclUneqSubs = True
@@ -226,6 +229,22 @@ catRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 catRDM[0:6,6:12]=np.ones((6,6)) #category
 
+
+
+##flip half the subs (direction counterbalanced)- shouldn't matter since sorted by cat, but in case stim direction makes a diff, this might help
+#ind=np.full((33),True)
+#for iSub in range(1,34):
+#    subNum=f'{iSub:02d}'
+#    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+#    iFile = sorted(glob.glob(fnames))
+#    dfBehav=pd.read_csv(iFile[0], sep="\t")
+#    if np.any((dfBehav['direction']==0)&(dfBehav['rawdirection']==135)):
+#        ind[iSub-1] = False
+#flipSubs = np.where(ind)
+#flipSubs = flipSubs[0]
+        
+        
+        
 #data
 rdm = np.zeros((12,12)) 
 rho = np.empty((sum(indSubs)))
@@ -240,7 +259,6 @@ tauCat = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
 
 rhoPcat=np.empty((len(roiList)))
 tauPcat=np.empty((len(roiList)))
-
 iRoi=0
 for roi in roiList:
     rdm = np.zeros((12,12)) 
@@ -260,6 +278,21 @@ for roi in roiList:
             catRDM = np.zeros((12,12))
             catRDM[0:6,6:12]=np.ones((6,6))
         
+#        if iSub in flipSubs:
+#            rdmTmp = rdm.copy()       
+#            rdm[0:6,0:6]  = rdmTmp[6:12,6:12]
+#            rdm[6:12,6:12] = rdmTmp[0:6,0:6]
+#            rdm[0:6,6:12]  = rdmTmp[6:12,0:6]
+#            rdm[6:12,0:6]  = rdmTmp[0:6,6:12]
+#            catRDMtmp = catRDM.copy()
+#            catRDM[0:6,0:6]  = catRDMtmp[6:12,6:12]
+#            catRDM[6:12,6:12] = catRDMtmp[0:6,0:6]
+#            catRDM[0:6,6:12]  = catRDMtmp[6:12,0:6]
+#            catRDM[6:12,0:6]  = catRDMtmp[0:6,6:12]
+#            catRDM[iu] = catRDM.T[iu]       
+##            plt.imshow(catRDM)
+##            plt.show()
+            
         rho[i], pval[i]=stats.spearmanr(rdm[iu],catRDM[iu])
 #         rhoTmp=partial_corr(np.stack((stats.rankdata(rdm[iu]),stats.rankdata(catRDM[iu]),stats.rankdata(modelRDM[iu]))).T)
 #         rho[i]=rhoTmp[0,1]
