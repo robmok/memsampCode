@@ -21,6 +21,8 @@ from statsmodels.stats.multitest import fdrcorrection as fdr
 #from statsmodels.stats.multitest import multipletests as multest
 from numpy.polynomial.polynomial import polyfit
 
+import statsmodels.api as sm
+
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 
 codeDir=os.path.join(mainDir,'memsampCode')
@@ -336,3 +338,27 @@ ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
 fig.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
+    
+    
+#robust regression
+    
+y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
+y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
+#y=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
+#y=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
+#y=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
+
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
+hub_results = huber_t.fit()
+print(hub_results.params)
+print(hub_results.bse)
+print(hub_results.summary(yname='behavAcc',
+            xname=['var_%d' % i for i in range(len(hub_results.params))]))
+
+#plot with CIs of the slopes
+
+
+
+
+
+
