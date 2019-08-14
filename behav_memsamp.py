@@ -46,8 +46,8 @@ import matplotlib.pyplot as plt
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 behavDir=os.path.join(mainDir,'behav')
 eventsDir=os.path.join(mainDir,'orig_events')
-#codeDir=os.path.join(mainDir,'memsampCode')
-#os.chdir(codeDir)
+behavFigDir=os.path.join(mainDir,'behav')
+
 
 #laptop
 #mainDir='/Users/robertmok/Downloads'
@@ -60,6 +60,7 @@ accA = np.empty(33)
 accB = np.empty(33)
 acc  = np.empty(33)
 objAcc = np.empty(33)
+respPrAll = pd.DataFrame(columns=range(12),index=range(33))
 for iSub in range(1,34):
 #    iSub=1 #temp
     subNum=f'{iSub:02d}'
@@ -92,6 +93,7 @@ for iSub in range(1,34):
     
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+        
     #unless:   
     if iSub==5: #move 240 and 270 to catA
         subjCatAconds = np.append(subjCatAconds,[240,270])
@@ -108,7 +110,16 @@ for iSub in range(1,34):
     elif iSub==27:#move 270 to cat A
         subjCatAconds = np.sort(np.append(subjCatAconds,270))
         subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+    
+    #for respPrAll plot
+    subjCatBcondsSorted=np.concatenate([subjCatBconds[subjCatBconds>=300],subjCatBconds[subjCatBconds<300]]) #rearrange to make the directions within a cat next to each other (300 and 330 need to be next to 0)
+    subjCatConds = np.concatenate([subjCatBcondsSorted, subjCatAconds])
+    cnt=0
+    for iCond in subjCatConds:
+        respPrAll[cnt].iloc[iSub-1] = respPr[iCond]
+        cnt=cnt+1
 
+    #accuracy
     respA=np.empty(0) 
     respB=np.empty(0) 
     for iCond in subjCatAconds:
@@ -122,16 +133,16 @@ for iSub in range(1,34):
     
     objAcc[iSub-1]=np.nansum(dfCond['resp'])/len(dfCond['resp'])
 
-
+#save
 #np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
 
 
-    if np.any((dfCond['direction']==0)&(dfCond['rawdirection']==135)):
-        print('sub-%s: a' % subNum)
-    elif np.any((dfCond['direction']==0)&(dfCond['rawdirection']==45)):
-        print('sub-%s: b' % subNum)
-    else:
-        print('???')
+#    if np.any((dfCond['direction']==0)&(dfCond['rawdirection']==135)):
+#        print('sub-%s: a' % subNum)
+#    elif np.any((dfCond['direction']==0)&(dfCond['rawdirection']==45)):
+#        print('sub-%s: b' % subNum)
+#    else:
+#        print('???')
 
 
 
@@ -163,3 +174,21 @@ for iSub in range(1,34):
 ##    plt.plot(pd.concat([respPr1,respPr2],axis=1))
 #    plt.plot(pd.concat([respPr3,respPr4],axis=1))
 #    plt.show()
+    
+#%%
+plt.style.use('seaborn-darkgrid')
+
+saveFigs = False
+fntSiz=14
+
+#ax = respPrAll.T.plot(legend=False)
+
+fig1, ax1 = plt.subplots()
+ax1.plot(range(0,12),respPrAll.T,alpha=0.2)
+ax1.errorbar(range(0,12),respPrAll.mean(), yerr=respPrAll.sem(), fmt='-o',color='b')
+ax1.set_xlabel('Direction',fontsize=fntSiz)
+ax1.set_ylabel('Proportion Responded Category A',fontsize=fntSiz)
+ax1.tick_params(axis='both', which='major', labelsize=fntSiz-2)
+
+if saveFigs:
+    plt.savefig(os.path.join(behavFigDir,'behav_subjCat_response_curve.pdf'))

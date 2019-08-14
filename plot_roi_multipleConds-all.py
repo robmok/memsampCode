@@ -43,7 +43,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -177,7 +177,7 @@ plt.style.use('seaborn-darkgrid')
 
 fntSiz=14
 
-saveFigs = False
+saveFigs = True
 
 exclSubs = False
 if exclSubs:
@@ -193,7 +193,7 @@ ylims = [0.475, 0.525]
 
 #subjCat sig
 roi='hMT_lh'
-#roi='MDroi_area8c_lh'
+roi='MDroi_area8c_lh'
 #
 ##RDM cat sig
 #roi='MDroi_area9_rh'
@@ -260,41 +260,17 @@ ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
 ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 plt.title(roi,fontsize=fntSiz)
-
-#if saveFigs:
-#    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '_toedit.pdf'))
-#plt.show()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '.pdf'))
+plt.show()
 
 t,p=stats.ttest_1samp(np.nanmean(rdmArr[:,:,indSubs],axis=0).T,0.5)
 print(p)
 
-
 #% plot RDMs for visualisation
-
 plt.rcdefaults()
 
-saveFigs = False
-fntSiz = 14
-    
-exclSubs = False
-if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-else:
-    indSubs=np.ones(33,dtype=bool)
-    
-#decoding subjCat sig    
-#roi='hMT_lh'
-#roi='MDroi_area8c_lh'
-
-#rdmModel category sig - crossnobis
-#roi='MDroi_area9_rh'
-
 rdm = np.zeros((12,12))
-
 rdmArr[np.isnan(rdmArr)]=0 # back to zero for mds
 rdm = rdmArr.mean(axis=2)
 #tstat (double check formula)
@@ -302,8 +278,7 @@ rdm = rdmArr.mean(axis=2)
 rdm[np.isnan(rdm)]=0 #dividing by 0 makes nans
 
 #RDM plot
-
-plt.figure(figsize=(25,4))
+plt.figure(figsize=(4,1.5))
 plt.imshow(rdm,cmap='viridis',interpolation='none')
 plt.title(roi,fontsize=fntSiz)
 plt.colorbar()
@@ -320,7 +295,7 @@ pos = mds.fit(rdm).embedding_
 
 #MDS plot
 ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
-plt.figure(figsize=(3,3))
+plt.figure(figsize=(1.5,1.5))
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.title(roi,fontsize=fntSiz)
 #if saveFigs:
@@ -331,14 +306,12 @@ plt.show()
 ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
 cnt = np.array((0.0,0.0,0.0))
 ctuple[:,1] = [.6,.8,1,1,.8,.6,.4,.2,0,0,.2,.4]
-plt.figure(figsize=(3,3))
+plt.figure(figsize=(1.5,1.5))
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.title(roi,fontsize=fntSiz)
 #if saveFigs:
 #    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDSdir_' + roi + '.pdf'))
 plt.show()
-
-
 #%% subjCat-all - plot 2
 #prototype - 6 conds each, for prototype is middle of conds 3&4
     
@@ -379,6 +352,7 @@ for iCond in 2,3,8,9: #range(0,11):
 #++
 
 #%%12-way-all
+plt.style.use('seaborn-darkgrid')
 
 # test the shape: 
 # more senory modulation, strongest decoding in the middle of each category, lowest at boundary
@@ -458,6 +432,7 @@ ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], 
 
 
 #%%dir-all
+plt.style.use('seaborn-darkgrid')
 
 exclSubs = True
 if exclSubs:
@@ -478,10 +453,10 @@ for roi in rois:
     dfMean[roi] = np.mean(np.asarray(np.stack(df1[roi].iloc[indSubs])),axis=0)
     dfSem[roi] = np.asarray(np.stack(df1[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
 
-roi='V1vd_lh' # up and down; median bit more flat
+roi='V1vd_lh' 
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
-roi='V1vd_rh' # U shaped; median U shaped
+roi='V1vd_rh' 
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
