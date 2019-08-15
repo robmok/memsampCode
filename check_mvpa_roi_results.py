@@ -35,7 +35,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
                       str(fwhm) + '_' + imDat)
 
 ##if looking at motor, uncomment:
-fname = fname + '_lock2resp'
+#fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
 print(df.loc['stats'])
@@ -71,10 +71,10 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 
 
 # recomputing tstat and pvals and savings to df
-#chance=0.5
+#chance=0
 #for roi in list(df):
 #    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
-#
+##
 #print(df.loc['stats'])
 #df.to_pickle(fname + '.pkl')
 

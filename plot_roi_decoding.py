@@ -44,7 +44,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-minus-motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
@@ -105,7 +105,6 @@ if saveFigs:
 #print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0))
 
 #loaded in subjCat-orth first, saved to df1, then loaded in dir to compare. MT and PFC sig
-#stats.ttest_rel(df1['V2vd_rh'].iloc[indSubs],df['V2vd_rh'].iloc[indSubs]-.5)
 #stats.ttest_rel(df1['hMT_lh'].iloc[indSubs],df['hMT_lh'].iloc[indSubs]-.5)
 #stats.ttest_rel(df1['MDroi_area8c_lh'].iloc[indSubs],df['MDroi_area8c_lh'].iloc[indSubs]-.5)
 
@@ -155,6 +154,15 @@ dfMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_
 
 dfHeader=['Category','12-way','Ori','Dir','Motor']
 
+#extra
+decodeFeature = 'motor'
+dfMotorCue=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth  
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+
+decodeFeature = 'subjCat-minus-motor'
+dfSubjCatMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+
  
 #subjCat-orth
 #seaborn - but errorbars are bootstrapped CIs (larger)
@@ -180,7 +188,7 @@ dfHeader=['Category','12-way','Ori','Dir','Motor']
 
 
 #combining - seaborn colours, sem errorbars
-roi='MDroi_area8c_lh' #category
+roi='MDroi_area8c_lh'
 svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader
@@ -192,7 +200,6 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
-
 
 roi='hMT_lh' #category
 svm_MT_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
@@ -257,6 +264,46 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
+roi='MDroi_area8c_lh'
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.003
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.003
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.0035
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfMotor[roi].iloc[indSubs]-.5) # one-tailed p=0.049
+
+roi='hMT_lh'
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.03
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.03
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.019
+stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfMotor[roi].iloc[indSubs]-.5) # one-tailed p=0.42
+
+roi='hMT_rh' #pairwise all n.s.
+stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfDir[roi].iloc[indSubs]-.5) #
+stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfOri[roi].iloc[indSubs]-.5) # 
+stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfSubjCat[roi].iloc[indSubs]) #
+stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfMotor[roi].iloc[indSubs]-.5) #
+#stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfSubjCatMotor[roi].iloc[indSubs]) #0.06
+
+
+roi='EVC_rh'
+stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.0487
+stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfSubjCat[roi].iloc[indSubs]) 
+stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,df12way[roi].iloc[indSubs]-1/12)
+stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5) # 
+#stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfSubjCatMotor[roi].iloc[indSubs])  #.08+
+
+#stats.spearmanr(dfSubjCat[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5)
+
+#extra:
+#subjCat-minus-motor
+roi='MDroi_area8c_lh'
+stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.004
+stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.01
+stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.005
+
+roi='hMT_lh'
+stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.07
+stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.075
+stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.055
 
 #%% behav corr svm
 

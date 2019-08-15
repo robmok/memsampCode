@@ -27,7 +27,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
                       str(fwhm) + '_' + imDat)
 
 #if looking at motor or lock2resp controls, uncomment:
-fname = fname + '_lock2resp'
+#fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
 
