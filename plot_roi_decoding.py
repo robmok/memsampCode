@@ -318,7 +318,7 @@ svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), title='Left dlPFC
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
 plt.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + 'subjCat-minus-motor.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
@@ -331,7 +331,7 @@ svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15), title='Left MT (mot
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_lh, ax=g.ax);
 plt.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + 'subjCat-minus-motor.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
 plt.show()
 
 
@@ -344,7 +344,7 @@ plt.show()
 #sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh, ax=g.ax);
 #plt.tight_layout()
 ##if saveFigs:
-##    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + 'subjCat-minus-motor.pdf'))
+##    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
 #plt.show()
 
 #%% behav corr svm
