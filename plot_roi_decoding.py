@@ -305,6 +305,48 @@ stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) #
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.075
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.055
 
+
+
+
+#subjCat-minus-motor
+roi='MDroi_area8c_lh'
+svm_area8c = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_area8c.columns=dfHeader[0:4]
+g = sns.catplot(data=svm_area8c,height=5,aspect=1, kind="bar", ci=None)
+svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), title='Left dlPFC (area 8)',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
+plt.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + 'subjCat-minus-motor.pdf'))
+    #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
+plt.show()
+
+roi='hMT_lh' #category
+svm_MT_lh = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
+                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+svm_MT_lh.columns=dfHeader[0:4]
+g = sns.catplot(data=svm_MT_lh,height=5,aspect=1, kind="bar", ci=None)
+svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15), title='Left MT (motion sensitive)',elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_lh, ax=g.ax);
+plt.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + 'subjCat-minus-motor.pdf'))
+plt.show()
+
+
+#roi='EVC_rh'
+#svm_V1_rh = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
+#                       dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
+#svm_V1_rh.columns=dfHeader[0:4]
+#g = sns.catplot(data=svm_V1_rh,height=5,aspect=1, kind="bar", ci=None)
+#svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1), title='Right Early Visual Cortex',elinewidth=2.5,fmt='k,',alpha=0.8)
+#sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh, ax=g.ax);
+#plt.tight_layout()
+##if saveFigs:
+##    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + 'subjCat-minus-motor.pdf'))
+#plt.show()
+
 #%% behav corr svm
 
 saveFigs = False
