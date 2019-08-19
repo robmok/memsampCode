@@ -417,25 +417,95 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
     
     
-#robust regression
-    
-y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
-y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
-#y=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
-#y=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
-#y=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
+#%% #robust regression
+#x=acc[indSubs]
+#y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
+##y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
+##y=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
+##y=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
+##y=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
+#
+#huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
+#hub_results = huber_t.fit()
+#print(hub_results.params)
+#print(hub_results.bse)
+#print(hub_results.summary(yname='behavAcc',
+#            xname=['var_%d' % i for i in range(len(hub_results.params))]))
 
-huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
-hub_results = huber_t.fit()
-print(hub_results.params)
-print(hub_results.bse)
-print(hub_results.summary(yname='behavAcc',
-            xname=['var_%d' % i for i in range(len(hub_results.params))]))
+plt.rcdefaults()
+#plt.style.use('seaborn-darkgrid')
+fntSiz=9.5 #fntSiz>10 cuts offf...
+
+saveFigs = False
+
+robustPlot = True #set to false when testing out things in plotting (takes time) 
 
 #plot with CIs of the slopes
+roi = 'MDroi_area8c_lh'
+x=acc[indSubs]
+y=np.array(df[roi].iloc[indSubs],dtype=float)
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
+hub_results = huber_t.fit()
+dfPlot=pd.DataFrame(data=[x,y], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+plt.title('Left dlPFC (area 8)',fontsize=fntSiz)
+legTxt='\n'.join(('b = %.2f' % hub_results.params, 'p < %.3f' % (hub_results.pvalues/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.fig.text(0.225, 0.925, legTxt, fontsize=14, verticalalignment='top', bbox=props) #rcdefaults - white bg
+#ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props) #seaborn-darkgrid - grey bg w/ grid
+ax.fig.tight_layout
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + roi + '.pdf'))
+    
+roi = 'hMT_lh'
+x=acc[indSubs]
+y=np.array(df[roi].iloc[indSubs],dtype=float)
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT())   
+hub_results = huber_t.fit()
+dfPlot=pd.DataFrame(data=[x,y], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+plt.title('Left MT',fontsize=fntSiz)
+legTxt='\n'.join(('b = %.2f' % hub_results.params, 'p < %.3f' % (hub_results.pvalues/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.fig.text(0.225, 0.925, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+#ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+ax.fig.tight_layout
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + roi + '.pdf'))
+    
+roi = 'EVC_rh'
+x=acc[indSubs]
+y=np.array(df[roi].iloc[indSubs],dtype=float)
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
+hub_results = huber_t.fit()
+dfPlot=pd.DataFrame(data=[x,y], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+legTxt='\n'.join(('b = %.2f' % hub_results.params, 'p = %.3f' % (hub_results.pvalues)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.fig.text(0.24, 0.275, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+#ax.fig.text(0.21, 0.25, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+plt.title('Right EVC',fontsize=fntSiz)
+ax.fig.tight_layout
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + roi + '.pdf'))
 
-
-
-
+##corr between 2 areas
+#
+#roi1 = 'MDroi_area8c_lh'
+#roi2 = 'hMT_lh'
+#x=np.array(df[roi1].iloc[indSubs],dtype=float)
+#y=np.array(df[roi2].iloc[indSubs],dtype=float)
+#b, m = polyfit(x,y, 1) 
+#xAx=np.linspace(min(x),max(x))
+#fig, ax = plt.subplots(figsize=(5,3.5))
+#ax.plot(xAx, b + m * xAx,'-',color=greycol,linewidth=1,alpha=0.5)
+#ax.scatter(x,y,s=mrkSiz)
+#r,p=stats.pearsonr(df[roi1].iloc[indSubs],df[roi2].iloc[indSubs]) #=0.039
+#r,p=stats.spearmanr(df[roi1].iloc[indSubs],df[roi2].iloc[indSubs]) #n.s.!
+#legTxt='\n'.join(('r = %.2f' % r, 'p = %.3f' % p))
+#props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+#ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
+#        verticalalignment='top', bbox=props)
+#fig.tight_layout()
 
 
