@@ -44,7 +44,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-minus-motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
@@ -397,7 +397,7 @@ ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
 fig.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
 roi = 'MDroi_area9_rh'
 
@@ -417,7 +417,7 @@ ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
 fig.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
     
 roi = 'hMT_lh'
 
@@ -437,7 +437,27 @@ ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
 fig.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
+
+roi = 'hMT_rh'
+
+x=acc[indSubs]
+y=np.array(df[roi].iloc[indSubs],dtype=float)
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=greycol,linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+ax.set_xlabel('Behavioral Accuracy')
+ax.set_ylabel('Decoding Accuracy (normalized)')
+ax.set_title('Right MT',fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.2f' % (rAcc[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+fig.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
 roi = 'EVC_rh'
 x=acc[indSubs]
@@ -456,17 +476,17 @@ ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
 fig.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_' + roi + '.pdf'))
-    
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
     
 #%% #robust regression
 #x=acc[indSubs]
-#y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
-##y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
-##y=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
-##y=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
-##y=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
-#
+##y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
+###y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
+#y=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
+###y=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
+###y=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
+##
+#y = sm.add_constant(y)
 #huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
 #hub_results = huber_t.fit()
 #print(hub_results.params)
@@ -480,56 +500,89 @@ fntSiz=9.5 #fntSiz>10 cuts offf...
 
 saveFigs = False
 
-robustPlot = True #set to false when testing out things in plotting (takes time) 
+robustPlot = False #set to false when testing out things in plotting (takes time) 
 
 #plot with CIs of the slopes
 roi = 'MDroi_area8c_lh'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
+y = sm.add_constant(y)
 huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
 hub_results = huber_t.fit()
-dfPlot=pd.DataFrame(data=[x,y], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+dfPlot=pd.DataFrame(data=[x,y[:,1]], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
 ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
 plt.title('Left dlPFC (area 8)',fontsize=fntSiz)
-legTxt='\n'.join(('b = %.2f' % hub_results.params, 'p < %.3f' % (hub_results.pvalues/2)))
+legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ax.fig.text(0.225, 0.925, legTxt, fontsize=14, verticalalignment='top', bbox=props) #rcdefaults - white bg
 #ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props) #seaborn-darkgrid - grey bg w/ grid
 ax.fig.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
     
 roi = 'hMT_lh'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
-huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT())   
+y = sm.add_constant(y)
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
 hub_results = huber_t.fit()
-dfPlot=pd.DataFrame(data=[x,y], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+dfPlot=pd.DataFrame(data=[x,y[:,1]], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
 ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
 plt.title('Left MT',fontsize=fntSiz)
-legTxt='\n'.join(('b = %.2f' % hub_results.params, 'p < %.3f' % (hub_results.pvalues/2)))
+if decodeFeature[0:7]=='subjCat':
+    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
+elif decodeFeature == "12-way":
+    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
+    ax.set(ylim=(0.048, 0.135))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ax.fig.text(0.225, 0.925, legTxt, fontsize=14, verticalalignment='top', bbox=props)
 #ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props)
 ax.fig.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + roi + '.pdf'))
-    
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
+
+roi = 'hMT_rh'
+x=acc[indSubs]
+y=np.array(df[roi].iloc[indSubs],dtype=float)
+y = sm.add_constant(y)
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
+hub_results = huber_t.fit()
+dfPlot=pd.DataFrame(data=[x,y[:,1]], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+plt.title('Right MT',fontsize=fntSiz)
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+if decodeFeature[0:7]=='subjCat':
+    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
+elif decodeFeature == "12-way":
+    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
+ax.fig.text(0.225, 0.925, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+#ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+ax.fig.tight_layout
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
+
 roi = 'EVC_rh'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
+y = sm.add_constant(y)
 huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
 hub_results = huber_t.fit()
-dfPlot=pd.DataFrame(data=[x,y], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
+dfPlot=pd.DataFrame(data=[x,y[:,1]], index=['Behavioral Accuracy','Decoding Accuracy (normalized)'], columns=None)
 ax = sns.lmplot(x='Behavioral Accuracy',y='Decoding Accuracy (normalized)',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
-legTxt='\n'.join(('b = %.2f' % hub_results.params, 'p = %.3f' % (hub_results.pvalues)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-ax.fig.text(0.24, 0.275, legTxt, fontsize=14, verticalalignment='top', bbox=props)
-#ax.fig.text(0.21, 0.25, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+if decodeFeature[0:7]=='subjCat':
+    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.24, 0.275, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+    #ax.fig.text(0.21, 0.25, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+elif decodeFeature == "12-way":
+    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.225, 0.925, legTxt, fontsize=14, verticalalignment='top', bbox=props)
+    
 plt.title('Right EVC',fontsize=fntSiz)
 ax.fig.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
+
 
 ##corr between 2 areas
 #
@@ -551,3 +604,52 @@ if saveFigs:
 #fig.tight_layout()
 
 
+#%% #testing if coeffcients are significant different - needs having loaded in multiple dfs
+x=acc[indSubs]
+##y=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
+
+roi = 'hMT_lh' #p=0.54
+roi = 'hMT_rh' # p=0.04 subjCat vs 12-way
+#roi = 'EVC_rh' # p=0.11
+
+#y = dfSubjCat[roi].iloc[indSubs].values-df12way[roi].iloc[indSubs].values
+
+#y = np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
+y = np.array([np.array(dfSubjCat[roi].iloc[indSubs].values,dtype=float),np.array(df12way[roi].iloc[indSubs].values,dtype=float)]).T
+
+#y = np.array([np.array(dfSubjCat['MDroi_area8c_lh'].iloc[indSubs].values,dtype=float),np.array(dfSubjCat['hMT_lh'].iloc[indSubs].values,dtype=float),
+#              np.array(dfSubjCat['hMT_rh'].iloc[indSubs].values,dtype=float), np.array(dfSubjCat['EVC_rh'].iloc[indSubs].values,dtype=float),
+#              np.array(df12way['MDroi_area8c_lh'].iloc[indSubs].values,dtype=float), np.array(df12way['hMT_lh'].iloc[indSubs].values,dtype=float),
+#              np.array(df12way['hMT_rh'].iloc[indSubs].values,dtype=float),np.array(df12way['EVC_rh'].iloc[indSubs].values,dtype=float)]).T
+
+y = np.array([np.array(dfSubjCat['hMT_lh'].iloc[indSubs].values,dtype=float),np.array(dfSubjCat['hMT_rh'].iloc[indSubs].values,dtype=float),
+              np.array(dfSubjCat['EVC_rh'].iloc[indSubs].values,dtype=float),np.array(df12way['hMT_lh'].iloc[indSubs].values,dtype=float),
+              np.array(df12way['hMT_rh'].iloc[indSubs].values,dtype=float),np.array(df12way['EVC_rh'].iloc[indSubs].values,dtype=float)]).T
+
+    
+y = sm.add_constant(y)
+huber_t = sm.RLM(x,y, M=sm.robust.norms.HuberT()) 
+hub_results = huber_t.fit()
+print(hub_results.params)
+print(hub_results.bse)
+print(hub_results.summary(yname='behavAcc',
+            xname=['var_%d' % i for i in range(len(hub_results.params))]))
+
+
+#within a model
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,1],use_f=True) #pairwise
+
+#big model
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,1,0,0,0,0],use_f=True) #hMT_lh vs hMTrh, subjCat, p=0.0696
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,0,1,0,0,0],use_f=True) #hMT_lh vs EVC_rh, subjCat, p=0.018
+
+
+
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,0,0,1,0,0],use_f=True) #hMT_lh vs self, subjCat-vs-12-way, p=0.65
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,-1,0,0,1,0],use_f=True) #hMT_rh vs self, subjCat-vs-12-way, p=0.02
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,-1,0,0,1],use_f=True) #EVC_rh vs self, subjCat-vs-12-way, p=0.045
+
+
+
+#sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=np.tile([0,-1,1],(33,1)),use_f=True) 
+#sm.robust.robust_linear_model.RLMResults.wald_test_terms(hub_results) #test all terms..?
