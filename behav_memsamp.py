@@ -176,10 +176,11 @@ for iSub in range(1,34):
 #    plt.show()
     
 #%%
+#plt.rcdefaults()
 plt.style.use('seaborn-darkgrid')
-
+#
 saveFigs = False
-fntSiz=14
+fntSiz=18
 
 #ax = respPrAll.T.plot(legend=False)
 
@@ -187,8 +188,8 @@ fig1, ax1 = plt.subplots()
 ax1.plot(range(0,12),respPrAll.T,alpha=0.2)
 ax1.errorbar(range(0,12),respPrAll.mean(), yerr=respPrAll.sem(), fmt='-o',color='b')
 ax1.set_xlabel('Direction',fontsize=fntSiz)
-ax1.set_ylabel('Proportion Responded Category A',fontsize=fntSiz)
-ax1.tick_params(axis='both', which='major', labelsize=fntSiz-2)
+ax1.set_ylabel("Proportion Responded Category 'Face'",fontsize=fntSiz)
+ax1.tick_params(axis='both', which='major', labelsize=fntSiz-2.5)
 
 if saveFigs:
     plt.savefig(os.path.join(behavFigDir,'behav_subjCat_response_curve.pdf'))

@@ -118,8 +118,9 @@ sns.swarmplot(color="k", size=3, data=df.iloc[indSubs,:], ax=g.ax);
 
 #%% plotting within area, across decoders
 
-plt.rcdefaults()
-#plt.style.use('seaborn-darkgrid')
+fntSiz=18
+sns.set(font_scale=1.2) #set font scale for sns
+sns.set_style("ticks")
 
 saveFigs = False
 
@@ -162,39 +163,18 @@ dfMotorCue=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decodi
 decodeFeature = 'subjCat-minus-motor'
 dfSubjCatMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
                                         + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
-
  
 #subjCat-orth
-#seaborn - but errorbars are bootstrapped CIs (larger)
-#roi='MDroi_area8c_lh'
-#svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
-#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
-#svm_area8c.columns=dfHeader
-#g = sns.catplot(data=svm_area8c.iloc[indSubs,:],height=6,aspect=1, kind="bar")
-#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_area8c.iloc[indSubs,:], ax=g.ax);
-#g.fig.suptitle('area8c_lh')
-#g.set_ylim=(-0.125,0.15)
-#plt.show()
-
-##subjCat-orth
-##matplotlib
-#roi='MDroi_area8c_lh'
-#svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12,
-#                        dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
-#svm_area8c.columns=dfHeader
-#ax=svm_area8c.mean().plot(figsize=(5,6),kind="bar",yerr=svm_area8c.sem(),ylim=(-0.125,0.15), title='area8c_lh')
-#sns.stripplot(color="k", alpha=0.3, size=3, data=svm_area8c.iloc[indSubs,:])
-#plt.show()
-
-
 #combining - seaborn colours, sem errorbars
 roi='MDroi_area8c_lh'
 svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader
 g = sns.catplot(data=svm_area8c,height=5,aspect=1, kind="bar", ci=None)
-svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), title='Left dlPFC (area 8)',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
+plt.title('Left mMFG (area 8)', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -206,9 +186,10 @@ svm_MT_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_lh.columns=dfHeader
 g = sns.catplot(data=svm_MT_lh,height=5,aspect=1, kind="bar", ci=None)
-svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15), title='Left MT (motion sensitive)',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15),elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_lh, ax=g.ax);
-plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
+plt.title('Left MT', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -219,9 +200,10 @@ svm_MT_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_rh.columns=dfHeader
 g = sns.catplot(data=svm_MT_rh,height=5,aspect=1, kind="bar", ci=None)
-svm_MT_rh.mean().plot(yerr=svm_MT_rh.sem(),ylim=(-.115,.15), title='Right MT (motion sensitive)',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_MT_rh.mean().plot(yerr=svm_MT_rh.sem(),ylim=(-.115,.15), elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_rh, ax=g.ax);
-plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
+plt.title('Right MT', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -233,8 +215,10 @@ svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_V1_rh.columns=dfHeader
 g = sns.catplot(data=svm_V1_rh,height=5,aspect=1, kind="bar", ci=None)
-svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1), title='Right Early Visual Cortex',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1),elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh, ax=g.ax);
+plt.title('Right Early Visual Cortex', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -245,8 +229,10 @@ svm_motor_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_motor_rh.columns=dfHeader
 g = sns.catplot(data=svm_motor_rh,height=5,aspect=1, kind="bar", ci=None)
-svm_motor_rh.mean().plot(yerr=svm_motor_rh.sem(),ylim=(-.06,.1), title='Right Primary Motor Cortex',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_motor_rh.mean().plot(yerr=svm_motor_rh.sem(),ylim=(-.06,.1),elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_motor_rh, ax=g.ax);
+plt.title('Right M1', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -257,8 +243,10 @@ svm_motor_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_motor_lh.columns=dfHeader
 g = sns.catplot(data=svm_motor_lh,height=5,aspect=1, kind="bar", ci=None)
-svm_motor_lh.mean().plot(yerr=svm_motor_lh.sem(),ylim=(-.06,.1), title='Left Primary Motor Cortex',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_motor_lh.mean().plot(yerr=svm_motor_lh.sem(),ylim=(-.06,.1), elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_motor_lh, ax=g.ax);
+plt.title('Right M1', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
@@ -314,8 +302,10 @@ svm_area8c = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indS
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader[0:4]
 g = sns.catplot(data=svm_area8c,height=5,aspect=1, kind="bar", ci=None)
-svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), title='Left dlPFC (area 8)',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
+plt.title('Left mMFG (area 8)', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
@@ -327,8 +317,10 @@ svm_MT_lh = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSu
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_lh.columns=dfHeader[0:4]
 g = sns.catplot(data=svm_MT_lh,height=5,aspect=1, kind="bar", ci=None)
-svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15), title='Left MT (motion sensitive)',elinewidth=2.5,fmt='k,',alpha=0.8)
+svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15), elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_lh, ax=g.ax);
+plt.title('Left MT', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
@@ -346,6 +338,80 @@ plt.show()
 ##if saveFigs:
 ##    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
 #plt.show()
+
+#%% Plot only cat, dir, motor
+
+#plt.rcdefaults()
+#plt.style.use('seaborn-darkgrid')
+#plt.style.use('default')
+
+fntSiz=18
+sns.set(font_scale=1.4) #set font scale for sns
+sns.set_style("ticks")
+
+saveFigs = False
+
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
+decodeFeature = 'subjCat-orth'
+dfSubjCat=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
+                       + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+decodeFeature = 'dir'
+dfDir=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth  
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+decodeFeature = 'motor'
+dfMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth  
+                                        + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_lock2resp.pkl')))
+
+dfHeader=['Category','Direction','Motor']
+
+roi='MDroi_area8c_lh'
+svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
+svm_area8c.columns=dfHeader
+g = sns.catplot(data=svm_area8c,height=5,aspect=1, kind="bar", ci=None)
+svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15),elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
+plt.title('Left mMFG (area 8)', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)')
+plt.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
+    #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
+plt.show()
+
+roi='hMT_lh' #category
+svm_MT_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
+svm_MT_lh.columns=dfHeader
+g = sns.catplot(data=svm_MT_lh,height=5,aspect=1, kind="bar", ci=None)
+svm_MT_lh.mean().plot(yerr=svm_MT_lh.sem(),ylim=(-.115,.15),elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_MT_lh, ax=g.ax);
+plt.title('Left MT', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)',fontsize=fntSiz-1)
+plt.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
+plt.show()
+
+roi='motor_rh'
+svm_motor_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
+svm_motor_rh.columns=dfHeader
+g = sns.catplot(data=svm_motor_rh,height=5,aspect=1, kind="bar", ci=None)
+svm_motor_rh.mean().plot(yerr=svm_motor_rh.sem(),ylim=(-.06,.1),elinewidth=2.5,fmt='k,',alpha=0.8)
+sns.stripplot(color="k", alpha=0.2, size=3, data=svm_motor_rh, ax=g.ax);
+plt.title('Right M1', fontsize=fntSiz)
+g.set_ylabels('Decoding Accuracy (normalized)',fontsize=fntSiz-1)
+plt.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
+plt.show()
 
 #%% behav corr svm
 
@@ -496,11 +562,11 @@ if saveFigs:
 
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
-fntSiz=9.5 #fntSiz>10 cuts offf...
+fntSiz=14 #fntSiz>10 cuts offf...
 legFntSiz = 12
-saveFigs = True
+saveFigs = False
 
-robustPlot = True #set to false when testing out things in plotting (takes time) 
+robustPlot = False #set to false when testing out things in plotting (takes time) 
 
 #plot with CIs of the slopes
 roi = 'MDroi_area8c_lh'
@@ -515,7 +581,11 @@ elif decodeFeature == '12-way':
     decodeLabel = 'Stimulus Decoding (normalized)'
 dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], columns=None)
 ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
-plt.title('Left dlPFC (area 8)',fontsize=fntSiz)
+#plt.title('Left dlPFC (area 8)',fontsize=fntSiz)
+ax.set_xlabels(fontsize=fntSiz)
+ax.set_ylabels(fontsize=fntSiz)
+ax.set_xticklabels(fontsize=fntSiz-2)
+ax.set_yticklabels(fontsize=fntSiz-2)
 legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 ##ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props) #seaborn-darkgrid - grey bg w/ grid
@@ -542,7 +612,11 @@ elif decodeFeature == '12-way':
     decodeLabel = 'Stimulus Decoding (normalized)'
 dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], columns=None)
 ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
-plt.title('Left MT',fontsize=fntSiz)
+#plt.title('Left MT',fontsize=fntSiz)
+ax.set_xlabels(fontsize=fntSiz)
+ax.set_ylabels(fontsize=fntSiz)
+ax.set_xticklabels(fontsize=fntSiz-2)
+ax.set_yticklabels(fontsize=fntSiz-2)
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 if decodeFeature[0:7]=='subjCat':
     legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
@@ -551,7 +625,7 @@ elif decodeFeature == "12-way":
     legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
     ax.fig.text(0.195, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
 #ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props)
-ax.set(ylim=(0.605, 1.023))
+#ax.set(ylim=(0.605, 1.023))
 ax.fig.tight_layout
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
@@ -569,6 +643,10 @@ elif decodeFeature == '12-way':
 dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], columns=None)
 ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
 plt.title('Right MT',fontsize=fntSiz)
+ax.set_xlabels(fontsize=fntSiz)
+ax.set_ylabels(fontsize=fntSiz)
+ax.set_xticklabels(fontsize=fntSiz-2)
+ax.set_yticklabels(fontsize=fntSiz-2)
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 if decodeFeature[0:7]=='subjCat':
     legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
@@ -595,6 +673,10 @@ dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], 
 ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 plt.title('Right EVC',fontsize=fntSiz)
+ax.set_xlabels(fontsize=fntSiz)
+ax.set_ylabels(fontsize=fntSiz)
+ax.set_xticklabels(fontsize=fntSiz-2)
+ax.set_yticklabels(fontsize=fntSiz-2)
 if decodeFeature[0:7]=='subjCat':
     legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
     ax.fig.text(0.195, 0.255, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props)
