@@ -19,7 +19,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-minus-motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -40,7 +40,7 @@ list(df)
 #        'SPL1_lh','SPL1_rh','MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh',
 #        'MDroi_area8c_rh', 'MDroi_area9_lh','MDroi_area9_rh', 'motor_lh', 'motor_rh']
 
-rois = ['EVC_lh','EVC_rh','V3a_lh','V3a_rh','hMT_lh','hMT_rh','IPS1-5_lh','IPS1-5_rh','MDroi_ifg_lh',
+rois = ['EVC_lh','EVC_rh','hMT_lh','hMT_rh','IPS1-5_lh','IPS1-5_rh','MDroi_ifg_lh',
         'MDroi_ifg_rh', 'MDroi_area8c_lh', 'MDroi_area8c_rh', 'MDroi_area9_lh',
         'MDroi_area9_rh', 'motor_lh', 'motor_rh']
 

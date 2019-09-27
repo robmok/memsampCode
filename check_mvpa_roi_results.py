@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -81,6 +81,7 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 #%% exclude subs
 
 exclSubs = False
+exclParietalSubs = True
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -90,12 +91,17 @@ if exclSubs:
         
 #    indSubs[:]=True # reset if don't include excl above
 #    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    
+#exclude parietal cutoff subs
+elif exclParietalSubs: # same, IPS no diff, others no diff
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[0,2,19,23]] = False #subs 1,3,20,24
 else:
     indSubs=np.ones(33,dtype=bool)
     
 
 newStats = pd.DataFrame(columns=list(df))
-chance = .5 #0, 0.5, 1/12
+chance = 0 #0, 0.5, 1/12
 for roi in list(df):
     newStats[roi]=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
 print(newStats.T)
@@ -113,5 +119,7 @@ pvals=newStats.iloc[1].values
 #print(fdr(pvals[0:12]/2,alpha=0.05,method='indep',is_sorted=False))
 #print(multest(pvals[0:12]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
 #ori
-print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
-print(multest(pvals[0:6]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
+
+#subjCat-orth/motor
+#print(fdr(pvals[4:14]/2,alpha=0.05,method='indep',is_sorted=False))
+#print(multest(pvals[4:14]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
