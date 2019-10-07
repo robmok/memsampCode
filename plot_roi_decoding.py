@@ -562,49 +562,60 @@ if saveFigs:
 
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
-fntSiz=14 #fntSiz>10 cuts offf...
+fntSiz = 14  # fntSiz>10 cuts offf...
 legFntSiz = 12
 saveFigs = False
 
-robustPlot = False #set to false when testing out things in plotting (takes time) 
+robustPlot = False  # set to false when testing out things in plotting (takes time) 
 
-#plot with CIs of the slopes
+# plot with CIs of the slopes
 roi = 'MDroi_area8c_lh'
 y = acc[indSubs]
-x = np.array(df[roi].iloc[indSubs],dtype=float)
+x = np.array(df[roi].iloc[indSubs], dtype=float)
+if decodeFeature == '12-way':
+    x = x-1/12
 x = sm.add_constant(x)
-huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
+huber_t = sm.RLM(y, x, M=sm.robust.norms.HuberT())
 hub_results = huber_t.fit()
 if decodeFeature[0:7] == 'subjCat':
     decodeLabel = 'Category Decoding (normalized)'
 elif decodeFeature == '12-way':
     decodeLabel = 'Stimulus Decoding (normalized)'
-dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], columns=None)
-ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+dfPlot = pd.DataFrame(data=[y, x[:, 1]], index=['Behavioral Accuracy', decodeLabel], columns=None)
+ax = sns.lmplot(x=decodeLabel, y='Behavioral Accuracy', data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
 #plt.title('Left dlPFC (area 8)',fontsize=fntSiz)
 ax.set_xlabels(fontsize=fntSiz)
 ax.set_ylabels(fontsize=fntSiz)
 ax.set_xticklabels(fontsize=fntSiz-2)
 ax.set_yticklabels(fontsize=fntSiz-2)
-legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
+legTxt = '\n'.join(
+        ('b = %.2f' % hub_results.params[1],
+         'p = %.3f' % (hub_results.pvalues[1]/2)))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-##ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props) #seaborn-darkgrid - grey bg w/ grid
-if decodeFeature[0:7]=='subjCat':
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.2, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
+if decodeFeature[0:7] == 'subjCat':
+    legTxt = '\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p < %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.2, 0.94, legTxt, fontsize=legFntSiz,verticalalignment='top',
+                bbox=props) #rcdefaults - white bg
 elif decodeFeature == "12-way":
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
+    legTxt = '\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p = %.3f' % (hub_results.pvalues[1]/2)))
     ax.fig.text(0.2, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
 ax.set(ylim=(0.605, 1.02))
 ax.fig.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir, 'mvpaROI_behavDecodeCorr_robustReg_' +
+                             decodeFeature + '_' + roi + '.pdf'))
     
 roi = 'hMT_lh'
 y = acc[indSubs]
-x = np.array(df[roi].iloc[indSubs],dtype=float)
+x = np.array(df[roi].iloc[indSubs], dtype=float)
+if decodeFeature == '12-way':
+    x = x-1/12
 x = sm.add_constant(x)
-huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
+huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT())
 hub_results = huber_t.fit()
 if decodeFeature[0:7] == 'subjCat':
     decodeLabel = 'Category Decoding (normalized)'
@@ -618,80 +629,103 @@ ax.set_ylabels(fontsize=fntSiz)
 ax.set_xticklabels(fontsize=fntSiz-2)
 ax.set_yticklabels(fontsize=fntSiz-2)
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-if decodeFeature[0:7]=='subjCat':
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.175, 0.952, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
+if decodeFeature[0:7] == 'subjCat':
+    legTxt='\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p < %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.175, 0.952, legTxt, fontsize=legFntSiz, verticalalignment='top',
+                bbox=props)
 elif decodeFeature == "12-way":
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.195, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
+    legTxt='\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p = %.3f' % (hub_results.pvalues[1]/2)))
+#    ax.fig.text(0.195, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
+    ax.fig.text(0.75, 0.17, legTxt, fontsize=legFntSiz, verticalalignment='bottom', bbox=props) #rcdefaults - white bg
+
 #ax.fig.text(0.195, 0.935, legTxt, fontsize=14, verticalalignment='top', bbox=props)
 #ax.set(ylim=(0.605, 1.023))
 ax.fig.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
-
+    plt.savefig(os.path.join(figDir, 'mvpaROI_behavDecodeCorr_robustReg_' +
+                             decodeFeature + '_' + roi + '.pdf'))
 roi = 'hMT_rh'
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs],dtype=float)
+if decodeFeature == '12-way':
+    x = x-1/12
 x = sm.add_constant(x)
-huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
+huber_t = sm.RLM(y, x, M=sm.robust.norms.HuberT())
 hub_results = huber_t.fit()
 if decodeFeature[0:7] == 'subjCat':
     decodeLabel = 'Category Decoding (normalized)'
 elif decodeFeature == '12-way':
     decodeLabel = 'Stimulus Decoding (normalized)'
-dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], columns=None)
-ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
-plt.title('Right MT',fontsize=fntSiz)
+dfPlot = pd.DataFrame(data=[y, x[:, 1]], index=['Behavioral Accuracy', decodeLabel], columns=None)
+ax = sns.lmplot(x=decodeLabel, y='Behavioral Accuracy', data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+#plt.title('Right MT',fontsize=fntSiz)
 ax.set_xlabels(fontsize=fntSiz)
 ax.set_ylabels(fontsize=fntSiz)
 ax.set_xticklabels(fontsize=fntSiz-2)
 ax.set_yticklabels(fontsize=fntSiz-2)
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 if decodeFeature[0:7]=='subjCat':
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.193, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
+    legTxt='\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p = %.3f' % (hub_results.pvalues[1]/2)))
+#    ax.fig.text(0.193, 0.96, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
+    ax.fig.text(0.75, 0.17, legTxt, fontsize=legFntSiz,
+                verticalalignment='bottom', bbox=props)
 elif decodeFeature == "12-way":
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.175, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
-ax.set(ylim=(0.58, 1.02))
+    legTxt='\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p < %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.175, 0.94, legTxt, fontsize=legFntSiz,
+                verticalalignment='top', bbox=props)
+#ax.set(ylim=(0.58, 1.02))
 ax.fig.tight_layout
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
 
 roi = 'EVC_rh'
 y = acc[indSubs]
-x = np.array(df[roi].iloc[indSubs],dtype=float)
+x = np.array(df[roi].iloc[indSubs], dtype=float)
+if decodeFeature == '12-way':
+    x = x-1/12
 x = sm.add_constant(x)
-huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
+huber_t = sm.RLM(y, x, M=sm.robust.norms.HuberT())
 hub_results = huber_t.fit()
 if decodeFeature[0:7] == 'subjCat':
     decodeLabel = 'Category Decoding (normalized)'
 elif decodeFeature == '12-way':
     decodeLabel = 'Stimulus Decoding (normalized)'
-dfPlot=pd.DataFrame(data=[y,x[:,1]], index=['Behavioral Accuracy',decodeLabel], columns=None)
-ax = sns.lmplot(x=decodeLabel,y='Behavioral Accuracy',data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+dfPlot = pd.DataFrame(data=[y, x[:, 1]], index=['Behavioral Accuracy', decodeLabel], columns=None)
+ax = sns.lmplot(x=decodeLabel, y='Behavioral Accuracy', data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-plt.title('Right EVC',fontsize=fntSiz)
+#plt.title('Right EVC',fontsize=fntSiz)
 ax.set_xlabels(fontsize=fntSiz)
 ax.set_ylabels(fontsize=fntSiz)
 ax.set_xticklabels(fontsize=fntSiz-2)
 ax.set_yticklabels(fontsize=fntSiz-2)
 if decodeFeature[0:7]=='subjCat':
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p = %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.195, 0.255, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props)
+    legTxt='\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p = %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.195, 0.255, legTxt, fontsize=legFntSiz,
+                verticalalignment='top', bbox=props)
     #ax.fig.text(0.21, 0.25, legTxt, fontsize=14, verticalalignment='top', bbox=props)
 elif decodeFeature == "12-way":
-    legTxt='\n'.join(('b = %.2f' % hub_results.params[1], 'p < %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.195, 0.944, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props)
+    legTxt = '\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p < %.3f' % (hub_results.pvalues[1]/2)))
+    ax.fig.text(0.195, 0.944, legTxt, fontsize=legFntSiz,
+                verticalalignment='top', bbox=props)
 #    ax.fig.text(0.725, 0.175, legTxt, fontsize=14, verticalalignment='bottom', bbox=props) #bottom right
-    ax.set(ylim=(0.605, 1.02))
+#    ax.set(ylim=(0.605, 1.02))
 ax.set(ylim=(0.605, 1.02))
 ax.fig.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
-
-
+    plt.savefig(os.path.join(figDir, 'mvpaROI_behavDecodeCorr_robustReg_' +
+                             decodeFeature + '_' + roi + '.pdf'))
 
 ##corr between 2 areas
 #
