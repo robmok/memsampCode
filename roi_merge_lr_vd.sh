@@ -20,6 +20,11 @@ while read subject; do
   #   # fslmaths ${roiDir}/${subject}_${iRoi}v_lrh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_lrh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_lrh.nii.gz #bilateral vd
   # done
 
+  #make bilateral mask (left + right)
+  for iRoi in 'hMT' 'V3a'; do
+    fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
+  done
+
   # #make visual and IPS merged rois
   # #list the files to merge (txt is replaced over subs, not saved)
   # rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt ${roiDir}/ips_rois_lh.txt ${roiDir}/ips_rois_rh.txt
@@ -126,6 +131,6 @@ while read subject; do
   # fslmaths ${roiDir}/${subject}_EVC_lh.nii.gz -add ${roiDir}/${subject}_EVC_rh.nii.gz -bin ${roiDir}/${subject}_EVC_lrh.nii.gz
 
   #motor lrh
-  fslmaths ${roiDir}/${subject}_motor_lh.nii.gz -add ${roiDir}/${subject}_motor_rh.nii.gz -bin ${roiDir}/${subject}_motor_lrh.nii.gz
+  # fslmaths ${roiDir}/${subject}_motor_lh.nii.gz -add ${roiDir}/${subject}_motor_rh.nii.gz -bin ${roiDir}/${subject}_motor_lrh.nii.gz
 
 done < ${fsfDir}/subject_list_full.txt
