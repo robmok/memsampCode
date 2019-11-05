@@ -47,6 +47,7 @@ lock2resp = False # if loading in lock2resp glms (to get motor effect)
 
 decodeFeature = 'subjCat'   
 
+bilateralRois = False
 #%%
 # =============================================================================
 # Set up decoding accuracy dataframe 
@@ -56,6 +57,11 @@ nSubs=33
 rois = ['EVC_lh','EVC_rh', 'V3a_lh','V3a_rh', 'hMT_lh','hMT_rh', 'IPS1-5_lh','IPS1-5_rh', 
         'MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh', 'MDroi_area8c_rh', 'MDroi_area9_lh',
         'MDroi_area9_rh', 'motor_lh', 'motor_rh']
+
+if bilateralRois:
+   rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
+           'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh'] 
+
 
 #reRunROIs
 #rois = ['EVC_lh','EVC_rh']
@@ -374,7 +380,10 @@ fnameSave = os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding
                                       '_fwhm' + str(fwhm) + '_' + imDat)
 if lock2resp:
     fnameSave = fnameSave + '_lock2resp'
-    
+
+if bilateralRois:
+    fnameSave = fnameSave + '_bilateral'
+
 # if re-running / adding, load in first, append new dat to df, then save
 if reRun == True:
     dfTmp=pd.read_pickle(fnameSave + '.pkl')
