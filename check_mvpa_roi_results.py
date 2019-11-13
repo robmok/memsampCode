@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'ori' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -38,7 +38,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #fname = fname + '_lock2resp'
 
 #bilateral
-fname = fname + '_bilateral'
+#fname = fname + '_bilateral'
 
 
 df=pd.read_pickle(fname + '.pkl')
@@ -49,8 +49,17 @@ pvals=np.empty((len(list(df))-1))
 for iRoi in range(0,len(list(df))-1):
     pvals[iRoi]= df.loc['stats'][iRoi].pvalue
 
+# correcting
+# all rois apart from motor (12 ROIS)
 print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+# all rois apart from EVC and motor (10 ROIS)
+print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+
+#EVC, MT, and IPS - 6 ROIs
+print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
+multest(pvals[0:6]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
 #first bunch for ori/12-way
 #print(fdr(pvals[0:16]/2,alpha=0.05,method='indep',is_sorted=False))
@@ -69,9 +78,6 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 #print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],chance))
 #print(stats.ttest_1samp(df['EVC_rh'].iloc[indSubs],chance))
 #print(stats.ttest_1samp(df['EVC_lh'].iloc[indSubs],chance))
-
-
-
 
 
 # recomputing tstat and pvals and savings to df
