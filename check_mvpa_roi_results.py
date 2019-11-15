@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = '12-way' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -35,7 +35,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
                       str(fwhm) + '_' + imDat)
 
 ##if looking at motor, uncomment:
-#fname = fname + '_lock2resp'
+fname = fname + '_lock2resp'
 
 #bilateral
 #fname = fname + '_bilateral'
@@ -58,8 +58,8 @@ print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
 #EVC, MT, and IPS - 6 ROIs
-print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
-multest(pvals[0:6]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+#print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
+#multest(pvals[0:6]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
 #first bunch for ori/12-way
 #print(fdr(pvals[0:16]/2,alpha=0.05,method='indep',is_sorted=False))

@@ -7,6 +7,9 @@ dataDir=${wd}/fmriprep_output/fmriprep
 fwhm=0 #0/2
 standardScript="memsamp_run-01_trial_fwhm2_T1"
 
+#for feedback decoding
+standardScript="memsamp_run-01_trial_fwhm2_T1_feedback"
+
 # single trial in T1 space
 # - code for each trial as an EV - looks like 7 trials per run (even run 4)
 # - 12 conds * 7 trials = 84 EVs PLUS feedback.
@@ -44,7 +47,7 @@ while read subject; do
       <${fsfDir}/${standardScript}.fsf >${fsfDir}/run_memsamp_run-0${iRun}_trial_T1_fwhm${fwhm}_${subject}.fsf
       feat ${fsfDir}/run_memsamp_run-0${iRun}_trial_T1_fwhm${fwhm}_${subject}.fsf
   fi #if ["subject" == "sub-09"]...
-done < ${fsfDir}/subject_list_1.txt #while read subject; do
+done < ${fsfDir}/subject_list_4.txt #while read subject; do
 
 #lock2resp - added 190801
 # -e s:"cue_trial":"cue_lock2resp_trial":g \ #event file name
