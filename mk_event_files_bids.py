@@ -140,7 +140,7 @@ for iSub in subs:
                 feedtimingTrl=feedtiming.iloc[iTrl]
                 feedtimingTrl=feedtimingTrl.reset_index() #for 1 trial, saves as 1 column; here, reset
                 feedtimingTrl=pd.pivot_table(feedtimingTrl, columns=feedtimingTrl['index']) #use index from the resetted index above
-                feedtimingTrl = feedtimingTrl[['onset','duration','value']] # BUG - edited from cuetimingTrl to feedtimingTrl - this probably is a proble.. re run!
+                feedtimingTrl = feedtimingTrl[['onset','duration','value']]
                 fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFile))[0] + "_" + str(int(iCond)) + "feed_trial" + str(trlCnt) + ".txt")
                 
                 if saveFeatTiming:
@@ -150,7 +150,7 @@ for iSub in subs:
                 trlCnt=trlCnt+1
         
         #********
-        #feedback - based on stimulus presented - separate GLM
+        #feedback - based on stimulus presented - separate GLM? probably don't need this for decoding; but 
         # block-wise estimation of betas
         #feedback - based on cue direction
         conds=trials["category"].sort_values().unique() #gets direction conditions
