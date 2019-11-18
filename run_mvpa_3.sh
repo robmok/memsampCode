@@ -7,9 +7,13 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-# bilateralRois
 
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
-    -e s:"bilateralRois = False":"bilateralRois = True":g \
+    -e s:"decodeFromFeedback = False":"decodeFromFeedback = True":g \
+    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
+    -e s:"decodeFromFeedback = False":"decodeFromFeedback = True":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

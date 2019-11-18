@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -35,7 +35,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
                       str(fwhm) + '_' + imDat)
 
 ##if looking at motor, uncomment:
-fname = fname + '_lock2resp'
+#fname = fname + '_lock2resp'
 
 #bilateral
 #fname = fname + '_bilateral'
@@ -45,8 +45,8 @@ df=pd.read_pickle(fname + '.pkl')
 print(df.loc['stats'])
 
 
-pvals=np.empty((len(list(df))-1))
-for iRoi in range(0,len(list(df))-1):
+pvals=np.empty((len(list(df))))
+for iRoi in range(0,len(list(df))):
     pvals[iRoi]= df.loc['stats'][iRoi].pvalue
 
 # correcting
@@ -56,6 +56,15 @@ multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 # all rois apart from EVC and motor (10 ROIS)
 print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+
+
+
+# no EVC and motor - after added ffa/ppa (and also evc, but drop later):
+ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
+#ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
+print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
+multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+
 
 #EVC, MT, and IPS - 6 ROIs
 #print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
@@ -82,8 +91,9 @@ multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 
 # recomputing tstat and pvals and savings to df
 #chance=0
+#indSubs=np.ones(33,dtype=bool)
 #for roi in list(df):
-#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
+#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
 ##
 #print(df.loc['stats'])
 #df.to_pickle(fname + '.pkl')

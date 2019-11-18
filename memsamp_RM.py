@@ -20,7 +20,7 @@ def getConds2comp(decodeFeature,conds=None):
         conds2comp = [[0,np.setxor1d(0,allDirs)],  [30,np.setxor1d(30,allDirs)], [60,np.setxor1d(60,allDirs)], [90,np.setxor1d(90,allDirs)],
                       [120,np.setxor1d(120,allDirs)],[150,np.setxor1d(150,allDirs)],[180,np.setxor1d(180,allDirs)],[210,np.setxor1d(210,allDirs)],
                       [240,np.setxor1d(240,allDirs)],[270,np.setxor1d(270,allDirs)],[300,np.setxor1d(300,allDirs)],[330,np.setxor1d(330,allDirs)]]
-    elif decodeFeature == "12-way":
+    elif (decodeFeature == "12-way"):
         conds2comp = []          
     elif decodeFeature == "subjCat-all":
         conds2comp = []

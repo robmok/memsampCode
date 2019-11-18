@@ -45,7 +45,9 @@ lock2resp = False # if loading in lock2resp glms (to get motor effect)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
-decodeFeature = 'subjCat'   
+decodeFeature = 'subjCat'
+
+decodeFromFeedback = False
 
 bilateralRois = False
 #%%
@@ -56,7 +58,7 @@ nSubs=33
 
 rois = ['EVC_lh','EVC_rh', 'V3a_lh','V3a_rh', 'hMT_lh','hMT_rh', 'IPS1-5_lh','IPS1-5_rh', 
         'MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh', 'MDroi_area8c_rh', 'MDroi_area9_lh',
-        'MDroi_area9_rh', 'motor_lh', 'motor_rh']
+        'MDroi_area9_rh', 'motor_lh', 'motor_rh', 'FFA_lrh', 'PPA_lrh', 'evc_lrh'] # 'FFA_lrh', 'PPA_lrh', 'evc_lrh' added 191118
 
 if bilateralRois:
    rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
@@ -64,7 +66,7 @@ if bilateralRois:
 
 
 #reRunROIs
-#rois = ['EVC_lh','EVC_rh']
+#rois = ['FFA_lrh', 'PPA_lrh', 'evc_lrh'] #functional localisers
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
 dfDecode.rename(index={nSubs:'stats'}, inplace=True)
@@ -104,17 +106,25 @@ for iSub in range(1,nSubs+1):
         for iCond in conds:
             for iTrial in range(1,8): #calculate cope number
                 #make a list and append to it
-                if not lock2resp: 
-                    imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
-                                               + str(iRun) +'_trial_T1_fwhm0.feat',
-                                               'stats',imDat + (str(copeNum)) + '.nii.gz'))
-                else: #lock2resp glm - to get motor effects
-                    imPath.append(os.path.join(featDir, 'sub-' + subNum + '_run-0'
-                                               + str(iRun) +'_trial_T1_lock2resp_fwhm0.feat',
-                                               'stats',imDat + (str(copeNum)) + '.nii.gz'))
-                copeNum=copeNum+1
-        df2['imPath']=pd.Series(imPath,index=df2.index)
-        dfCond = dfCond.append(df2) #append to main df
+                if decodeFromFeedback: # get feedback activity
+                    imPath.append(os.path.join(
+                            featDir, 'sub-' + subNum + '_run-0' + str(iRun)
+                            + '_trial_feedback_T1_fwhm0.feat', 'stats', imDat
+                            + (str(copeNum)) + '.nii.gz'))
+                else:  # otherwise, get cue-evoked activity
+                    if lock2resp:  # lock2resp glm - to get motor effects
+                        imPath.append(os.path.join(
+                                featDir, 'sub-' + subNum + '_run-0' + str(iRun)
+                                + '_trial_T1_lock2resp_fwhm0.feat', 'stats', imDat
+                                + (str(copeNum)) + '.nii.gz'))
+                    else:
+                        imPath.append(os.path.join(
+                                featDir, 'sub-' + subNum + '_run-0' + str(iRun)
+                                + '_trial_T1_fwhm0.feat', 'stats', imDat +
+                                (str(copeNum)) + '.nii.gz'))
+                copeNum = copeNum+1
+        df2['imPath'] = pd.Series(imPath, index=df2.index)
+        dfCond = dfCond.append(df2)  # append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
     
     # only select 2 out of 3/4 runs that share the same motor response (no counterbalancing)
@@ -175,23 +185,24 @@ for iSub in range(1,nSubs+1):
     # set up brain data
     # =============================================================================
 
-    dat = dfCond['imPath'].values #img paths - keeping same variables as searchlight
-    y   = dfCond['direction'].values #conditions / stimulus
-    groups  = dfCond['run'].values # info about the sessions   
+    dat = dfCond['imPath'].values  #img paths - keeping same variables as searchlight
+    y   = dfCond['direction'].values  #conditions / stimulus
+    groups  = dfCond['run'].values  # info about the sessions   
     
     for roi in rois:
         #define ROI  mask
-#        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '_lrh.nii.gz') 
         mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '.nii.gz') #separate L and R
         
         #resample mask to match epi
-        imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
-        maskROI = nib.load(mask_path)
-        maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
-                                    target_shape=imgs.shape[:3], interpolation='nearest')
-        fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
+        if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+            imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
+            maskROI = nib.load(mask_path)
+            maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
+                                        target_shape=imgs.shape[:3], interpolation='nearest')
+            fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
+        else:
+            fmri_masked = dat
             
-        # CHECK normalise mean and std using nilearn - how this does it exactly
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
@@ -245,7 +256,7 @@ for iSub in range(1,nSubs+1):
         elif decodeFeature == "subjCat-all":
             condsTmp=list(subjCatAconds)+list(subjCatBconds)
             conds2comp = getConds2comp(decodeFeature,condsTmp)
-        elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
+        elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor")|(decodeFeature=="feedstim"):
             conds2comp = np.empty((1)) #len of 1 placeholder
         elif decodeFeature == "dir-all":
             oppDirs = np.array(([subjCatAconds, abs((subjCatAconds-180) % 360)]))
@@ -261,15 +272,16 @@ for iSub in range(1,nSubs+1):
             cv   = LeaveOneGroupOut()
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
-            if distMeth == 'svm':
-                clf   = LinearSVC(C=.1)
-            elif distMeth == 'lda':
-                clf = LinearDiscriminantAnalysis()
-                clf.fit(fmri_masked_cleaned, y) 
-            cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
-            print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
-            print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
-            y_indexed = y #for computing chance
+            if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+                if distMeth == 'svm':
+                    clf   = LinearSVC(C=.1)
+                elif distMeth == 'lda':
+                    clf = LinearDiscriminantAnalysis()
+                    clf.fit(fmri_masked_cleaned, y) 
+                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
+                print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
+                print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
+                y_indexed = y #for computing chance
         else: #all condition-wise comparisons
             cvAccTmp = np.empty(len(conds2comp))
             for iPair in range(0,len(conds2comp)):
@@ -281,8 +293,12 @@ for iSub in range(1,nSubs+1):
                     ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
                 elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
                     condInd = np.append(np.where(dfCond['key']==1),np.where(dfCond['key']==6))
-                    ytmp[np.where(dfCond['key']==1)]=0 # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
-                    ytmp[np.where(dfCond['key']==6)]=1  
+                    ytmp[np.where(dfCond['key']==1)] = 0 # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
+                    ytmp[np.where(dfCond['key']==6)] = 1
+                elif decodeFeature == 'feedstim':
+                    condInd = np.append(np.where(dfCond['category']==0),np.where(dfCond['category']==1))
+                    ytmp[np.where(dfCond['category']==0)] = 0 # edit ytmp (direction conds) to what you want to test
+                    ytmp[np.where(dfCond['category']==1)] = 1
                 else:
                     condInd=np.empty(0,dtype=int) 
                     if np.size(conds2comp[iPair][0])>2: #need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
@@ -301,17 +317,18 @@ for iSub in range(1,nSubs+1):
                 cv    = LeaveOneGroupOut()
                 cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                 cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
-                if distMeth == 'svm':
-                    clf   = LinearSVC(C=.1)
-                    cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                elif distMeth == 'lda':
-                    clf = LinearDiscriminantAnalysis()
-                    clf.fit(fmri_masked_cleaned, y) 
-                    cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                elif distMeth in {'crossEuclid','crossNobis'}:
-                    cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
-                elif distMeth == 'mNobis':
-                    cvAccTmp[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)
+                if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+                    if distMeth == 'svm':
+                        clf   = LinearSVC(C=.1)
+                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                    elif distMeth == 'lda':
+                        clf = LinearDiscriminantAnalysis()
+                        clf.fit(fmri_masked_cleaned, y) 
+                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                    elif distMeth in {'crossEuclid','crossNobis'}:
+                        cvAccTmp[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                    elif distMeth == 'mNobis':
+                        cvAccTmp[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)
 
             if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-orth-motor")|(decodeFeature=="subjCat-minus-motor"):                
                 catA90 = conds2comp[0][0]+90
@@ -343,17 +360,18 @@ for iSub in range(1,nSubs+1):
                     cv    = LeaveOneGroupOut()
                     cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                     cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
-                    if distMeth == 'svm':
-                        clf   = LinearSVC(C=.1)
-                        cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                    elif distMeth == 'lda':
-                        clf = LinearDiscriminantAnalysis()
-                        clf.fit(fmri_masked_cleaned, y) 
-                        cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
-                    elif distMeth in {'crossEuclid','crossNobis'}:
-                        cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
-                    elif distMeth == 'mNobis':
-                        cvAccTmp90[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)                    
+                    if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+                        if distMeth == 'svm':
+                            clf   = LinearSVC(C=.1)
+                            cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                        elif distMeth == 'lda':
+                            clf = LinearDiscriminantAnalysis()
+                            clf.fit(fmri_masked_cleaned, y) 
+                            cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                        elif distMeth in {'crossEuclid','crossNobis'}:
+                            cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                        elif distMeth == 'mNobis':
+                            cvAccTmp90[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)                    
                 cvAccTmp = cvAccTmp-cvAccTmp90
         
         if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): 
@@ -361,8 +379,9 @@ for iSub in range(1,nSubs+1):
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
         else:
             cvAcc = cvAccTmp #save all pairs
-        dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
-            
+        if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+            dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
+        
     if decodeFeature=="subjCat-all": #add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 #compute t-test, append to df
@@ -373,7 +392,7 @@ else:
 
 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
-        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs],chance) #compute t-test, append to df
+        dfDecode[roi].iloc[-1]=stats.ttest_1samp(df[roi].iloc[0:nSubs].astype(float), chance, nan_policy='omit') #compute t-test, append to df
 
 fnameSave = os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
                                       distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -384,12 +403,15 @@ if lock2resp:
 if bilateralRois:
     fnameSave = fnameSave + '_bilateral'
 
-# if re-running / adding, load in first, append new dat to df, then save
-if reRun == True:
-    dfTmp=pd.read_pickle(fnameSave + '.pkl')
-    for roi in rois:
-        dfTmp[roi]=dfDecode[roi]
-    dfDecode=dfTmp
+if decodeFromFeedback:
+    fnameSave = fnameSave + '_fromfeedback'
 
-#save df
+# if re-running / adding, load in first, append new dat to df, then save
+if reRun is True:
+    dfTmp = pd.read_pickle(fnameSave + '.pkl')
+    for roi in rois:
+        dfTmp[roi] = dfDecode[roi]
+    dfDecode = dfTmp
+
+# save df
 dfDecode.to_pickle(fnameSave + '.pkl')
