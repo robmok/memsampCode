@@ -392,7 +392,7 @@ else:
 
 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
-        dfDecode[roi].iloc[-1]=stats.ttest_1samp(df[roi].iloc[0:nSubs].astype(float), chance, nan_policy='omit') #compute t-test, append to df
+        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs].astype(float), chance, nan_policy='omit') #compute t-test, append to df
 
 fnameSave = os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
                                       distMeth + '_' + normMeth + '_'  + trainSetMeth + 
