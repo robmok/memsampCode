@@ -156,35 +156,36 @@ for iSub in subs:
         conds=trials["category"].sort_values().unique() #gets direction conditions
         for iCond in conds:
             tmp=trials.loc[(trials['trial_type'] == 'feedback') & (trials['category'] == iCond)]
-            feedtiming=tmp[['onset','duration','category']]
+            feedtiming=tmp[['onset','duration']]
+            feedtiming.insert(2, 'value', 1) #stim value
             fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFile))[0] + "_" + str(int(iCond)) + "feed_stim_block.txt")
             #save
-            feedtiming1=feedtiming.iloc[0:len(cuetiming)-1]
-            feedtiming2=feedtiming.iloc[len(cuetiming)-1]
+            feedtiming1=feedtiming.iloc[0:len(feedtiming)-1]
+            feedtiming2=feedtiming.iloc[len(feedtiming)-1]
             #fix single line format
             feedtiming2=feedtiming2.reset_index() #for 1 trial, saves as 1 column; here, reset
             feedtiming2=pd.pivot_table(feedtiming2, columns=feedtiming2['index']) #use index from the resetted index above
-            feedtiming2 = feedtiming2[['onset','duration','category']]
+            feedtiming2 = feedtiming2[['onset','duration','value']]
             #save
             if saveFeatTiming:
                 feedtiming1.to_csv(fname1,sep='\t', header=False, index=False, float_format='%0.2f')
                 feedtiming2.to_csv(fname1,sep='\t', header=False, index=False, mode='a', line_terminator="", float_format='%0.2f')
         
-            # trial-wise estimation of betas
-            trlCnt=1
-            for iTrl in range(0,len(cuetiming)): #number of trials in each condition
-                # feedback - based on feedback stimulus
-                feedtimingTrl=feedtiming.iloc[iTrl]
-                feedtimingTrl=feedtimingTrl.reset_index() #for 1 trial, saves as 1 column; here, reset
-                feedtimingTrl=pd.pivot_table(feedtimingTrl, columns=feedtimingTrl['index']) #use index from the resetted index above
-                feedtimingTrl = feedtimingTrl[['onset','duration','category']]
-                fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFile))[0] + "_" + str(int(iCond)) + "feed_stim_trial" + str(trlCnt) + ".txt")
-                
-                if saveFeatTiming:
-                    #feedtimingTrl.to_csv(fname1,sep='\t', header=False, index=False)
-                    feedtimingTrl.to_csv(fname1,sep='\t', header=False, index=False, line_terminator="", float_format='%0.2f')
-                
-                trlCnt=trlCnt+1
+#            # trial-wise estimation of betas - don't really need this since can order trialwise from above?
+#            trlCnt=1
+#            for iTrl in range(0,len(cuetiming)): #number of trials in each condition
+#                # feedback - based on feedback stimulus
+#                feedtimingTrl=feedtiming.iloc[iTrl]
+#                feedtimingTrl=feedtimingTrl.reset_index() #for 1 trial, saves as 1 column; here, reset
+#                feedtimingTrl=pd.pivot_table(feedtimingTrl, columns=feedtimingTrl['index']) #use index from the resetted index above
+#                feedtimingTrl = feedtimingTrl[['onset','duration','value']]
+#                fname1=os.path.join(featDir,os.path.splitext(os.path.basename(iFile))[0] + "_" + str(int(iCond)) + "feed_stim_trial" + str(trlCnt) + ".txt")
+#                
+#                if saveFeatTiming:
+#                    #feedtimingTrl.to_csv(fname1,sep='\t', header=False, index=False)
+#                    feedtimingTrl.to_csv(fname1,sep='\t', header=False, index=False, line_terminator="", float_format='%0.2f')
+#                
+#                trlCnt=trlCnt+1
 
 #    #Localisers
 #    #motion loc

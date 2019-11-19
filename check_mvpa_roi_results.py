@@ -40,6 +40,9 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #bilateral
 #fname = fname + '_bilateral'
 
+#decoding at feedback time
+fname = fname + '_fromfeedback'
+
 
 df=pd.read_pickle(fname + '.pkl')
 print(df.loc['stats'])
@@ -90,7 +93,7 @@ multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnso
 
 
 # recomputing tstat and pvals and savings to df
-#chance=0
+#chance=0.5
 #indSubs=np.ones(33,dtype=bool)
 #for roi in list(df):
 #    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')

@@ -8,7 +8,7 @@ Created on Mon Feb 25 22:48:06 2019
 import sys
 import os
 import numpy as np
-from nilearn import image as nli # Import image processing tool
+from nilearn import image as nli  # Import image processing tool
 import pandas as pd
 import nibabel as nib
 from nilearn.masking import apply_mask 
@@ -18,8 +18,8 @@ from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import scipy.stats as stats
 
-mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
+#mainDir = '/home/robmok/Documents/memsamp_fMRI' #love01
 
 sys.path.append(mainDir)
 
@@ -33,13 +33,13 @@ from memsamp_RM import crossEuclid, mNobis, compCovMat, getConds2comp
 #set to true if rerunning only a few rois, appending it to old df
 reRun = False
 
-imDat = 'cope' # cope or tstat images
-normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
-distMeth = 'svm' # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
-trainSetMeth = 'trials' # 'trials' or 'block' - only tirals in this script
-fwhm = None # optional smoothing param - 1, or None
+imDat = 'cope'  # cope or tstat images
+normMeth = 'noNorm'  # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
+distMeth = 'svm'  # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
+trainSetMeth = 'trials'  # 'trials' or 'block' - only tirals in this script
+fwhm = None  # optional smoothing param - 1, or None
 
-lock2resp = False # if loading in lock2resp glms (to get motor effect)
+lock2resp = False  # if loading in lock2resp glms (to get motor effect)
 
 # stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
@@ -68,8 +68,8 @@ if bilateralRois:
 #reRunROIs
 #rois = ['FFA_lrh', 'PPA_lrh', 'evc_lrh'] #functional localisers
 
-dfDecode = pd.DataFrame(columns=rois, index=range(0,nSubs+1))
-dfDecode.rename(index={nSubs:'stats'}, inplace=True)
+dfDecode = pd.DataFrame(columns=rois, index=range(0, nSubs+1))
+dfDecode.rename(index={nSubs: 'stats'}, inplace=True)
 if decodeFeature == "subjCat-all":
     dfDecode['subjCat'] = ""
 
@@ -77,36 +77,36 @@ if decodeFeature == "subjCat-all":
 # load in trial log and append image paths
 # =============================================================================
 
-for iSub in range(1,nSubs+1):
-    subNum=f'{iSub:02d}'
-    dfCond=pd.DataFrame() #main df with all runs
-    if iSub in {9,12,16,26}:
-        runs = range(1,5) #4 runs
+for iSub in range(1, nSubs+1):
+    subNum = f'{iSub:02d}'
+    dfCond = pd.DataFrame()  # main df with all runs
+    if iSub in {9, 12, 16, 26}:
+        runs = range(1, 5)  # 4 runs
     else:
-        runs = range(1,4) #3 runs
+        runs = range(1, 4)  # 3 runs
     for iRun in runs:
-        condPath=os.path.join(mainDir, 'orig_events','sub-' + subNum + 
+        condPath = os.path.join(mainDir, 'orig_events','sub-' + subNum +
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
         
         # df to load in and organise run-wise data
         df = pd.read_csv(condPath, sep='\t')
-        df['run'] = pd.Series(np.ones((len(df)))*iRun,index=df.index) #add run number
+        df['run'] = pd.Series(np.ones((len(df)))*iRun, index=df.index)  # add run number
         #df.loc[:,'run2']=pd.Series(np.ones((len(df)))*iRun,index=df.index) #alt way - better/worse?
-        
-        # add path to match cue condition and trial number - cope1:7 is dir0 trial1:7   
-        conds=df.direction.unique()
+
+        # add path to match cue cond and trial num - cope1:7 is dir0 trial1:7
+        conds = df.direction.unique()
         conds.sort()
         #sort - arrange df so it matches cope1:84 image structure
-        df2=pd.DataFrame() 
+        df2 = pd.DataFrame()
         for iCond in conds:
             df2 = df2.append(df[df['direction']==iCond])
-        
-        copeNum=1 #counter
-        imPath=[]
+
+        copeNum = 1  # counter
+        imPath = []
         for iCond in conds:
-            for iTrial in range(1,8): #calculate cope number
-                #make a list and append to it
-                if decodeFromFeedback: # get feedback activity
+            for iTrial in range(1, 8):  # calculate cope number
+                # make a list and append to it
+                if decodeFromFeedback:  # get feedback activity
                     imPath.append(os.path.join(
                             featDir, 'sub-' + subNum + '_run-0' + str(iRun)
                             + '_trial_feedback_T1_fwhm0.feat', 'stats', imDat
@@ -115,8 +115,8 @@ for iSub in range(1,nSubs+1):
                     if lock2resp:  # lock2resp glm - to get motor effects
                         imPath.append(os.path.join(
                                 featDir, 'sub-' + subNum + '_run-0' + str(iRun)
-                                + '_trial_T1_lock2resp_fwhm0.feat', 'stats', imDat
-                                + (str(copeNum)) + '.nii.gz'))
+                                + '_trial_T1_lock2resp_fwhm0.feat', 'stats',
+                                imDat + (str(copeNum)) + '.nii.gz'))
                     else:
                         imPath.append(os.path.join(
                                 featDir, 'sub-' + subNum + '_run-0' + str(iRun)
@@ -126,28 +126,28 @@ for iSub in range(1,nSubs+1):
         df2['imPath'] = pd.Series(imPath, index=df2.index)
         dfCond = dfCond.append(df2)  # append to main df
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
-    
-    # only select 2 out of 3/4 runs that share the same motor response (no counterbalancing)
+
+    # only get 2 out of 3/4 runs that share same response (no counterbalance)
     if (decodeFeature=='subjCat-motor')|(decodeFeature=='subjCat-orth-motor'):
         if sum(dfCond['keymap']==0)>sum(dfCond['keymap']==1):
             dfCond=dfCond[dfCond['keymap']==0]
         elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
             dfCond=dfCond[dfCond['keymap']==1]
-        else: #if 4 runs, just select one set
+        else:  # if 4 runs, just select one set
             dfCond=dfCond[dfCond['keymap']==1]
-                
-    if lock2resp: #remove trials without responses
+         
+    if lock2resp:  # remove trials without responses
         indResp = np.where(~np.isnan(dfCond['rt']))
-        dfCond=dfCond.iloc[indResp[0]]
-            
-    #get objective category
-    catAconds=np.array((range(120,271,30))) 
-    catBconds=np.append(np.array((range(0,91,30))),[300,330])
+        dfCond = dfCond.iloc[indResp[0]]
+
+    # get objective category
+    catAconds = np.array((range(120, 271, 30)))
+    catBconds = np.append(np.array((range(0, 91, 30))), [300, 330])
 
     if decodeFeature == 'subjCat-minus-motor':
         dfCondResp = dfCond['key']
 
-    #get subjective category based on responses
+    # get subjective category based on responses
     if (decodeFeature[0:7]=='subjCat')|(decodeFeature=='dir-all'):
         #flip responses for runs - need double check if keymap is what i think it is. looks ok
         ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
@@ -164,42 +164,44 @@ for iSub in range(1,nSubs+1):
             respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
         subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
         subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-        #unless:   
-        if iSub==5: #move 240 and 270 to catA
+        # unless:   
+        if iSub == 5:  # move 240 and 270 to catA
             subjCatAconds = np.append(subjCatAconds,[240,270])
             subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-        elif iSub==10: #move 270 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds,270))
+        elif iSub == 10:  # move 270 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
             subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-        elif iSub == 17:#move 30 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds,30))
+        elif iSub == 17:  # move 30 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
             subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-        elif iSub==24: #move 120 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds,120))
+        elif iSub == 24:  # move 120 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
             subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-        elif iSub==27:#move 270 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds,270))
+        elif iSub == 27:  # move 270 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
             subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
-    
+
     # =============================================================================
     # set up brain data
     # =============================================================================
 
-    dat = dfCond['imPath'].values  #img paths - keeping same variables as searchlight
-    y   = dfCond['direction'].values  #conditions / stimulus
-    groups  = dfCond['run'].values  # info about the sessions   
-    
+    dat = dfCond['imPath'].values  # img paths - keeping same variables as sl
+    y = dfCond['direction'].values  # conditions / stimulus
+    groups = dfCond['run'].values  # info about the sessions
+
     for roi in rois:
-        #define ROI  mask
-        mask_path = os.path.join(roiDir, 'sub-' + subNum + '_' + roi + '.nii.gz') #separate L and R
-        
-        #resample mask to match epi
+        # define ROI  mask
+        mask_path = os.path.join(
+                roiDir, 'sub-' + subNum + '_' + roi + '.nii.gz')
+
+        # resample mask to match epi
         if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
-            imgs = nib.load(dat[0]) #load in one im to dawnsample mask to match epi
+            imgs = nib.load(dat[0])  # load 1 im to downsample to match epi
             maskROI = nib.load(mask_path)
-            maskROI = nli.resample_img(maskROI, target_affine=imgs.affine, 
-                                        target_shape=imgs.shape[:3], interpolation='nearest')
-            fmri_masked = apply_mask(dat,maskROI,smoothing_fwhm=fwhm)  #optional fwhm param
+            maskROI = nli.resample_img(
+                    maskROI, target_affine=imgs.affine,
+                    target_shape=imgs.shape[:3], interpolation='nearest')
+            fmri_masked = apply_mask(dat, maskROI, smoothing_fwhm=fwhm)
         else:
             fmri_masked = dat
             
@@ -220,8 +222,8 @@ for iSub in range(1,nSubs+1):
         elif normMeth == 'noNorm':
             fmri_masked_cleaned = fmri_masked                    
 
-        if distMeth in {'crossNobis','mNobis'}: #get variance to compute covar matrix below
-            # compute each run's covariance matrix here, then apply it to fmri_masked_cleaned, then euclid below
+        if distMeth in {'crossNobis','mNobis'}:  # get variance to compute covar matrix below
+            # compute each run's cov mat here, then apply it to fmri_masked_cleaned, then euclid below
             covMat = np.empty((np.size(fmri_masked_cleaned,axis=1),np.size(fmri_masked_cleaned,axis=1),len(runs))) #nVox x nVox
             for iRun1 in runs: #append to list, since var sometimes has more/less timepoints in each run
                 varPath = os.path.join(featDir, 'sub-' + subNum + '_run-0' + str(iRun1) +'_trial_T1_fwhm0.feat', 'stats', 'res4d.nii.gz')
@@ -232,16 +234,19 @@ for iSub in range(1,nSubs+1):
                     trlInd = np.where(groups==iRun1)
                     trlInd = trlInd[0]
                     for iTrl in trlInd:
-                        fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat[:,:,iRun1-1])
-            else: #average covMat over runs
-                for iTrl in range(0,len(fmri_masked_cleaned)):
-                    fmri_masked_cleaned[iTrl,] = np.dot(fmri_masked_cleaned[iTrl,],covMat.mean(axis=2))
-            
+                        fmri_masked_cleaned[iTrl, ] = np.dot(
+                                fmri_masked_cleaned[iTrl, ],
+                                covMat[:, :, iRun1-1])
+            else:  # average covMat over runs
+                for iTrl in range(0, len(fmri_masked_cleaned)):
+                    fmri_masked_cleaned[iTrl, ] = np.dot(
+                            fmri_masked_cleaned[iTrl, ], covMat.mean(axis=2))
+
     # =============================================================================
     #     #set up splits and run cv
     # ============================================================================
     
-        #set up the conditions you want to classify. if 12-way, no need
+        # set up the conditions you want to classify. if 12-way, no need
         if (decodeFeature=="objCat")|(decodeFeature=="objCat-orth"):
             conds2comp = [[catAconds, catBconds]]   #put in conditions to compare, e.g. conditions=[catAconds, catBconds]      
         elif (decodeFeature=="subjCat")|(decodeFeature=="subjCat-orth")|(decodeFeature=="subjCat-motor")|(decodeFeature=="subjCat-orth-motor")|(decodeFeature=="subjCat-minus-motor"): #subjective catgory bound based on responses
@@ -263,10 +268,10 @@ for iSub in range(1,nSubs+1):
             conds2comp = []
             for iDirPairs in range(0,np.size(oppDirs,1)):
                 conds2comp.append(oppDirs[:,iDirPairs])
-        else: #stimulus decoding
+        else:  # stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         
-        #run cv
+        # run cv
         if decodeFeature == "12-way": # no need conds2comp, just compare all
             iPair=0
             cv   = LeaveOneGroupOut()
@@ -278,11 +283,11 @@ for iSub in range(1,nSubs+1):
                 elif distMeth == 'lda':
                     clf = LinearDiscriminantAnalysis()
                     clf.fit(fmri_masked_cleaned, y) 
-                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean() # mean over crossval folds
+                cvAccTmp = cross_val_score(clf,fmri_masked_cleaned,y=y,scoring='accuracy',cv=cv).mean()  # mean over crossval folds
                 print('ROI: %s, Sub-%s cvAcc = %0.3f' % (roi, subNum, (cvAccTmp*100)))
                 print('ROI: %s, Sub-%s cvAcc-chance = %0.3f' % (roi, subNum, (cvAccTmp-(1/len(np.unique(y))))*100))
-                y_indexed = y #for computing chance
-        else: #all condition-wise comparisons
+                y_indexed = y  # for computing chance
+        else:   # all condition-wise comparisons
             cvAccTmp = np.empty(len(conds2comp))
             for iPair in range(0,len(conds2comp)):
                 ytmp=y.copy()
@@ -290,25 +295,25 @@ for iSub in range(1,nSubs+1):
                     condInd=np.where(y==conds2comp[iPair][0])
                     for iVal in conds2comp[iPair][1]:
                         condInd=np.append(condInd, np.where(y==iVal))
-                    ytmp[y!=conds2comp[iPair][0]] = 1 #change the 'other' conditions to 1, comparing to the main value
+                    ytmp[y!=conds2comp[iPair][0]] = 1  # change the 'other' conditions to 1, comparing to the main value
                 elif (decodeFeature=="subjCat-resp")|(decodeFeature=="motor"):
-                    condInd = np.append(np.where(dfCond['key']==1),np.where(dfCond['key']==6))
-                    ytmp[np.where(dfCond['key']==1)] = 0 # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
+                    condInd = np.append(np.where(dfCond['key']==1), np.where(dfCond['key']==6))
+                    ytmp[np.where(dfCond['key']==1)] = 0  # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
                     ytmp[np.where(dfCond['key']==6)] = 1
                 elif decodeFeature == 'feedstim':
-                    condInd = np.append(np.where(dfCond['category']==0),np.where(dfCond['category']==1))
-                    ytmp[np.where(dfCond['category']==0)] = 0 # edit ytmp (direction conds) to what you want to test
+                    condInd = np.append(np.where(dfCond['category']==0), np.where(dfCond['category']==1))
+                    ytmp[np.where(dfCond['category']==0)] = 0  # edit ytmp (direction conds) to what you want to test
                     ytmp[np.where(dfCond['category']==1)] = 1
                 else:
                     condInd=np.empty(0,dtype=int) 
-                    if np.size(conds2comp[iPair][0])>2: #need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
+                    if np.size(conds2comp[iPair][0])>2:  # need to loop through if more stim within one category to decode (no need if ori/dir since pairwise)
                         for iVal in conds2comp[iPair][0]:
-                            ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
+                            ytmp[np.where(y==iVal)]=0  # change cat A to 0 and cat B to 1
                             condInd=np.append(condInd, np.where(y==iVal)) # index all conds
                         for iVal in conds2comp[iPair][1]:
                             ytmp[np.where(y==iVal)]=1
                             condInd=np.append(condInd, np.where(y==iVal)) 
-                    else: #ori, dir
+                    else:  # ori, dir
                         condInd=np.append(np.where(y==conds2comp[iPair][0]), np.where(y==conds2comp[iPair][1])) 
 
                 fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
@@ -341,14 +346,14 @@ for iSub in range(1,nSubs+1):
                     ytmp=y.copy()
                     if decodeFeature=="motor":
                         condInd = np.append(np.where(dfCondResp['key']==1),np.where(dfCondResp['key']==6)) #dfCond edited to dfCondResp since in subjCat-minus-motor dfCond, 'key' is flipped
-                        ytmp[np.where(dfCond['key']==1)]=0 # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
+                        ytmp[np.where(dfCond['key']==1)]=0  # if subjCat-resp, motor resps flipped across blocks so changed stim directions to responses (changed above if decodeFeature[0:7]=="subjCat")
                         ytmp[np.where(dfCond['key']==6)]=1  
-                        cvAccTmp90 = np.empty((1)) #just keep this naming
+                        cvAccTmp90 = np.empty((1))  # just keep this naming
                     else:
-                        condInd=np.empty(0,dtype=int) 
+                        condInd = np.empty(0 ,dtype=int) 
                         for iVal in conds2comp[iPair][0]:
-                            ytmp[np.where(y==iVal)]=0 #change cat A to 0 and cat B to 1
-                            condInd=np.append(condInd, np.where(y==iVal)) # index all conds
+                            ytmp[np.where(y==iVal)]=0  # change cat A to 0 and cat B to 1
+                            condInd=np.append(condInd, np.where(y==iVal))  # index all conds
                         for iVal in conds2comp[iPair][1]:
                             ytmp[np.where(y==iVal)]=1
                             condInd=np.append(condInd, np.where(y==iVal)) 
@@ -356,7 +361,7 @@ for iSub in range(1,nSubs+1):
                     fmri_masked_cleaned_indexed= fmri_masked_cleaned[condInd,]
                     y_indexed = ytmp[condInd]
                     groups_indexed = groups[condInd]
-            
+
                     cv    = LeaveOneGroupOut()
                     cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                     cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
@@ -369,32 +374,32 @@ for iSub in range(1,nSubs+1):
                             clf.fit(fmri_masked_cleaned, y) 
                             cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
                         elif distMeth in {'crossEuclid','crossNobis'}:
-                            cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean() # mean over crossval folds
+                            cvAccTmp90[iPair] = crossEuclid(fmri_masked_cleaned_indexed,y_indexed,cv).mean()  # mean over crossval folds
                         elif distMeth == 'mNobis':
                             cvAccTmp90[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)                    
                 cvAccTmp = cvAccTmp-cvAccTmp90
         
         if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): 
-            cvAcc = cvAccTmp.mean() #mean over pairs
+            cvAcc = cvAccTmp.mean()  # mean over pairs
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
         else:
-            cvAcc = cvAccTmp #save all pairs
+            cvAcc = cvAccTmp  # save all pairs
         if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
             dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
         
-    if decodeFeature=="subjCat-all": #add subjCat info to df
+    if decodeFeature=="subjCat-all":  # add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
-#compute t-test, append to df
+# compute t-test, append to df
 if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")&(decodeFeature!="subjCat-orth-motor")&(decodeFeature!="subjCat-minus-motor")):
     chance = 1/len(np.unique(y_indexed))
 else: 
-    chance = 0 #for crossvalidated distances or subtractions (e.g. subjCat-orth)
+    chance = 0  # for crossvalidated distances or subtractions (e.g. subjCat-orth)
 
 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
         dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs].astype(float), chance, nan_policy='omit') #compute t-test, append to df
 
-fnameSave = os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature + 'Decoding_' +
+fnameSave = os.path.join(mainDir, 'mvpa_roi', 'roi_' + decodeFeature +'Decoding_' +
                                       distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                       '_fwhm' + str(fwhm) + '_' + imDat)
 if lock2resp:
