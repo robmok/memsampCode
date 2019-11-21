@@ -38,7 +38,7 @@ while read subject; do
   # scp ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/standard.nii.gz
   # scp ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/standard.nii.gz
 
-  # feeback
+  # feedback
   for iRun in {1..3}; do
     # 1.replace transformation mat to identity matrix
     rm -r ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg_standard

@@ -66,7 +66,7 @@ if bilateralRois:
 
 
 #reRunROIs
-#rois = ['FFA_lrh', 'PPA_lrh', 'evc_lrh'] #functional localisers
+#rois = ['FFA_lrh_sm', 'PPA_lrh_sm'] #functional localisers
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0, nSubs+1))
 dfDecode.rename(index={nSubs: 'stats'}, inplace=True)
@@ -164,22 +164,22 @@ for iSub in range(1, nSubs+1):
             respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
         subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
         subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-        # unless:   
-        if iSub == 5:  # move 240 and 270 to catA
-            subjCatAconds = np.append(subjCatAconds,[240,270])
-            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-        elif iSub == 10:  # move 270 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
-            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-        elif iSub == 17:  # move 30 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
-            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-        elif iSub == 24:  # move 120 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
-            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-        elif iSub == 27:  # move 270 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
-            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+#        # unless:   
+#        if iSub == 5:  # move 240 and 270 to catA
+#            subjCatAconds = np.append(subjCatAconds,[240,270])
+#            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+#        elif iSub == 10:  # move 270 to cat B
+#            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
+#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+#        elif iSub == 17:  # move 30 to cat B
+#            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
+#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+#        elif iSub == 24:  # move 120 to cat A
+#            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
+#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+#        elif iSub == 27:  # move 270 to cat A
+#            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
+#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
 
     # =============================================================================
     # set up brain data
@@ -195,7 +195,7 @@ for iSub in range(1, nSubs+1):
                 roiDir, 'sub-' + subNum + '_' + roi + '.nii.gz')
 
         # resample mask to match epi
-        if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+        if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
             imgs = nib.load(dat[0])  # load 1 im to downsample to match epi
             maskROI = nib.load(mask_path)
             maskROI = nli.resample_img(
@@ -277,7 +277,7 @@ for iSub in range(1, nSubs+1):
             cv   = LeaveOneGroupOut()
             cv.get_n_splits(fmri_masked_cleaned, y, groups)
             cv   = cv.split(fmri_masked_cleaned,y,groups)   
-            if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+            if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
                 if distMeth == 'svm':
                     clf   = LinearSVC(C=.1)
                 elif distMeth == 'lda':
@@ -322,7 +322,7 @@ for iSub in range(1, nSubs+1):
                 cv    = LeaveOneGroupOut()
                 cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                 cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
-                if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+                if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
                     if distMeth == 'svm':
                         clf   = LinearSVC(C=.1)
                         cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
@@ -365,7 +365,7 @@ for iSub in range(1, nSubs+1):
                     cv    = LeaveOneGroupOut()
                     cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
                     cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
-                    if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+                    if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
                         if distMeth == 'svm':
                             clf   = LinearSVC(C=.1)
                             cvAccTmp90[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
@@ -384,7 +384,7 @@ for iSub in range(1, nSubs+1):
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
         else:
             cvAcc = cvAccTmp  # save all pairs
-        if not (((roi == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
+        if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
             dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
         
     if decodeFeature=="subjCat-all":  # add subjCat info to df
