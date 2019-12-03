@@ -14,9 +14,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 #decode feedback stimulus - smmothed (larger) FFA/PPA rois
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'feedstim'":g \
-    -e s:"decodeFromFeedback = False":"decodeFromFeedback = True":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+    -e s:"lock2resp = False":"lock2resp = True":g \
         < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

@@ -22,7 +22,7 @@ os.chdir(bidsDir)
 moveEvFiles = False
 
 saveBids = False
-saveFeatTiming = True
+saveFeatTiming = False
 lock2resp = False  # for motor
 
 # %%

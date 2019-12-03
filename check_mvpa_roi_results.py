@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'objCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -40,8 +40,8 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #bilateral
 #fname = fname + '_bilateral'
 
-#decoding at feedback time
-fname = fname + '_fromfeedback'
+##decoding at feedback time
+#fname = fname + '_fromfeedback'
 
 
 df=pd.read_pickle(fname + '.pkl')
@@ -63,10 +63,10 @@ multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=Fals
 
 
 # no EVC and motor - after added ffa/ppa (and also evc, but drop later):
-ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
-#ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
+#ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
+ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
 print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
-multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+#multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
 
 #EVC, MT, and IPS - 6 ROIs
@@ -103,8 +103,8 @@ multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnso
 
 #%% exclude subs
 
-exclSubs = False
-exclParietalSubs = True
+exclSubs = True
+exclParietalSubs = False
 if exclSubs:
     nDirInCat=np.empty((2,33))
     for iSub in range(0,33):
@@ -126,23 +126,14 @@ else:
 newStats = pd.DataFrame(columns=list(df))
 chance = 0 #0, 0.5, 1/12
 for roi in list(df):
-    newStats[roi]=stats.ttest_1samp(df[roi].iloc[indSubs],chance)
+    newStats[roi] = stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
 print(newStats.T)
 
 
 pvals=newStats.iloc[1].values
-#print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
-#multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
-#print(fdr(pvals[0:len(pvals)-11]/2,alpha=0.05,method='indep',is_sorted=False))
-#print(multest(pvals[0:len(pvals)-11]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
+#subjCat-orth without unequal conds subs
+ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
+print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 
 
-#12-way (0:12 for visRois, 0:16 incl some IPS but note not same for all)
-#print(fdr(pvals[0:12]/2,alpha=0.05,method='indep',is_sorted=False))
-#print(multest(pvals[0:12]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))
-#ori
-
-#subjCat-orth/motor
-#print(fdr(pvals[4:14]/2,alpha=0.05,method='indep',is_sorted=False))
-#print(multest(pvals[4:14]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False))

@@ -129,6 +129,6 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/rois'
 
 for iSub in {1..33}; do
   sub=`printf "sub-%.2d" ${iSub}`
-  # fslmaths ${roiDir}/${sub}_FFA_lrh.nii.gz -s 0.5 -bin ${roiDir}/${sub}_FFA_lrh_sm.nii.gz
-  fslmaths ${roiDir}/${sub}_PPA_lrh.nii.gz -s 0.5 -bin ${roiDir}/${sub}_PPA_lrh_sm.nii.gz
+  fslmaths ${roiDir}/${sub}_FFA_lrh.nii.gz -s 0.25 -bin ${roiDir}/${sub}_FFA_lrh_sm.nii.gz
+  fslmaths ${roiDir}/${sub}_PPA_lrh.nii.gz -s 0.25 -bin ${roiDir}/${sub}_PPA_lrh_sm.nii.gz
 done

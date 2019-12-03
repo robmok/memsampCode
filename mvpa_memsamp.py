@@ -164,22 +164,22 @@ for iSub in range(1, nSubs+1):
             respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
         subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
         subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-#        # unless:   
-#        if iSub == 5:  # move 240 and 270 to catA
-#            subjCatAconds = np.append(subjCatAconds,[240,270])
-#            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-#        elif iSub == 10:  # move 270 to cat B
-#            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
-#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-#        elif iSub == 17:  # move 30 to cat B
-#            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
-#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-#        elif iSub == 24:  # move 120 to cat A
-#            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
-#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-#        elif iSub == 27:  # move 270 to cat A
-#            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
-#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+        # unless:   
+        if iSub == 5:  # move 240 and 270 to catA
+            subjCatAconds = np.append(subjCatAconds,[240,270])
+            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+        elif iSub == 10:  # move 270 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
+            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+        elif iSub == 17:  # move 30 to cat B
+            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
+            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+        elif iSub == 24:  # move 120 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
+            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+        elif iSub == 27:  # move 270 to cat A
+            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
+            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
 
     # =============================================================================
     # set up brain data

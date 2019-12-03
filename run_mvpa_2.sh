@@ -8,11 +8,10 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-# subjCat again without my subjective edits of the subjective categories
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat-orth'":g \
     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
+# sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat'":g \
+#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# python ${tmpScrDir}/mvpa_memsamp1.py
