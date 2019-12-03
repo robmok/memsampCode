@@ -61,13 +61,28 @@ dat = dat[~np.isnan(dat['key'])]
 
 
 # %% 
-starting_params = [15, 195, 1]  # bound 1, bound 2, and sigma (gaussian SD)
+params = [15, 195, 1]  # bound 1, bound 2, and sigma (gaussian SD)
 
 
 #deterimine which is the closest bound
 
-#dat['direction']-starting_params[0]
-#dat['direction']-starting_params[1]
+#dat['direction']-params[0]
+#dat['direction']-params[1]
+
+#x = np.linspace(norm.ppf(0.01),
+#                norm.ppf(0.99), 100)
+#rv = norm(1,2)
+#plt.plot(x, rv.pdf(x))
+
+
+def absangdiff(x, y):
+    import numpy as np
+    return abs(np.arctan2(np.sin(x-y), np.cos(x-y)))
+
+
+angdiff1 = absangdiff(np.radians(dat['direction'].values), params[0])
+angdiff2 = absangdiff(np.radians(dat['direction'].values), params[1])
+
 
 
 
@@ -80,15 +95,28 @@ starting_params = [15, 195, 1]  # bound 1, bound 2, and sigma (gaussian SD)
 # for each trial, check if it's on the right side of the boundary
 # then compute (1 - pr it's this far away, one-tailed); gaussian distribution with sigma
 
+# - for each bound point, associate it with cat A or cat B; if far, the pr's will still add up correctly (1-pr)
 
 
 
 
+# normal
+mu = 1
+sigma = 2
+x = np.linspace(norm.ppf(0.01, mu, sigma),
+                norm.ppf(0.99, mu, sigma), 100)
+rv = norm(mu,sigma)
+plt.plot(x, rv.pdf(x))
 
-
-
-
-
+# vonmises
+from scipy.stats import vonmises
+import math
+mu = math.radians(90)
+kappa = 3.99
+x = np.linspace(vonmises.ppf(0.01, kappa),
+                vonmises.ppf(0.99, kappa), 100)
+rv = vonmises(kappa, mu)
+plt.plot(x, rv.pdf(x), 'k-', lw=2, label='frozen pdf')
 
 
 
