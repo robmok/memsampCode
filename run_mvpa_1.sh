@@ -10,27 +10,11 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 # -e s:"reRun = False":"reRun = True":g \
 # -e s:"#rois":"rois":g \
 
-#love06
-#SPL1
-#crossNobis, subjCat, subjCat-orth, objCat, objCat-orth, ori, dir
-#mNobis - subjCat-orth, subjCat-all
+# -e s:"decodeFromFeedback = False":"decodeFromFeedback = True":g \
 
-# sed -e s:"reRun = False":"reRun = True":g \
-#     -e s:"#rois":"rois":g \
-#     -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-#     < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-# python ${tmpScrDir}/mvpa_memsamp1.py
+#decode feedback stimulus - smmothed (larger) FFA/PPA rois
 
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'objCat'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"distMeth = 'svm'":"distMeth = 'crossNobis'":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+    -e s:"lock2resp = False":"lock2resp = True":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

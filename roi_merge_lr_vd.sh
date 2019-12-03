@@ -20,6 +20,11 @@ while read subject; do
   #   # fslmaths ${roiDir}/${subject}_${iRoi}v_lrh.nii.gz -add ${roiDir}/${subject}_${iRoi}d_lrh.nii.gz -bin ${roiDir}/${subject}_${iRoi}vd_lrh.nii.gz #bilateral vd
   # done
 
+  #make bilateral mask (left + right)
+  for iRoi in 'hMT' 'V3a'; do
+    fslmaths ${roiDir}/${subject}_${iRoi}_lh.nii.gz -add ${roiDir}/${subject}_${iRoi}_rh.nii.gz -bin ${roiDir}/${subject}_${iRoi}_lrh.nii.gz
+  done
+
   # #make visual and IPS merged rois
   # #list the files to merge (txt is replaced over subs, not saved)
   # rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt ${roiDir}/ips_rois_lh.txt ${roiDir}/ips_rois_rh.txt
@@ -60,17 +65,17 @@ while read subject; do
 
 
   # #merge IPS1-2 and IPS3-5 (more similar properties (see Silver & Kasnter, 2009, TiCS))
-  fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_lh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS3-5_lh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_rh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS3-5_rh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS1-2_lh.nii.gz -add ${roiDir}/${subject}_IPS1-2_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_lrh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS3-5_lh.nii.gz -add ${roiDir}/${subject}_IPS3-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
-  #
-  # # also merge 1-5 in case (prob similar to MD ips roi)
-  fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_rh.nii.gz
-  fslmaths ${roiDir}/${subject}_IPS1-5_lh.nii.gz -add ${roiDir}/${subject}_IPS1-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS3-5_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS3-5_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1-2_lh.nii.gz -add ${roiDir}/${subject}_IPS1-2_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-2_lrh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS3-5_lh.nii.gz -add ${roiDir}/${subject}_IPS3-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
+  # #
+  # # # also merge 1-5 in case (prob similar to MD ips roi)
+  # fslmaths ${roiDir}/${subject}_IPS1_lh.nii.gz -add ${roiDir}/${subject}_IPS2_lh.nii.gz -add ${roiDir}/${subject}_IPS3_lh.nii.gz -add ${roiDir}/${subject}_IPS4_lh.nii.gz -add ${roiDir}/${subject}_IPS5_lh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1_rh.nii.gz -add ${roiDir}/${subject}_IPS2_rh.nii.gz -add ${roiDir}/${subject}_IPS3_rh.nii.gz -add ${roiDir}/${subject}_IPS4_rh.nii.gz -add ${roiDir}/${subject}_IPS5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_rh.nii.gz
+  # fslmaths ${roiDir}/${subject}_IPS1-5_lh.nii.gz -add ${roiDir}/${subject}_IPS1-5_rh.nii.gz -bin ${roiDir}/${subject}_IPS1-5_lrh.nii.gz
 
   # #MD regions
   # for iRoi in 'MDroi_ips' 'MDroi_pcg' 'MDroi_ifg' 'MDroi_area8c' 'MDroi_area9'; do
@@ -106,7 +111,6 @@ while read subject; do
   # roiList=`cat ${roiDir}/sl_rois.txt`
   # fslmaths ${roiList} -bin ${roiDir}/${subject}_allROIsSL.nii.gz
 
-
   # #make merged EVC rois
   # #list the files to merge (txt is replaced over subs, not saved)
   # rm ${roiDir}/visual_rois_lh.txt ${roiDir}/visual_rois_rh.txt
@@ -126,6 +130,7 @@ while read subject; do
   # fslmaths ${roiList} -bin ${roiDir}/${subject}_EVC_rh.nii.gz
   # fslmaths ${roiDir}/${subject}_EVC_lh.nii.gz -add ${roiDir}/${subject}_EVC_rh.nii.gz -bin ${roiDir}/${subject}_EVC_lrh.nii.gz
 
-
+  #motor lrh
+  # fslmaths ${roiDir}/${subject}_motor_lh.nii.gz -add ${roiDir}/${subject}_motor_rh.nii.gz -bin ${roiDir}/${subject}_motor_lrh.nii.gz
 
 done < ${fsfDir}/subject_list_full.txt

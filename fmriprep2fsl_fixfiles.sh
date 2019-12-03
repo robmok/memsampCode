@@ -8,33 +8,74 @@ fwhm=6 #6/8
 
 cd ${wd}
 while read subject; do
+  # for iRun in {1..3}; do
+  #   # 1.replace transformation mat to identity matrix
+  #   rm -r ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg_standard
+  #   rm ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/*.mat
+  #   scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/example_func2standard.mat
+  #   #2.replace mean_func.nii.gz reg/standard.nii.gz
+  #   scp ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/standard.nii.gz
+  # done #for iRun
+  # #extra runs
+  # if [ "$subject" = "sub-09" ] || [ "$subject" = "sub-12" ] || [ "$subject" = "sub-16" ] || [ "$subject" = "sub-26" ]; then
+  #     iRun=4
+  #     # 1.replace transformation mat to identity matrix
+  #     rm -r ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg_standard
+  #     rm ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/*.mat
+  #     scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/example_func2standard.mat
+  #     #2.replace mean_func.nii.gz reg/standard.nii.gz
+  #     scp ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/standard.nii.gz
+  # fi #if ["subject" == "sub-09"]...
+
+  # # 1.replace transformation mat to identity matrix
+  # #localisers
+  # rm ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/*.mat
+  # scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/example_func2standard.mat
+  # rm ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/*.mat
+  # scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/example_func2standard.mat
+  #
+  # #2.replace mean_func.nii.gz reg/standard.nii.gz
+  # scp ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/standard.nii.gz
+  # scp ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/standard.nii.gz
+
+  # feedback
   for iRun in {1..3}; do
     # 1.replace transformation mat to identity matrix
-    rm -r ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg_standard
-    rm ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/*.mat
-    scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/example_func2standard.mat
+    rm -r ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg_standard
+    rm ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg/*.mat
+    scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg/example_func2standard.mat
     #2.replace mean_func.nii.gz reg/standard.nii.gz
-    scp ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/standard.nii.gz
+    scp ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg/standard.nii.gz
   done #for iRun
   #extra runs
   if [ "$subject" = "sub-09" ] || [ "$subject" = "sub-12" ] || [ "$subject" = "sub-16" ] || [ "$subject" = "sub-26" ]; then
       iRun=4
       # 1.replace transformation mat to identity matrix
-      rm -r ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg_standard
-      rm ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/*.mat
-      scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/example_func2standard.mat
+      rm -r ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg_standard
+      rm ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg/*.mat
+      scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg/example_func2standard.mat
       #2.replace mean_func.nii.gz reg/standard.nii.gz
-      scp ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_fwhm${fwhm}.feat/reg/standard.nii.gz
-
+      scp ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_feed_fwhm${fwhm}.feat/reg/standard.nii.gz
   fi #if ["subject" == "sub-09"]...
-  # 1.replace transformation mat to identity matrix
-  #localisers
-  rm ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/*.mat
-  scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/example_func2standard.mat
-  rm ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/*.mat
-  scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/example_func2standard.mat
 
-  #2.replace mean_func.nii.gz reg/standard.nii.gz
-  scp ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_exemplarLocaliser_fwhm${fwhm}.feat/reg/standard.nii.gz
-  scp ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_motionLocaliser_fwhm${fwhm}.feat/reg/standard.nii.gz
-done < ${fsfDir}/subject_list.txt #while read subject; do
+done < ${fsfDir}/subject_list_full.txt #while read subject; do
+
+
+# # lock2resp
+# cd ${wd}
+# while read subject; do
+#   for iRun in {1..3}; do
+#     rm -r ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg_standard
+#     rm ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg/*.mat
+#     scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg/example_func2standard.mat
+#     scp ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg/standard.nii.gz
+#   done #for iRun
+#   #extra runs
+#   if [ "$subject" = "sub-09" ] || [ "$subject" = "sub-12" ] || [ "$subject" = "sub-16" ] || [ "$subject" = "sub-26" ]; then
+#       iRun=4
+#       rm -r ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg_standard
+#       rm ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg/*.mat
+#       scp ${FSLDIR}/etc/flirtsch/ident.mat ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg/example_func2standard.mat
+#       scp ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/mean_func.nii.gz ${featDir}/${subject}_run-0${iRun}_block_lock2resp_fwhm${fwhm}.feat/reg/standard.nii.gz
+#   fi #if ["subject" == "sub-09"]...
+# done < ${fsfDir}/subject_list_full.txt #while read subject; do

@@ -99,8 +99,8 @@ done # for iDir
 
 #rm ${bidsDir}/myhdr.txt ${bidsDir}/myhdr2.txt
 #subject counter
-let subCounter=subCounter+1
-done < ${wd}/subNames.txt #while read
+# let subCounter=subCounter+1
+# done < ${wd}/subNames.txt #while read
 
-#edit TR info from 0.07 to 2.8
-python ${codeDir}/edit_epi_hdr_TR.py
+# edit TR info from 0.07 to 2.8
+# python ${codeDir}/edit_epi_hdr_TR.py

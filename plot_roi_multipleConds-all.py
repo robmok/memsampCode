@@ -9,6 +9,7 @@ Plotting '-all' conditions: 12-way-all, subjCat-all, dir-all
 """
 
 import os
+import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -29,6 +30,7 @@ roiDir=os.path.join(mainDir,'mvpa_roi')
 
 figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
 behavDir=os.path.join(mainDir,'behav')
+eventsDir=os.path.join(mainDir,'orig_events')
 
 # laptop
 #roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
@@ -37,11 +39,11 @@ os.chdir(codeDir)
 
 imDat    = 'cope' # cope or tstat images
 normMeth = 'noNorm' # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm - dividing by std does work atm
-distMeth = 'crossNobis' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
+distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'dir-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -54,6 +56,11 @@ behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
 locals().update(behav) #load in each variable into workspace
 
 #%% subjCat-all - organise
+plt.style.use('seaborn-darkgrid')
+
+fntSiz=14
+
+saveFigs = False
 
 exclSubs = True
 if exclSubs:
@@ -69,7 +76,6 @@ else:
 #for roi in df.columns.values[0:-1]:
 
 #subjCat sig
-roi='V2vd_rh'
 roi='hMT_lh'
 roi='MDroi_area8c_lh'
 
@@ -77,10 +83,12 @@ roi='MDroi_area8c_lh'
 roi='MDroi_area9_rh'
 
 #12-way sig
-roi='V2vd_rh'
-#roi='hMT_rh'
+roi='hMT_rh'
 
-ylims = [0.45, 0.55]
+#ori sig
+roi='EVC_lh'
+
+ylims = [0.4875, 0.5225]
 
 # plot mean and std across subs and plot (if including all subs, this ignores that some might have diff nConds per cat)
 nCond=12
@@ -94,9 +102,24 @@ for iSub in range(0,nSubs):
     rdm[il] = rdm.T[il]
     rdmAll[:,:,iSub] = rdm
 
+#flip half the subs (direction counterbalanced)- shouldn't matter since sorted by cat, but in case stim direction makes a diff, this might help
+ind=np.full((33),True)
+for iSub in range(1,34):
+    subNum=f'{iSub:02d}'
+    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+    iFile = sorted(glob.glob(fnames))
+    dfBehav=pd.read_csv(iFile[0], sep="\t")
+    if np.any((dfBehav['direction']==0)&(dfBehav['rawdirection']==135)):
+        ind[iSub-1] = False
+rdmAlltmp = rdmAll.copy()       
+rdmAll[0:6,0:6,ind]  = rdmAlltmp[6:12,6:12,ind]
+rdmAll[6:12,6:12,ind] = rdmAlltmp[0:6,0:6,ind]
+rdmAll[0:6,6:12,ind]  = rdmAlltmp[6:12,0:6,ind]
+rdmAll[6:12,0:6,ind]  = rdmAlltmp[0:6,6:12,ind]
+
 rdmMean = rdmAll[:,:,indSubs].mean(axis=2)
 rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
-#
+
 ##% subjCat-all - plot 1
 #ax = plt.figure(figsize=(8,4))
 #ctuple=np.array((0.1,0.3,0.5))
@@ -119,7 +142,6 @@ rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
 #average values, ignoring the current training category (values 0)
 rdmAll[rdmAll==0]=np.nan #so can nanmean
 
-ylims = [0.45, 0.55]
 ctuple=np.array((0.1,0.3,0.5))
 #rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
 rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
@@ -140,6 +162,156 @@ ax = plt.errorbar(range(0,12),rdmMeanB, yerr=rdmSEB, fmt='-o', color=ctuple)
 ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 
+#average across conds
+ctuple=np.array((0.1,0.3,0.5))
+rdmMeanAll = np.nanmean(rdmAll[:,:,indSubs],axis=0).mean(axis=1)
+rdmSEAll = np.nanstd(np.nanmean(rdmAll[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+plt.title(roi,fontsize=fntSiz)
+
+#%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
+plt.style.use('seaborn-darkgrid')
+
+fntSiz=14
+
+saveFigs = True
+
+exclSubs = False
+if exclSubs:
+    nDirInCat=np.empty((2,33))
+    for iSub in range(0,33):
+        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+else:
+    indSubs=np.ones(33,dtype=bool)
+
+ylims = [0.475, 0.525]
+
+#subjCat sig
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
+#
+##RDM cat sig
+#roi='MDroi_area9_rh'
+#
+##12-way sig
+#roi='hMT_rh'
+#
+##ori sig
+#roi='EVC_lh'
+#
+#other
+#roi='EVC_rh'
+#roi='V3a_lh'
+#roi='V3a_rh'
+
+nCond=12
+nSubs=33
+rdmAll = np.zeros((nCond,nCond,nSubs))
+rdm = np.zeros((nCond,nCond))
+iu = np.triu_indices(nCond,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
+il = np.tril_indices(nCond,-1) #to make symmetric rdm
+for iSub in range(0,nSubs):
+    rdm[iu] = df[roi].iloc[iSub]
+    rdm[il] = rdm.T[il]
+    rdmAll[:,:,iSub] = rdm
+rdmAll[rdmAll==0]=np.nan #so can nanmean
+
+#get indices to rearrange so the directions are the same across subs (since subjCat-all is arranged )
+condInd=np.empty((12,33),dtype=int)
+for iSub in range(33):
+    conds=np.append(subjCat.loc[iSub][0],subjCat.loc[iSub][1],axis=0)
+    condInd[:,iSub]=np.argsort(conds)
+
+#load in behav data to rotate the direction conditions around (since 'direction' is coded so its same for all subs [rotated around], and 'rawdirection' is the actual direction presented, or something similar)
+# make index for which subjects needs to flipped
+ind=np.full((33),True)
+for iSub in range(1,34):
+    subNum=f'{iSub:02d}'
+    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+    iFile = sorted(glob.glob(fnames))
+    dfBehav=pd.read_csv(iFile[0], sep="\t")
+    if np.any((dfBehav['direction']==0)&(dfBehav['rawdirection']==135)):
+        ind[iSub-1] = False
+
+# arrange the directions first (with sorted indices) - using inds in step 1 above, then flip - using inds in step 2 above
+rdmArr1 = np.zeros((nCond,nCond,nSubs))
+for iSub in range(33):
+    rdmArr1[:,:,iSub] = rdmAll[condInd[:,iSub],:,iSub] 
+    rdmArr1[:,:,iSub] = rdmArr1[:,condInd[:,iSub],iSub]
+
+#flip half the subs
+rdmArr = rdmArr1.copy()
+rdmArr[0:6,0:6,ind]  = rdmArr1[6:12,6:12,ind]
+rdmArr[6:12,6:12,ind] = rdmArr1[0:6,0:6,ind]
+rdmArr[0:6,6:12,ind]  = rdmArr1[6:12,0:6,ind]
+rdmArr[6:12,0:6,ind]  = rdmArr1[0:6,6:12,ind]
+
+#average across conds 
+ctuple=np.array((0.1,0.3,0.5))
+rdmMeanAll = np.nanmean(rdmArr[:,:,indSubs],axis=0).mean(axis=1)
+rdmSEAll = np.nanstd(np.nanmean(rdmArr[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
+ax = plt.figure(figsize=(4,3))
+ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
+ylim1, ylim2 = plt.ylim()
+plt.ylim(ylims[0],ylims[1])
+plt.title(roi,fontsize=fntSiz)
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_pairwiseDirs_' + roi + '.pdf'))
+plt.show()
+
+t,p=stats.ttest_1samp(np.nanmean(rdmArr[:,:,indSubs],axis=0).T,0.5)
+print(p)
+
+#% plot RDMs for visualisation
+plt.rcdefaults()
+
+rdm = np.zeros((12,12))
+rdmArr[np.isnan(rdmArr)]=0 # back to zero for mds
+rdm = rdmArr.mean(axis=2)
+#tstat (double check formula)
+#rdm = rdmArr.mean(axis=2)/rdmArr.std(axis=2)/np.sqrt(sum(indSubs))
+rdm[np.isnan(rdm)]=0 #dividing by 0 makes nans
+
+#RDM plot
+plt.figure(figsize=(4,1.5))
+plt.imshow(rdm,cmap='viridis',interpolation='none')
+plt.title(roi,fontsize=fntSiz)
+plt.colorbar()
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_RDM' + roi + '.pdf'))
+plt.show()
+
+#MDS
+from sklearn import manifold
+seed = np.random.RandomState(seed=3)
+mds = manifold.MDS(n_components=2, max_iter=3000, eps=1e-9, random_state=seed,
+                   dissimilarity="precomputed", n_jobs=1)
+pos = mds.fit(rdm).embedding_
+
+#MDS plot
+ctuple=np.append(np.tile(np.array((0.0,1.0,0.0)),(6,1)),np.tile(np.array((0.0,0.065,0.0)),(6,1)),axis=0)
+plt.figure(figsize=(1.5,1.5))
+plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.title(roi,fontsize=fntSiz)
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDScat_' + roi + '.pdf'))
+plt.show()
+
+#MDS plot with gradation by direction condition
+ctuple=np.tile(np.array((0.0,1.0,0.0)),(12,1))
+cnt = np.array((0.0,0.0,0.0))
+ctuple[:,1] = [.6,.8,1,1,.8,.6,.4,.2,0,0,.2,.4]
+plt.figure(figsize=(1.5,1.5))
+plt.scatter(pos[:,0],pos[:,1],color=ctuple)
+plt.title(roi,fontsize=fntSiz)
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_crossNobis_MDSdir_' + roi + '.pdf'))
+plt.show()
 #%% subjCat-all - plot 2
 #prototype - 6 conds each, for prototype is middle of conds 3&4
     
@@ -180,6 +352,7 @@ for iCond in 2,3,8,9: #range(0,11):
 #++
 
 #%%12-way-all
+plt.style.use('seaborn-darkgrid')
 
 # test the shape: 
 # more senory modulation, strongest decoding in the middle of each category, lowest at boundary
@@ -197,7 +370,20 @@ for iCond in 2,3,8,9: #range(0,11):
 
 #if not excluding subjects
 indSubs=np.ones(33,dtype=bool)
-#
+
+#flip half the subs (direction counterbalanced)- shouldn't matter since sorted by cat, but in case stim direction makes a diff, this might help
+ind=np.full((33),True)
+for iSub in range(1,34):
+    subNum=f'{iSub:02d}'
+    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+    iFile = sorted(glob.glob(fnames))
+    dfBehav=pd.read_csv(iFile[0], sep="\t")
+    if np.any((dfBehav['direction']==0)&(dfBehav['rawdirection']==135)):
+        ind[iSub-1] = False
+flipSubs = np.where(ind)
+flipSubs = flipSubs[0]
+        
+
 rois = list(df)
 dfMean = pd.DataFrame(columns=rois,index=range(0,12))
 dfSem  = pd.DataFrame(columns=rois,index=range(0,12))
@@ -207,7 +393,7 @@ df1=df.copy() #reorganise so in stimulus direction order
 for roi in rois:
     ind12way=np.empty(33,dtype=int)
     indLen1=np.empty(33,dtype=int) #nDirs in first cat
-    for iSub in range(0,33):
+    for iSub in range(33):
         ind=np.where(np.diff(subjCat[iSub][1])>30)
         ind12way[iSub]=ind[0][0]+1
         indLen1[iSub]=len(subjCat[iSub][0])
@@ -220,6 +406,9 @@ for roi in rois:
     #    print(df[roi].iloc[iSub])
     #    print(np.append(np.append(df[roi].iloc[iSub][0:indLen1[iSub]],df[roi].iloc[iSub][indLen1[iSub]+ind12way[iSub]:]),df[roi].iloc[iSub][indLen1[iSub]:indLen1[iSub]+ind12way[iSub]]))
     
+        if iSub in flipSubs:
+            df1[roi].iloc[iSub] = np.concatenate([df1[roi].iloc[iSub][6:12],df1[roi].iloc[iSub][0:6]])
+            
     #compute mean sem - note edited to df1  here
     dfMean[roi] = np.mean(np.asarray(np.stack(df1[roi].iloc[indSubs])),axis=0)
     dfSem[roi] = np.asarray(np.stack(df1[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
@@ -227,20 +416,13 @@ for roi in rois:
 #    tstat.append(statsTmp.statistic)
 #    pval.append(statsTmp.pvalue)
 
-    
-#ax=dfMean.iloc[0:33,:].T.plot(figsize=(20,5),kind="bar",yerr=dfSem.T,ylim=(.55,.65))
-
-roi='V1vd_lh' # up and down; median bit more flat
+roi='EVC_lh' 
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
-roi='V1vd_rh' # U shaped; median U shaped
+roi='EVC_rh' 
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
-
-roi='V2vd_rh'
-plt.figure(figsize=(5,3))
-ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 roi='hMT_lh'
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
@@ -248,7 +430,9 @@ roi='MDroi_area8c_lh'
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 
+
 #%%dir-all
+plt.style.use('seaborn-darkgrid')
 
 exclSubs = True
 if exclSubs:
@@ -269,10 +453,10 @@ for roi in rois:
     dfMean[roi] = np.mean(np.asarray(np.stack(df1[roi].iloc[indSubs])),axis=0)
     dfSem[roi] = np.asarray(np.stack(df1[roi].iloc[indSubs])).std(axis=0)/np.sqrt(sum(indSubs))
 
-roi='V1vd_lh' # up and down; median bit more flat
+roi='V1vd_lh' 
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
-roi='V1vd_rh' # U shaped; median U shaped
+roi='V1vd_rh' 
 plt.figure(figsize=(5,3))
 ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], fmt='-o')
 

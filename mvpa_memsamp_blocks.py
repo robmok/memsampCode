@@ -369,7 +369,7 @@ else:
 
 if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
-        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs-1],chance) #compute t-test, append to df
+        dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs],chance) #compute t-test, append to df
 
 # if re-running / adding, load in first, append new dat to df, then save
 if reRun == True:

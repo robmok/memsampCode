@@ -9,6 +9,7 @@ RSA analyses, plotting RDMs
 """
 
 import os
+import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -29,6 +30,7 @@ roiDir=os.path.join(mainDir,'mvpa_roi')
 
 figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
 behavDir=os.path.join(mainDir,'behav')
+eventsDir=os.path.join(mainDir,'orig_events')
 
 # laptop
 #roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
@@ -89,7 +91,7 @@ rdm[il] = rdm.T[il]
 
 #RDM plot
 plt.figure(figsize=(25,4))
-plt.imshow(rdm,cmap='viridis')
+plt.imshow(rdm,cmap='viridis',interpolation='none')
 plt.title(roi,fontsize=fntSiz)
 plt.colorbar()
 if saveFigs:
@@ -129,7 +131,7 @@ rdm[iu] = df[roi].iloc[iSub]
 il = np.tril_indices(12,-1) 
 rdm[il] = rdm.T[il]
 ax = plt.figure(figsize=(25,4))
-ax = plt.imshow(rdm,cmap='viridis')
+ax = plt.imshow(rdm,cmap='viridis',interpolation='none')
 plt.colorbar()
 plt.show()
 
@@ -140,6 +142,8 @@ pos = mds.fit(rdm).embedding_
 plt.scatter(pos[:,0],pos[:,1],color=ctuple)
 plt.show()
 #%% Visualise RDM models
+plt.rcdefaults()
+
 saveFigs = False
 
 modelRDM = np.zeros((12,12))
@@ -148,7 +152,7 @@ il = np.tril_indices(12,-1)
 #category
 modelRDM[0:6,6:12]=np.ones((6,6))
 modelRDM[il] = modelRDM.T[il]
-ax = plt.imshow(modelRDM,cmap='viridis')
+ax = plt.imshow(modelRDM,cmap='viridis',interpolation='none')
 plt.colorbar()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'modelRDM_category.pdf'))
@@ -166,7 +170,7 @@ for iCond in range(0,len(conds)):
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 modelRDM[iu] = angDist
 modelRDM[il] = modelRDM.T[il]
-ax = plt.imshow(modelRDM,cmap='viridis')
+ax = plt.imshow(modelRDM,cmap='viridis',interpolation='none')
 plt.colorbar()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'modelRDM_dir.pdf'))
@@ -185,15 +189,18 @@ for iCond in range(0,len(conds)):
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 modelRDM[iu] = angDist
 modelRDM[il] = modelRDM.T[il]
-ax = plt.imshow(modelRDM,cmap='viridis')
+ax = plt.imshow(modelRDM,cmap='viridis',interpolation='none')
 plt.colorbar()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'modelRDM_ori.pdf'))
 plt.show()
 
 #%% model RDMs - category
+
 saveFigs = False
 fontsize = 14
+plt.rcdefaults()
+#plt.style.use('seaborn-darkgrid')
 
 #include subjects with unequal conds in categories (manually made their RDMs)
 inclUneqSubs = True
@@ -222,6 +229,22 @@ catRDM = np.zeros((12,12))
 iu = np.triu_indices(12,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
 catRDM[0:6,6:12]=np.ones((6,6)) #category
 
+
+
+##flip half the subs (direction counterbalanced)- shouldn't matter since sorted by cat, but in case stim direction makes a diff, this might help
+#ind=np.full((33),True)
+#for iSub in range(1,34):
+#    subNum=f'{iSub:02d}'
+#    fnames    = os.path.join(eventsDir, "sub-" + subNum + "*memsamp*run-01*." + 'tsv')
+#    iFile = sorted(glob.glob(fnames))
+#    dfBehav=pd.read_csv(iFile[0], sep="\t")
+#    if np.any((dfBehav['direction']==0)&(dfBehav['rawdirection']==135)):
+#        ind[iSub-1] = False
+#flipSubs = np.where(ind)
+#flipSubs = flipSubs[0]
+        
+        
+        
 #data
 rdm = np.zeros((12,12)) 
 rho = np.empty((sum(indSubs)))
@@ -236,7 +259,6 @@ tauCat = pd.DataFrame(columns=roiList,index=range(0,sum(indSubs)))
 
 rhoPcat=np.empty((len(roiList)))
 tauPcat=np.empty((len(roiList)))
-
 iRoi=0
 for roi in roiList:
     rdm = np.zeros((12,12)) 
@@ -256,6 +278,21 @@ for roi in roiList:
             catRDM = np.zeros((12,12))
             catRDM[0:6,6:12]=np.ones((6,6))
         
+#        if iSub in flipSubs:
+#            rdmTmp = rdm.copy()       
+#            rdm[0:6,0:6]  = rdmTmp[6:12,6:12]
+#            rdm[6:12,6:12] = rdmTmp[0:6,0:6]
+#            rdm[0:6,6:12]  = rdmTmp[6:12,0:6]
+#            rdm[6:12,0:6]  = rdmTmp[0:6,6:12]
+#            catRDMtmp = catRDM.copy()
+#            catRDM[0:6,0:6]  = catRDMtmp[6:12,6:12]
+#            catRDM[6:12,6:12] = catRDMtmp[0:6,0:6]
+#            catRDM[0:6,6:12]  = catRDMtmp[6:12,0:6]
+#            catRDM[6:12,0:6]  = catRDMtmp[0:6,6:12]
+#            catRDM[iu] = catRDM.T[iu]       
+##            plt.imshow(catRDM)
+##            plt.show()
+            
         rho[i], pval[i]=stats.spearmanr(rdm[iu],catRDM[iu])
 #         rhoTmp=partial_corr(np.stack((stats.rankdata(rdm[iu]),stats.rankdata(catRDM[iu]),stats.rankdata(modelRDM[iu]))).T)
 #         rho[i]=rhoTmp[0,1]
@@ -273,8 +310,9 @@ for roi in roiList:
     tauCat[roi]=tau
     iRoi+=1
     
-#ax=rhoCat.mean().plot(figsize=(20,5),kind="bar",yerr=rhoCat.sem(),ylim=(-0.075,0.075))
-ax=tauCat.mean().plot(figsize=(20,5),kind="bar",yerr=tauCat.sem(),ylim=(-0.04,0.04))
+fig, ax = plt.subplots(figsize=(8,5))    
+#rhoCat.mean().plot(figsize=(20,5),kind="bar",yerr=rhoCat.sem(),ylim=(-0.075,0.075))
+tauCat.mean().plot(figsize=(20,5),kind="bar",yerr=tauCat.sem(),ylim=(-0.04,0.04))
 ax.set_title('Category RDM correlation (tau-A)',fontsize=fntSiz)
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barplotByROI_RDMcat.pdf'))
@@ -348,9 +386,10 @@ for roi in roiList:
     rhoDir[roi]=rho
     tauDir[roi]=tau
     iRoi+=1
-    
-#ax=rhoDir.mean().plot(figsize=(20,5),kind="bar",yerr=rhoDir.sem(),ylim=(-0.075,0.075))
-ax=tauDir.mean().plot(figsize=(20,5),kind="bar",yerr=tauDir.sem(),ylim=(-0.065,0.065))
+
+fig, ax = plt.subplots(figsize=(8,5))        
+#rhoDir.mean().plot(figsize=(20,5),kind="bar",yerr=rhoDir.sem(),ylim=(-0.075,0.075))
+tauDir.mean().plot(figsize=(20,5),kind="bar",yerr=tauDir.sem(),ylim=(-0.04,0.04))
 ax.set_title('Direction RDM correlation (tau-A)',fontsize=fntSiz)
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barplotByROI_RDMdir.pdf'))
@@ -421,9 +460,10 @@ for roi in roiList:
     rhoOri[roi]=rho
     tauOri[roi]=tau
     iRoi+=1
-    
-#ax=rhoOri.mean().plot(figsize=(20,5),kind="bar",yerr=rhoOri.sem(),ylim=(-0.075,0.075))
-ax=tauOri.mean().plot(figsize=(20,5),kind="bar",yerr=tauOri.sem(),ylim=(-0.065,0.065))
+
+fig, ax = plt.subplots(figsize=(8,5))    
+#rhoOri.mean().plot(figsize=(20,5),kind="bar",yerr=rhoOri.sem(),ylim=(-0.075,0.075))
+tauOri.mean().plot(figsize=(20,5),kind="bar",yerr=tauOri.sem(),ylim=(-0.04,0.04))
 ax.set_title('Orientation RDM correlation (tau-A)',fontsize=fntSiz)
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaRSA_crossNobis_barplotByROI_RDMori.pdf'))
@@ -458,7 +498,7 @@ modelR_v2.columns = dfHeader
 
 #bar strip plots
 roi='MDroi_area9_rh'
-g = sns.catplot(data=modelR_area9.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+g = sns.catplot(data=modelR_area9.iloc[indSubs,:],height=5,aspect=1, kind="bar", ci=None)
 modelR_area9.iloc[indSubs,:].mean().plot(yerr=modelR_area9.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title=roi,elinewidth=2.5,fmt='k,',alpha=0.8,fontsize=fntsiz)
 sns.stripplot(color="k", alpha=0.2, size=3, data=modelR_area9.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
@@ -466,7 +506,7 @@ if saveFigs:
 plt.show()
 
 roi='SPL1_rh'
-g = sns.catplot(data=modelR_SPL1.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+g = sns.catplot(data=modelR_SPL1.iloc[indSubs,:],height=5,aspect=1, kind="bar", ci=None)
 modelR_SPL1.iloc[indSubs,:].mean().plot(yerr=modelR_SPL1.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title=roi,elinewidth=2.5,fmt='k,',alpha=0.8,fontsize=fntsiz)
 sns.stripplot(color="k", alpha=0.2, size=3, data=modelR_SPL1.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
@@ -474,7 +514,7 @@ if saveFigs:
 plt.show()
 
 roi='V2vd_lh'
-g = sns.catplot(data=modelR_v2.iloc[indSubs,:],height=6,aspect=1, kind="bar", ci=None)
+g = sns.catplot(data=modelR_v2.iloc[indSubs,:],height=5,aspect=1, kind="bar", ci=None)
 modelR_v2.iloc[indSubs,:].mean().plot(yerr=modelR_v2.iloc[indSubs,:].sem(),ylim=(-0.125,0.15), title=roi, elinewidth=2.5,fmt='k,',alpha=0.8,fontsize=fntsiz)
 sns.stripplot(color="k", alpha=0.2, size=3, data=modelR_v2.iloc[indSubs,:], ax=g.ax);
 if saveFigs:
@@ -482,6 +522,13 @@ if saveFigs:
 plt.show()
 
 #%% behav corr RDM
+
+saveFigs = False
+
+mrkSiz=15
+fntSiz=14
+greycol=tuple([0.5,0.5,0.5])
+plt.style.use('seaborn-darkgrid')
 
 exclSubs = False # MDroi_area9_rh - false p=0.0768; true p=0.0575 (two-tailed, divide by 2)
 if exclSubs:
@@ -496,38 +543,71 @@ else:
     indSubs=np.ones(33,dtype=bool)
     
 roiList=list(df)
-roiList.remove('subjCat')
 rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 for roi in roiList:
     rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauCat[roi].iloc[indSubs])
-    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauCat[roi].iloc[indSubs])
-    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauCat[roi].iloc[indSubs])
-    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauCat[roi].iloc[indSubs])
+#    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauCat[roi].iloc[indSubs])
+#    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauCat[roi].iloc[indSubs])
+#    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauCat[roi].iloc[indSubs])
 
 
-plt.scatter(tauCat['MDroi_area9_rh'].iloc[indSubs],acc[indSubs])
-plt.show()
-
+roi = 'MDroi_area9_rh'
+x=acc[indSubs]
+y=tauCat[roi].iloc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=greycol,linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+#ax.grid(color='grey', linestyle='-.', linewidth=0.5, alpha=0.5) #add gridlines
+#ax.set_facecolor((.9,.9,.9)) #make old matplotlib grey bg colour
+ax.set_ylabel('RDM correlation (tau-A)')
+ax.set_xlabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc_RDM[roi][0]), 'p = %.4f' % (rAcc_RDM[roi][1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+fig.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavRDMCorr_' + roi + '.pdf'))
+    
 
 roiList=list(df)
-roiList.remove('subjCat')
 rAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccA_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rAccB_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 rObjAcc_RDM=pd.DataFrame(columns=roiList,index=range(0,2))
 for roi in roiList:
     rAcc_RDM[roi][0], rAcc_RDM[roi][1]=stats.pearsonr(acc[indSubs],tauOri[roi].iloc[indSubs])
-    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauOri[roi].iloc[indSubs])
-    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauOri[roi].iloc[indSubs])
-    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauOri[roi].iloc[indSubs])
+#    rAccA_RDM[roi][0], rAccA_RDM[roi][1]=stats.pearsonr(accA[indSubs],tauOri[roi].iloc[indSubs])
+#    rAccB_RDM[roi][0], rAccB_RDM[roi][1]=stats.pearsonr(accB[indSubs],tauOri[roi].iloc[indSubs])
+#    rObjAcc_RDM[roi][0], rObjAcc_RDM[roi][1]=stats.pearsonr(objAcc[indSubs],tauOri[roi].iloc[indSubs])
 
-
-plt.scatter(tauOri['V1vd_lh'].iloc[indSubs],acc[indSubs])
-plt.show()
-
+roi='V1vd_lh'
+x=acc[indSubs]
+y=tauOri[roi].iloc[indSubs]
+b, m = polyfit(x,y, 1) 
+xAx=np.linspace(min(x),max(x))
+fig, ax = plt.subplots(figsize=(5,3.5))
+ax.plot(xAx, b + m * xAx,'-',color=greycol,linewidth=1,alpha=0.5)
+ax.scatter(x,y,s=mrkSiz)
+#ax.grid(color='grey', linestyle='-.', linewidth=0.5, alpha=0.5) #add gridlines
+#ax.set_facecolor((.9,.9,.9)) #make old matplotlib grey bg colour
+ax.set_ylabel('RDM correlation (tau-A)')
+ax.set_xlabel('Behavioral Accuracy')
+ax.set_title(roi,fontsize=fntSiz)
+legTxt='\n'.join(('r = %.2f' % (rAcc_RDM[roi][0]), 'p = %.4f' % (rAcc_RDM[roi][1]))) #here should be one-tailed, so taken /2 away
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+fig.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_behavRDMCorr_' + roi + '.pdf'))
+    
 
 #roiList=list(df)
 #roiList.remove('subjCat')
