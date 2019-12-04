@@ -11,14 +11,13 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from scipy.stats import norm
 
 
-mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
+#mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
+mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
-
 
 
 # %% load in data
@@ -66,28 +65,80 @@ params = [15, 195, 1]  # bound 1, bound 2, and sigma (gaussian SD)
 
 #deterimine which is the closest bound
 
-#dat['direction']-params[0]
-#dat['direction']-params[1]
-
-#x = np.linspace(norm.ppf(0.01),
-#                norm.ppf(0.99), 100)
-#rv = norm(1,2)
-#plt.plot(x, rv.pdf(x))
-
-
-def absangdiff(x, y):
+def angdiff(x, y):
     import numpy as np
-    return abs(np.arctan2(np.sin(x-y), np.cos(x-y)))
+    return np.arctan2(np.sin(x-y), np.cos(x-y))
 
 
-angdiff1 = absangdiff(np.radians(dat['direction'].values), params[0])
-angdiff2 = absangdiff(np.radians(dat['direction'].values), params[1])
+angdiff1 = angdiff(np.radians(dat['direction'].values), params[0])
+angdiff2 = angdiff(np.radians(dat['direction'].values), params[1])
+
+# closests to bound 1 or 2
+ind1 = abs(angdiff1) < abs(angdiff2)  # True: closer to bound 1, False: to 2
+
+# get the dat closer to bound 1 - is it positive or negative (so cat A or B)
+# if positive, then compute pr for category A one
+# if negative, compute 1-pr for category B
+    # - should I double the probabilities, since it's one-tailed?
+
+ind1pos = angdiff1 > 0
+ind1neg = angdiff1 < 0
+ind2pos = angdiff2 > 0
+ind2neg = angdiff2 > 0
+
+# indexing 
+dat['direction'][ind1 & ind1pos]
+dat['direction'][ind1 & ind1neg]
+
+x = angdiff1[ind1 & ind1pos]
+y = angdiff1[ind1 & ind1neg]
+
+# for ind1pos (ind2pos), comput pr cat A (cat B) given that bound
+# for ~ind1pos (~ind2pos), comput pr cat B (cat A) given that bound
+
+# hmm... need to figure out how to match with behav pr... maybe what brad said is relevant
 
 
+
+
+
+
+
+# compute activation given bound
+mu = 0
+sigma = params[2]
+rv = norm(mu, sigma)
+plt.plot(1-rv.pdf(x))  # for cat A
+plt.show()
+plt.plot(1-rv.pdf(y))  # for cat B
+plt.show()
+
+
+
+
+
+## testing activations make sense
+#x = np.radians(np.array([0., 30., 60., 120., 150., 180., 210., 240, 270, 300., 330.]))
+#bound = np.radians(15)
+#
+## computed activation given bound
+#mu = 0
+#sigma = params[2]
+##sigma = 0.1
+#rv = norm(mu, sigma)
+#plt.plot(1-rv.pdf(angdiff(x,bound)))
+
+#from scipy.stats import vonmises
+#mu = 0
+#kappa = 1
+#rv = vonmises(kappa, mu)
+#plt.plot(1-rv.pdf(angdiff(x,bound)))  # 1-pr
 
 
 
 # assign category to each side of the boundary...
+
+
 
 
 
@@ -100,23 +151,8 @@ angdiff2 = absangdiff(np.radians(dat['direction'].values), params[1])
 
 
 
-# normal
-mu = 1
-sigma = 2
-x = np.linspace(norm.ppf(0.01, mu, sigma),
-                norm.ppf(0.99, mu, sigma), 100)
-rv = norm(mu,sigma)
-plt.plot(x, rv.pdf(x))
 
-# vonmises
-from scipy.stats import vonmises
-import math
-mu = math.radians(90)
-kappa = 3.99
-x = np.linspace(vonmises.ppf(0.01, kappa),
-                vonmises.ppf(0.99, kappa), 100)
-rv = vonmises(kappa, mu)
-plt.plot(x, rv.pdf(x), 'k-', lw=2, label='frozen pdf')
+
 
 
 
