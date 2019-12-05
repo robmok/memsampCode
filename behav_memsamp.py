@@ -44,6 +44,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
+mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 behavDir=os.path.join(mainDir,'behav')
 eventsDir=os.path.join(mainDir,'orig_events')
 behavFigDir=os.path.join(mainDir,'behav')
@@ -61,6 +62,7 @@ accB = np.empty(33)
 acc  = np.empty(33)
 objAcc = np.empty(33)
 respPrAll = pd.DataFrame(columns=range(12),index=range(33))
+respPrAllsorted = pd.DataFrame(columns=range(12),index=range(33))
 for iSub in range(1,34):
 #    iSub=1 #temp
     subNum=f'{iSub:02d}'
@@ -94,22 +96,22 @@ for iSub in range(1,34):
     subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
     subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
         
-    #unless:   
-    if iSub==5: #move 240 and 270 to catA
-        subjCatAconds = np.append(subjCatAconds,[240,270])
-        subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-    elif iSub==10: #move 270 to cat B
-        subjCatBconds = np.sort(np.append(subjCatBconds,270))
-        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-    elif iSub == 17:#move 30 to cat B
-        subjCatBconds = np.sort(np.append(subjCatBconds,30))
-        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-    elif iSub==24: #move 120 to cat A
-        subjCatAconds = np.sort(np.append(subjCatAconds,120))
-        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-    elif iSub==27:#move 270 to cat A
-        subjCatAconds = np.sort(np.append(subjCatAconds,270))
-        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+#    #unless:   
+#    if iSub==5: #move 240 and 270 to catA
+#        subjCatAconds = np.append(subjCatAconds,[240,270])
+#        subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+#    elif iSub==10: #move 270 to cat B
+#        subjCatBconds = np.sort(np.append(subjCatBconds,270))
+#        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+#    elif iSub == 17:#move 30 to cat B
+#        subjCatBconds = np.sort(np.append(subjCatBconds,30))
+#        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+#    elif iSub==24: #move 120 to cat A
+#        subjCatAconds = np.sort(np.append(subjCatAconds,120))
+#        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+#    elif iSub==27:#move 270 to cat A
+#        subjCatAconds = np.sort(np.append(subjCatAconds,270))
+#        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
     
     #for respPrAll plot
     subjCatBcondsSorted=np.concatenate([subjCatBconds[subjCatBconds>=300],subjCatBconds[subjCatBconds<300]]) #rearrange to make the directions within a cat next to each other (300 and 330 need to be next to 0)
@@ -117,6 +119,12 @@ for iSub in range(1,34):
     cnt=0
     for iCond in subjCatConds:
         respPrAll[cnt].iloc[iSub-1] = respPr[iCond]
+        cnt=cnt+1
+        
+    cnt=0
+    #no sorting
+    for iCond in conds:
+        respPrAllsorted[cnt].iloc[iSub-1] = respPr[iCond]
         cnt=cnt+1
 
     #accuracy
@@ -193,3 +201,11 @@ ax1.tick_params(axis='both', which='major', labelsize=fntSiz-2.5)
 
 if saveFigs:
     plt.savefig(os.path.join(behavFigDir,'behav_subjCat_response_curve.pdf'))
+    
+# %%
+    
+# conds sorted from 0 to 330 for all subs, check if matches up
+    
+iSub=0
+plt.plot(range(0,12),respPrAllsorted.loc[iSub],alpha=0.2)
+
