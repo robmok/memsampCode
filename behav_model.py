@@ -62,6 +62,8 @@ for iSub in range(1, 34):
     startparams = [270, 90, 1]  # bound 1, bound 2, and sigma (gaussian SD)
     #bounds = [(0., np.radians(359)), (0., np.radians(359)), [0., 5.]]
 
+#    startparams = [270, 90, 1, 0.5] # with guess rate
+
     def runit(startparams, dat=dat):
 
         def angdiff(x, y):
@@ -114,17 +116,24 @@ for iSub in range(1, 34):
                                           (dat['key'] == 1)],
                                  angdiff2[(dat['direction'].isin(catB2)) &
                                           (dat['key'] == 1)]))
+        if len(startparams) < 4:        
+            resps1pr = 1-rv.pdf(resps1)
+            resps2pr = rv.pdf(resps2)
+        else:  # guess rate
+            alpha = startparams[3]  # guess rate
+            resps1pr = alpha * 0.5 + (1-alpha) * (1-rv.pdf(resps1))
+            resps2pr = alpha * 0.5 + (1-alpha) * rv.pdf(resps2)
 
         # sum of log pr (to check exp this result, compare to np.prod of pr's)
         negloglik = -np.sum(np.log(
-                np.concatenate((1-rv.pdf(resps1), rv.pdf(resps2)))))
+                np.concatenate((resps1pr, resps2pr))))
 
         return negloglik
 
-#    # quick runthrough - without multiple starting point
-#    method = 'Nelder-Mead'
-#    res = opt.minimize(runit, startparams, method=method)  # bounds=bounds)
-#    bestparams = res.x
+    # quick runthrough - without multiple starting point
+    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][0]
+    res = opt.minimize(runit, startparams, method=method)  #, bounds=bounds)
+    bestparams = res.x
 
 #    # multiple starting point (opt.basinhopping)
 #    method = 'Nelder-Mead'
@@ -134,19 +143,53 @@ for iSub in range(1, 34):
 #    bestparams = res.x
 
     # multiple starting point (self)
+    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
+    bounds = [(-359, 359), (-359, 359), (0., 20.)]
+#    bounds = [(-np.radians(359), np.radians(359)), (-np.radians(359), np.radians(359)), (0., 20.), (0., 1.)]
+
     starts = [[0, 180, .5], [270, 90, .5], [45, 225, .5], [135, 315, .5],
               [0, 180, 1], [270, 90, 1], [45, 225, 1], [135, 315, 1],
               [0, 180, 3], [270, 90, 3], [45, 225, 3], [135, 315, 3],
               [0, 180, 6], [270, 90, 6], [45, 225, 6], [135, 315, 6],
+              [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10],
+              [0, 180, 15], [270, 90, 15], [45, 225, 15], [135, 315, 15],
               [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10]]
+
+#    # guess rate
+#    starts = [[0, 180, .5, .25], [270, 90, .5, .25], [45, 225, .5, .25], [135, 315, .5, .25],
+#              [0, 180, 1, .25], [270, 90, 1, .25], [45, 225, 1, .25], [135, 315, 1, .25],
+#              [0, 180, 3, .25], [270, 90, 3, .25], [45, 225, 3, .25], [135, 315, 3, .25],
+#              [0, 180, 6, .25], [270, 90, 6, .25], [45, 225, 6, .25], [135, 315, 6, .25],
+#              [0, 180, 10, .25], [270, 90, 10, .25], [45, 225, 10, .25], [135, 315, 10, .25],
+#              [0, 180, 15, .25], [270, 90, 15, .25], [45, 225, 15, .25], [135, 315, 15, .25],
+#              [0, 180, 10, .25], [270, 90, 10, .25], [45, 225, 10, .25], [135, 315, 10, .25],
+#              [0, 180, .5, .5], [270, 90, .5, .5], [45, 225, .5, .5], [135, 315, .5, .5],
+#              [0, 180, 1, .5], [270, 90, 1, .5], [45, 225, 1, .5], [135, 315, 1, .5],
+#              [0, 180, 3, .5], [270, 90, 3, .5], [45, 225, 3, .5], [135, 315, 3, .5],
+#              [0, 180, 6, .5], [270, 90, 6, .5], [45, 225, 6, .5], [135, 315, 6, .5],
+#              [0, 180, 10, .5], [270, 90, 10, .5], [45, 225, 10, .5], [135, 315, 10, .5],
+#              [0, 180, 15, .5], [270, 90, 15, .5], [45, 225, 15, .5], [135, 315, 15, .5],
+#              [0, 180, 10, .5], [270, 90, 10, .5], [45, 225, 10, .5], [135, 315, 10, .5],
+#              [0, 180, .5, .5], [270, 90, .5, .5], [45, 225, .5, .5], [135, 315, .5, .5],
+#              [0, 180, 1, .75], [270, 90, 1, .75], [45, 225, 1, .75], [135, 315, 1, .75],
+#              [0, 180, 3, .75], [270, 90, 3, .75], [45, 225, 3, .75], [135, 315, 3, .75],
+#              [0, 180, 6, .75], [270, 90, 6, .75], [45, 225, 6, .75], [135, 315, 6, .75],
+#              [0, 180, 10, .75], [270, 90, 10, .75], [45, 225, 10, .75], [135, 315, 10, .75],
+#              [0, 180, 15, .75], [270, 90, 15, .75], [45, 225, 15, .75], [135, 315, 15, .75],
+#              [0, 180, 10, .75], [270, 90, 10, .75], [45, 225, 10, .75], [135, 315, 10, .75]]
     negloglik = np.inf
     method = 'Nelder-Mead'
+    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][2]
 
     for startparams in starts:
-        res = opt.minimize(runit, startparams, method=method)  # bounds=bounds)
+#        res = opt.minimize(runit, startparams, method=method)  # bounds=bounds)
+        res = opt.minimize(runit, startparams, method=method, bounds=bounds)
+
         if res.fun < negloglik:  # if new result is smaller, replace it
             negloglik = res.fun
             bestparams = res.x
+            print('  loss: {0:.2f}'.format(negloglik))
+            print('')
 
     # fix negative and over 360 bounds
     while bestparams[0] < 0:
