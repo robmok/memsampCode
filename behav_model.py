@@ -58,8 +58,8 @@ for iSub in range(1, 34):
 
     # ...optimize this with bound1, bound2, and SD .., with sensible limits
 
-    startparams = [15, 195, 1]  # bound 1, bound 2, and sigma (gaussian SD)
-#    startparams = [-60, 120, 1]  # bound 1, bound 2, and sigma (gaussian SD)
+    startparams = [0, 180, 1]  # bound 1, bound 2, and sigma (gaussian SD)
+    startparams = [270, 90, 1]  # bound 1, bound 2, and sigma (gaussian SD)
     #bounds = [(0., np.radians(359)), (0., np.radians(359)), [0., 5.]]
 
     def runit(startparams, dat=dat):
@@ -77,14 +77,14 @@ for iSub in range(1, 34):
                 np.radians(dat['direction'].values),
                 np.radians(startparams[1]))
 
-        # find out if closer to bound 1 or 2
-        ind1 = abs(angdiff1) < abs(angdiff2)  # closer to bound 1
-        ind2 = abs(angdiff1) > abs(angdiff2)
+        # find out if closer to bound 1 or 2, if same, include both
+        ind1 = abs(angdiff1) <= abs(angdiff2)  # closer to bound 1
+        ind2 = abs(angdiff1) >= abs(angdiff2)
 
         # clockwise or counterclowise to bound
-        ind1pos = angdiff1 > 0
+        ind1pos = angdiff1 >= 0  # = - so if on bound, count on bound as pos
         ind1neg = angdiff1 < 0
-        ind2pos = angdiff2 > 0
+        ind2pos = angdiff2 >= 0
         ind2neg = angdiff2 < 0
 
         # conditions
@@ -125,87 +125,96 @@ for iSub in range(1, 34):
 #    method = 'Nelder-Mead'
 #    res = opt.minimize(runit, startparams, method=method)  # bounds=bounds)
 #    bestparams = res.x
-#
-#    if bestparams[0] < 0:
-#        bestparams[0] += 360
-#
-#    if bestparams[0] < bestparams[1]:
-#        n_cata_resps_side1 = (dat.loc[(dat['direction'] > bestparams[0]) & (dat['direction'] < bestparams[1]), 'key'].values == 1).sum()
-#        n_catb_resps_side1 = (dat.loc[(dat['direction'] > bestparams[0]) & (dat['direction'] < bestparams[1]), 'key'].values == 6).sum()
-#        # using OR operator here
-#        n_cata_resps_side2 = (dat.loc[(dat['direction'] > bestparams[1]) | (dat['direction'] < bestparams[0]), 'key'].values == 1).sum()
-#        n_catb_resps_side2 = (dat.loc[(dat['direction'] > bestparams[1]) | (dat['direction'] < bestparams[0]), 'key'].values == 6).sum()
-#    elif bestparams[0] > bestparams[1]:
-#        n_cata_resps_side1 = (dat.loc[(dat['direction'] > bestparams[1]) & (dat['direction'] < bestparams[0]), 'key'].values == 6).sum()
-#        n_catb_resps_side1 = (dat.loc[(dat['direction'] > bestparams[1]) & (dat['direction'] < bestparams[0]), 'key'].values == 1).sum()
-#        # using OR operator here
-#        n_cata_resps_side2 = (dat.loc[(dat['direction'] > bestparams[0]) | (dat['direction'] < bestparams[1]), 'key'].values == 6).sum()
-#        n_catb_resps_side2 = (dat.loc[(dat['direction'] > bestparams[0]) | (dat['direction'] < bestparams[1]), 'key'].values == 1).sum()
-#
-#    print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
-#    if bestparams[0] < bestparams[1]:
-#        print('catA %s' % np.array2string(conds[(conds > bestparams[0]) & (conds < bestparams[1])]))
-#        print('catB %s' % np.array2string(conds[(conds > bestparams[1]) | (conds < bestparams[0])]))
-#    elif bestparams[0] > bestparams[1]:
-#        print('catA: %s' % np.array2string(conds[(conds < bestparams[0]) & (conds > bestparams[1])]))
-#        print('catB: %s' % np.array2string(conds[(conds < bestparams[1]) | (conds > bestparams[0])]))
-#    
-#    # correct, incorrect, correct, incorrect (so most resps should be on the correct side)
-#    #print([n_cata_resps_side1, n_cata_resps_side2, n_catb_resps_side2, n_catb_resps_side1])
-#
-#    # checking how it matches up    
-#    print('subjCat catA: %s' % subjCat[iSub-1][0])
-#    print('subjCat catB: %s' % subjCat[iSub-1][1])
 
+#    # multiple starting point (opt.basinhopping)
+#    method = 'Nelder-Mead'
+#    minimizer_kwargs = {"method": method}
+#    res=opt.basinhopping(runit, startparams, niter=20, stepsize=179.,
+#                         minimizer_kwargs=minimizer_kwargs)
+#    bestparams = res.x
 
-
-
-
-
-    # multiple starting point (opt.basinhopping)
-    
-    #import time
-    #t0 = time.time()
-
+    # multiple starting point (self)
+    starts = [[0, 180, .5], [270, 90, .5], [45, 225, .5], [135, 315, .5],
+              [0, 180, 1], [270, 90, 1], [45, 225, 1], [135, 315, 1],
+              [0, 180, 3], [270, 90, 3], [45, 225, 3], [135, 315, 3],
+              [0, 180, 6], [270, 90, 6], [45, 225, 6], [135, 315, 6],
+              [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10]]
+    negloglik = np.inf
     method = 'Nelder-Mead'
-    minimizer_kwargs = {"method": method}
-    res=opt.basinhopping(runit, startparams, niter=50, stepsize=90., minimizer_kwargs=minimizer_kwargs)
-    bestparams = res.x
-    
-    #t1 = time.time()
-    #print(t1-t0)
-    
-    if bestparams[0] < 0:
+
+    for startparams in starts:
+        res = opt.minimize(runit, startparams, method=method)  # bounds=bounds)
+        if res.fun < negloglik:  # if new result is smaller, replace it
+            negloglik = res.fun
+            bestparams = res.x
+
+    # fix negative and over 360 bounds
+    while bestparams[0] < 0:
         bestparams[0] += 360
-    
+    while bestparams[1] < 0:
+        bestparams[1] += 360
+    while bestparams[0] > 360:
+        bestparams[0] -= 360
+    while bestparams[1] > 360:
+        bestparams[1] -= 360
+
+    # display results
     if bestparams[0] < bestparams[1]:
-        n_cata_resps_side1 = (dat.loc[(dat['direction'] > bestparams[0]) & (dat['direction'] < bestparams[1]), 'key'].values == 1).sum()
-        n_catb_resps_side1 = (dat.loc[(dat['direction'] > bestparams[0]) & (dat['direction'] < bestparams[1]), 'key'].values == 6).sum()
+        n_cata_resps_side1 = (
+                dat.loc[(dat['direction'] > bestparams[0]) &
+                        (dat['direction'] < bestparams[1]),
+                        'key'].values == 1).sum()
+        n_catb_resps_side1 = (
+                dat.loc[(dat['direction'] > bestparams[0]) &
+                        (dat['direction'] < bestparams[1]),
+                        'key'].values == 6).sum()
         # using OR operator here
-        n_cata_resps_side2 = (dat.loc[(dat['direction'] > bestparams[1]) | (dat['direction'] < bestparams[0]), 'key'].values == 1).sum()
-        n_catb_resps_side2 = (dat.loc[(dat['direction'] > bestparams[1]) | (dat['direction'] < bestparams[0]), 'key'].values == 6).sum()
+        n_cata_resps_side2 = (
+                dat.loc[(dat['direction'] > bestparams[1]) |
+                        (dat['direction'] < bestparams[0]),
+                        'key'].values == 1).sum()
+        n_catb_resps_side2 = (
+                dat.loc[(dat['direction'] > bestparams[1]) |
+                        (dat['direction'] < bestparams[0]),
+                        'key'].values == 6).sum()
     elif bestparams[0] > bestparams[1]:
-        n_cata_resps_side1 = (dat.loc[(dat['direction'] > bestparams[1]) & (dat['direction'] < bestparams[0]), 'key'].values == 6).sum()
-        n_catb_resps_side1 = (dat.loc[(dat['direction'] > bestparams[1]) & (dat['direction'] < bestparams[0]), 'key'].values == 1).sum()
+        n_cata_resps_side1 = (
+                dat.loc[(dat['direction'] > bestparams[1]) &
+                        (dat['direction'] < bestparams[0]),
+                        'key'].values == 6).sum()
+        n_catb_resps_side1 = (
+                dat.loc[(dat['direction'] > bestparams[1]) &
+                        (dat['direction'] < bestparams[0]),
+                        'key'].values == 1).sum()
         # using OR operator here
-        n_cata_resps_side2 = (dat.loc[(dat['direction'] > bestparams[0]) | (dat['direction'] < bestparams[1]), 'key'].values == 6).sum()
-        n_catb_resps_side2 = (dat.loc[(dat['direction'] > bestparams[0]) | (dat['direction'] < bestparams[1]), 'key'].values == 1).sum()
-    
-    
-        print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
-        if bestparams[0] < bestparams[1]:
-            print('catA %s' % np.array2string(conds[(conds > bestparams[0]) & (conds <= bestparams[1])]))
-            print('catB %s' % np.array2string(conds[(conds > bestparams[1]) | (conds <= bestparams[0])]))
-        elif bestparams[0] > bestparams[1]:
-            print('catA: %s' % np.array2string(conds[(conds <= bestparams[0]) & (conds > bestparams[1])]))
-            print('catB: %s' % np.array2string(conds[(conds <= bestparams[1]) | (conds > bestparams[0])]))
-        
-        # correct, incorrect, correct, incorrect (so most resps should be on the correct side)
-        #print([n_cata_resps_side1, n_cata_resps_side2, n_catb_resps_side2, n_catb_resps_side1])
-    
-        # checking how it matches up    
-        print('subjCat catA: %s' % subjCat[iSub-1][0])
-        print('subjCat catB: %s' % subjCat[iSub-1][1])
+        n_cata_resps_side2 = (
+                dat.loc[(dat['direction'] > bestparams[0]) |
+                        (dat['direction'] < bestparams[1]),
+                        'key'].values == 6).sum()
+        n_catb_resps_side2 = (
+                dat.loc[(dat['direction'] > bestparams[0]) |
+                        (dat['direction'] < bestparams[1]),
+                        'key'].values == 1).sum()
+
+    print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
+    if bestparams[0] < bestparams[1]:
+        print('catA %s' % np.array2string(conds[(conds > bestparams[0]) &
+                                                (conds < bestparams[1])]))
+        print('catB %s' % np.array2string(conds[(conds > bestparams[1]) |
+                                                (conds < bestparams[0])]))
+    elif bestparams[0] > bestparams[1]:
+        print('catA: %s' % np.array2string(conds[(conds < bestparams[0]) &
+                                                 (conds > bestparams[1])]))
+        print('catB: %s' % np.array2string(conds[(conds < bestparams[1]) |
+                                                 (conds > bestparams[0])]))
+
+    # correct, incorrect, corr, inc (most resps should be on the correct side)
+#    print([n_cata_resps_side1, n_cata_resps_side2,
+#           n_catb_resps_side2, n_catb_resps_side1])
+
+    # checking how it matches up
+    print('subjCat catA: %s' % subjCat[iSub-1][0])
+    print('subjCat catB: %s' % subjCat[iSub-1][1])
 
 # %%
 
