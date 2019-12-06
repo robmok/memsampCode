@@ -15,8 +15,8 @@ from scipy.stats import norm
 from scipy.stats import vonmises
 from scipy import optimize as opt
 
-#mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
-mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
+mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'  # love06
+#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
@@ -169,7 +169,7 @@ for iSub in range(1, 34):
 
     method = 'Nelder-Mead'
     minimizer_kwargs = {"method": method}
-    res=opt.basinhopping(runit, startparams, niter=5, stepsize=90., minimizer_kwargs=minimizer_kwargs)
+    res=opt.basinhopping(runit, startparams, niter=50, stepsize=90., minimizer_kwargs=minimizer_kwargs)
     bestparams = res.x
     
     #t1 = time.time()
