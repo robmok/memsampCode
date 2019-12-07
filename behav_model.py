@@ -24,6 +24,9 @@ subjCat = pd.read_pickle(mainDir + 'mvpa_roi/subjCat.pkl')
 
 # %% load in data
 
+import time
+t0 = time.time()
+
 for iSub in range(1, 34):
 #iSub = 1
 
@@ -144,52 +147,59 @@ for iSub in range(1, 34):
 
     # multiple starting point (self)
     starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
-    bounds = [(-359, 359), (-359, 359), (0., 20.)]
+#    bounds = [(None, None), (None, None), (0., 50.)]
+    bounds = [(-359, 359), (-359, 359), (0., 50.)]
+
 #    bounds = [(-np.radians(359), np.radians(359)), (-np.radians(359), np.radians(359)), (0., 20.), (0., 1.)]
 
+    # this look good enough for nelder-mead but not for others
     starts = [[0, 180, .5], [270, 90, .5], [45, 225, .5], [135, 315, .5],
               [0, 180, 1], [270, 90, 1], [45, 225, 1], [135, 315, 1],
-              [0, 180, 3], [270, 90, 3], [45, 225, 3], [135, 315, 3],
               [0, 180, 6], [270, 90, 6], [45, 225, 6], [135, 315, 6],
               [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10],
-              [0, 180, 15], [270, 90, 15], [45, 225, 15], [135, 315, 15],
-              [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10]]
+              [0, 180, 20], [270, 90, 20], [45, 225, 20], [135, 315, 20]]
+
+#              [0, 180, 3], [270, 90, 3], [45, 225, 3], [135, 315, 3],
+#              [0, 180, 15], [270, 90, 15], [45, 225, 15], [135, 315, 15],
+
+    # looping through starts
+    starts = []
+    startsb1 = np.arange(15, 345, 60)
+    startsb2 = np.arange(60, 345, 60)
+    sds = [.5, 2, 5, 12]
+
+    guess = True
+    if guess:
+        gs = [.1, .3, .6, .8]
+        bounds.append((0., 1.))
+
+    if not guess:
+        for b1 in startsb1:
+            for b2 in startsb2:
+                for sd in sds:
+                    starts.append([b1, b2, sd])
+    else:
+        for b1 in startsb1:
+            for b2 in startsb2:
+                for sd in sds:
+                    for g in gs:
+                        starts.append([b1, b2, sd, g])
 
 #    # guess rate
-#    starts = [[0, 180, .5, .25], [270, 90, .5, .25], [45, 225, .5, .25], [135, 315, .5, .25],
-#              [0, 180, 1, .25], [270, 90, 1, .25], [45, 225, 1, .25], [135, 315, 1, .25],
-#              [0, 180, 3, .25], [270, 90, 3, .25], [45, 225, 3, .25], [135, 315, 3, .25],
-#              [0, 180, 6, .25], [270, 90, 6, .25], [45, 225, 6, .25], [135, 315, 6, .25],
-#              [0, 180, 10, .25], [270, 90, 10, .25], [45, 225, 10, .25], [135, 315, 10, .25],
-#              [0, 180, 15, .25], [270, 90, 15, .25], [45, 225, 15, .25], [135, 315, 15, .25],
-#              [0, 180, 10, .25], [270, 90, 10, .25], [45, 225, 10, .25], [135, 315, 10, .25],
-#              [0, 180, .5, .5], [270, 90, .5, .5], [45, 225, .5, .5], [135, 315, .5, .5],
-#              [0, 180, 1, .5], [270, 90, 1, .5], [45, 225, 1, .5], [135, 315, 1, .5],
-#              [0, 180, 3, .5], [270, 90, 3, .5], [45, 225, 3, .5], [135, 315, 3, .5],
-#              [0, 180, 6, .5], [270, 90, 6, .5], [45, 225, 6, .5], [135, 315, 6, .5],
-#              [0, 180, 10, .5], [270, 90, 10, .5], [45, 225, 10, .5], [135, 315, 10, .5],
-#              [0, 180, 15, .5], [270, 90, 15, .5], [45, 225, 15, .5], [135, 315, 15, .5],
-#              [0, 180, 10, .5], [270, 90, 10, .5], [45, 225, 10, .5], [135, 315, 10, .5],
-#              [0, 180, .5, .5], [270, 90, .5, .5], [45, 225, .5, .5], [135, 315, .5, .5],
-#              [0, 180, 1, .75], [270, 90, 1, .75], [45, 225, 1, .75], [135, 315, 1, .75],
-#              [0, 180, 3, .75], [270, 90, 3, .75], [45, 225, 3, .75], [135, 315, 3, .75],
-#              [0, 180, 6, .75], [270, 90, 6, .75], [45, 225, 6, .75], [135, 315, 6, .75],
-#              [0, 180, 10, .75], [270, 90, 10, .75], [45, 225, 10, .75], [135, 315, 10, .75],
-#              [0, 180, 15, .75], [270, 90, 15, .75], [45, 225, 15, .75], [135, 315, 15, .75],
-#              [0, 180, 10, .75], [270, 90, 10, .75], [45, 225, 10, .75], [135, 315, 10, .75]]
+
     negloglik = np.inf
     method = 'Nelder-Mead'
-    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][2]
+    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][1]
 
     for startparams in starts:
-#        res = opt.minimize(runit, startparams, method=method)  # bounds=bounds)
+#        res = opt.minimize(runit, startparams, method=method)  # no bounds, nm
         res = opt.minimize(runit, startparams, method=method, bounds=bounds)
 
         if res.fun < negloglik:  # if new result is smaller, replace it
             negloglik = res.fun
             bestparams = res.x
-            print('  loss: {0:.2f}'.format(negloglik))
-            print('')
+#            print('  loss: {0:.2f}'.format(negloglik))
+#            print('')
 
     # fix negative and over 360 bounds
     while bestparams[0] < 0:
@@ -259,6 +269,8 @@ for iSub in range(1, 34):
     print('subjCat catA: %s' % subjCat[iSub-1][0])
     print('subjCat catB: %s' % subjCat[iSub-1][1])
 
+t1 = time.time()
+print(t1-t0)
 # %%
 
 ## testing activations make sense
