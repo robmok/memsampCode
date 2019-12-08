@@ -12,11 +12,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import norm
-from scipy.stats import vonmises
+#from scipy.stats import vonmises
 from scipy import optimize as opt
 
 mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'  # love06
-#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
+mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
@@ -133,10 +133,10 @@ for iSub in range(1, 34):
 
         return negloglik
 
-    # quick runthrough - without multiple starting point
-    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][0]
-    res = opt.minimize(runit, startparams, method=method)  #, bounds=bounds)
-    bestparams = res.x
+#    # quick runthrough - without multiple starting point
+#    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][0]
+#    res = opt.minimize(runit, startparams, method=method)  #, bounds=bounds)
+#    bestparams = res.x
 
 #    # multiple starting point (opt.basinhopping)
 #    method = 'Nelder-Mead'
@@ -146,29 +146,30 @@ for iSub in range(1, 34):
 #    bestparams = res.x
 
     # multiple starting point (self)
-    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
+#    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
 #    bounds = [(None, None), (None, None), (0., 50.)]
     bounds = [(-359, 359), (-359, 359), (0., 50.)]
 
 #    bounds = [(-np.radians(359), np.radians(359)), (-np.radians(359), np.radians(359)), (0., 20.), (0., 1.)]
 
-    # this look good enough for nelder-mead but not for others
-    starts = [[0, 180, .5], [270, 90, .5], [45, 225, .5], [135, 315, .5],
-              [0, 180, 1], [270, 90, 1], [45, 225, 1], [135, 315, 1],
-              [0, 180, 6], [270, 90, 6], [45, 225, 6], [135, 315, 6],
-              [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10],
-              [0, 180, 20], [270, 90, 20], [45, 225, 20], [135, 315, 20]]
+#    # this look good enough for nelder-mead but not for others
+#    starts = [[0, 180, .5], [270, 90, .5], [45, 225, .5], [135, 315, .5],
+#              [0, 180, 1], [270, 90, 1], [45, 225, 1], [135, 315, 1],
+#              [0, 180, 6], [270, 90, 6], [45, 225, 6], [135, 315, 6],
+#              [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10],
+#              [0, 180, 20], [270, 90, 20], [45, 225, 20], [135, 315, 20]]
 
 #              [0, 180, 3], [270, 90, 3], [45, 225, 3], [135, 315, 3],
 #              [0, 180, 15], [270, 90, 15], [45, 225, 15], [135, 315, 15],
 
     # looping through starts
     starts = []
-    startsb1 = np.arange(15, 345, 60)
+    startsb1 = np.arange(15, 345, 60)  # 60 orig, trying 45
     startsb2 = np.arange(60, 345, 60)
     sds = [.5, 2, 5, 12]
+    sds = [.5, 1, 2, 5, 10, 15, 20]  #trying more
 
-    guess = True
+    guess = False
     if guess:
         gs = [.1, .3, .6, .8]
         bounds.append((0., 1.))
@@ -185,10 +186,7 @@ for iSub in range(1, 34):
                     for g in gs:
                         starts.append([b1, b2, sd, g])
 
-#    # guess rate
-
     negloglik = np.inf
-    method = 'Nelder-Mead'
     method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][1]
 
     for startparams in starts:
