@@ -16,7 +16,7 @@ from scipy.stats import norm
 from scipy import optimize as opt
 
 mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'  # love06
-mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
+#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
@@ -28,7 +28,7 @@ import time
 t0 = time.time()
 
 for iSub in range(1, 34):
-#iSub = 1
+#iSub = 2
 
     subNum = f'{iSub:02d}'
     dfCond = pd.DataFrame()  # main df with all runs
@@ -63,8 +63,6 @@ for iSub in range(1, 34):
 
     startparams = [0, 180, 1]  # bound 1, bound 2, and sigma (gaussian SD)
     startparams = [270, 90, 1]  # bound 1, bound 2, and sigma (gaussian SD)
-    #bounds = [(0., np.radians(359)), (0., np.radians(359)), [0., 5.]]
-
 #    startparams = [270, 90, 1, 0.5] # with guess rate
 
     def runit(startparams, dat=dat):
@@ -149,31 +147,22 @@ for iSub in range(1, 34):
 #    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
 #    bounds = [(None, None), (None, None), (0., 50.)]
     bounds = [(-359, 359), (-359, 359), (0., 50.)]
-
 #    bounds = [(-np.radians(359), np.radians(359)), (-np.radians(359), np.radians(359)), (0., 20.), (0., 1.)]
-
-#    # this look good enough for nelder-mead but not for others
-#    starts = [[0, 180, .5], [270, 90, .5], [45, 225, .5], [135, 315, .5],
-#              [0, 180, 1], [270, 90, 1], [45, 225, 1], [135, 315, 1],
-#              [0, 180, 6], [270, 90, 6], [45, 225, 6], [135, 315, 6],
-#              [0, 180, 10], [270, 90, 10], [45, 225, 10], [135, 315, 10],
-#              [0, 180, 20], [270, 90, 20], [45, 225, 20], [135, 315, 20]]
-
-#              [0, 180, 3], [270, 90, 3], [45, 225, 3], [135, 315, 3],
-#              [0, 180, 15], [270, 90, 15], [45, 225, 15], [135, 315, 15],
 
     # looping through starts
     starts = []
-    startsb1 = np.arange(15, 345, 60)  # 60 orig, trying 45
-    startsb2 = np.arange(60, 345, 60)
-    sds = [.5, 2, 5, 12]
-    sds = [.5, 1, 2, 5, 10, 15, 20]  #trying more
+    startsb1 = np.arange(15., 345., 60)  # 60 orig, trying 45
+    startsb2 = np.arange(45., 360., 60)-360
+    sds = [.5, 1, 2, 5, 10, 15]
+#    sds = [.1, .5, 1, 1.5, 2, 3.5, 5, 7.5, 10, 15]  #trying more
+#    sds = [.1, .5, 1, 1.5, 2, 3, 3.5, 5, 6, 7.5, 10, 11, 12, 13, 15, 17]  #trying even more
+    sds = [.5, 1, 2, 3, 5, 8, 10, 15]
+    
 
     guess = False
     if guess:
         gs = [.1, .3, .6, .8]
         bounds.append((0., 1.))
-
     if not guess:
         for b1 in startsb1:
             for b2 in startsb2:
@@ -187,15 +176,16 @@ for iSub in range(1, 34):
                         starts.append([b1, b2, sd, g])
 
     negloglik = np.inf
-    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][1]
+    method = ['SLSQP', 'L-BFGS-B'][0]
 
     for startparams in starts:
-#        res = opt.minimize(runit, startparams, method=method)  # no bounds, nm
         res = opt.minimize(runit, startparams, method=method, bounds=bounds)
 
         if res.fun < negloglik:  # if new result is smaller, replace it
             negloglik = res.fun
             bestparams = res.x
+#            print('%s' % startparams)
+#            print('%s' % np.array2string(bestparams))
 #            print('  loss: {0:.2f}'.format(negloglik))
 #            print('')
 
@@ -250,13 +240,13 @@ for iSub in range(1, 34):
     print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
     if bestparams[0] < bestparams[1]:
         print('catA %s' % np.array2string(conds[(conds > bestparams[0]) &
-                                                (conds < bestparams[1])]))
+                                                (conds <= bestparams[1])]))
         print('catB %s' % np.array2string(conds[(conds > bestparams[1]) |
-                                                (conds < bestparams[0])]))
+                                                (conds <= bestparams[0])]))
     elif bestparams[0] > bestparams[1]:
-        print('catA: %s' % np.array2string(conds[(conds < bestparams[0]) &
+        print('catA: %s' % np.array2string(conds[(conds <= bestparams[0]) &
                                                  (conds > bestparams[1])]))
-        print('catB: %s' % np.array2string(conds[(conds < bestparams[1]) |
+        print('catB: %s' % np.array2string(conds[(conds <= bestparams[1]) |
                                                  (conds > bestparams[0])]))
 
     # correct, incorrect, corr, inc (most resps should be on the correct side)
