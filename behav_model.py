@@ -16,7 +16,7 @@ from scipy.stats import norm
 from scipy import optimize as opt
 
 mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'  # love06
-#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
+mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
@@ -117,7 +117,7 @@ for iSub in range(1, 34):
                                           (dat['key'] == 1)],
                                  angdiff2[(dat['direction'].isin(catB2)) &
                                           (dat['key'] == 1)]))
-        if len(startparams) < 4:        
+        if len(startparams) < 4:
             resps1pr = 1-rv.pdf(resps1)
             resps2pr = rv.pdf(resps2)
         else:  # guess rate
@@ -174,6 +174,16 @@ for iSub in range(1, 34):
                 for sd in sds:
                     for g in gs:
                         starts.append([b1, b2, sd, g])
+
+    # use objective bounds ±30 as starting points
+    starts = []
+    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
+          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
+          [-15., 165.], [75., 255.], [165., -15.], [225., 75.]]
+
+    for b in bs:
+        for sd in sds:
+            starts.append([b[0], b[1], sd])
 
     negloglik = np.inf
     method = ['SLSQP', 'L-BFGS-B'][0]
