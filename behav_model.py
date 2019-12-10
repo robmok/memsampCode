@@ -16,7 +16,7 @@ from scipy.stats import norm
 from scipy import optimize as opt
 
 mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/'  # love06
-mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
+#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 codeDir=os.path.join(mainDir,'memsampCode')
 os.chdir(codeDir)
 
@@ -26,6 +26,8 @@ subjCat = pd.read_pickle(mainDir + 'mvpa_roi/subjCat.pkl')
 
 import time
 t0 = time.time()
+
+dfres = pd.DataFrame(columns=['bestparams','a','b', 'modelacc'], index=range(0, 34))
 
 for iSub in range(1, 34):
 #iSub = 2
@@ -59,77 +61,82 @@ for iSub in range(1, 34):
     # remove nans
     dat = dat[~np.isnan(dat['key'])]
 
-    # ...optimize this with bound1, bound2, and SD .., with sensible limits
+    # objective function - can i add dat in a different way?
+    def runit(params, dat=dat):
 
-    startparams = [0, 180, 1]  # bound 1, bound 2, and sigma (gaussian SD)
-    startparams = [270, 90, 1]  # bound 1, bound 2, and sigma (gaussian SD)
-#    startparams = [270, 90, 1, 0.5] # with guess rate
+        import numpy as np
+        if np.any(np.isnan(params)):
+            negloglik = np.inf
+        else:
+            def angdiff(x, y):
+                return np.arctan2(np.sin(x-y), np.cos(x-y))
 
-    def runit(startparams, dat=dat):
+            # distance from bound 1 and 2
+            angdiff1 = angdiff(
+                    np.radians(dat['direction'].values),
+                    np.radians(params[0]))
 
-        def angdiff(x, y):
-            import numpy as np
-            return np.arctan2(np.sin(x-y), np.cos(x-y))
+            angdiff2 = angdiff(
+                    np.radians(dat['direction'].values),
+                    np.radians(params[1]))
 
-        # distance from bound 1 and 2
-        angdiff1 = angdiff(
-                np.radians(dat['direction'].values),
-                np.radians(startparams[0]))
+            # find out if closer to bound 1 or 2, if same, include both
+            ind1 = abs(angdiff1) <= abs(angdiff2)  # closer to bound 1
+            ind2 = abs(angdiff1) >= abs(angdiff2)
 
-        angdiff2 = angdiff(
-                np.radians(dat['direction'].values),
-                np.radians(startparams[1]))
+            # clockwise or counterclowise to bound
+            ind1pos = angdiff1 >= 0  # = so if on bound, count on bound as pos
+            ind1neg = angdiff1 < 0
+            ind2pos = angdiff2 >= 0
+            ind2neg = angdiff2 < 0
 
-        # find out if closer to bound 1 or 2, if same, include both
-        ind1 = abs(angdiff1) <= abs(angdiff2)  # closer to bound 1
-        ind2 = abs(angdiff1) >= abs(angdiff2)
+            # conditions
+            catA1 = sorted(dat['direction'][ind1 & ind1pos].unique())  # A one side
+            catA2 = sorted(dat['direction'][ind2 & ind2neg].unique())  # other side
+            catB1 = sorted(dat['direction'][ind1 & ind1neg].unique())
+            catB2 = sorted(dat['direction'][ind2 & ind2pos].unique())
 
-        # clockwise or counterclowise to bound
-        ind1pos = angdiff1 >= 0  # = - so if on bound, count on bound as pos
-        ind1neg = angdiff1 < 0
-        ind2pos = angdiff2 >= 0
-        ind2neg = angdiff2 < 0
+            # normal distribution
+            rv = norm(0, params[2])
+        #        rv = vonmises(startparams[2], 0)
 
-        # conditions
-        catA1 = sorted(dat['direction'][ind1 & ind1pos].unique())  # A one side
-        catA2 = sorted(dat['direction'][ind2 & ind2neg].unique())  # other side
-        catB1 = sorted(dat['direction'][ind1 & ind1neg].unique())
-        catB2 = sorted(dat['direction'][ind2 & ind2pos].unique())
+            resps1 = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
+                                              (dat['key'] == 1)],
+                                     angdiff2[(dat['direction'].isin(catA2)) &
+                                              (dat['key'] == 1)],
+                                     angdiff1[(dat['direction'].isin(catB1)) &
+                                              (dat['key'] == 6)],
+                                     angdiff2[(dat['direction'].isin(catB2)) &
+                                              (dat['key'] == 6)]))
 
-        # normal distribution
-        rv = norm(0, startparams[2])
-#        rv = vonmises(startparams[2], 0)
+            resps2 = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
+                                              (dat['key'] == 6)],
+                                     angdiff2[(dat['direction'].isin(catA2)) &
+                                              (dat['key'] == 6)],
+                                     angdiff1[(dat['direction'].isin(catB1)) &
+                                              (dat['key'] == 1)],
+                                     angdiff2[(dat['direction'].isin(catB2)) &
+                                              (dat['key'] == 1)]))
+            if len(params) < 4:
+                resps1pr = 1-rv.pdf(resps1)
+                resps2pr = rv.pdf(resps2)
+            else:  # guess rate
+                alpha = params[3]  # guess rate
+                resps1pr = alpha * 0.5 + (1-alpha) * (1-rv.pdf(resps1))
+                resps2pr = alpha * 0.5 + (1-alpha) * rv.pdf(resps2)
 
-        resps1 = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
-                                          (dat['key'] == 1)],
-                                 angdiff2[(dat['direction'].isin(catA2)) &
-                                          (dat['key'] == 1)],
-                                 angdiff1[(dat['direction'].isin(catB1)) &
-                                          (dat['key'] == 6)],
-                                 angdiff2[(dat['direction'].isin(catB2)) &
-                                          (dat['key'] == 6)]))
-
-        resps2 = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
-                                          (dat['key'] == 6)],
-                                 angdiff2[(dat['direction'].isin(catA2)) &
-                                          (dat['key'] == 6)],
-                                 angdiff1[(dat['direction'].isin(catB1)) &
-                                          (dat['key'] == 1)],
-                                 angdiff2[(dat['direction'].isin(catB2)) &
-                                          (dat['key'] == 1)]))
-        if len(startparams) < 4:
-            resps1pr = 1-rv.pdf(resps1)
-            resps2pr = rv.pdf(resps2)
-        else:  # guess rate
-            alpha = startparams[3]  # guess rate
-            resps1pr = alpha * 0.5 + (1-alpha) * (1-rv.pdf(resps1))
-            resps2pr = alpha * 0.5 + (1-alpha) * rv.pdf(resps2)
-
-        # sum of log pr (to check exp this result, compare to np.prod of pr's)
-        negloglik = -np.sum(np.log(
-                np.concatenate((resps1pr, resps2pr))))
+            # sum logpr (to check exp this result, comp w np.prod of pr's)
+            negloglik = -np.sum(np.log(
+                    np.concatenate((resps1pr, resps2pr))))
 
         return negloglik
+
+    # ...optimize this with bound1, bound2, and SD .., with sensible limits
+
+#    startparams = [0, 180, 1]  # bound 1, bound 2, and sigma (gaussian SD)
+#    startparams = [270, 90, 1]  # bound 1, bound 2, and sigma (gaussian SD)
+#    startparams = [270, 90, 1, 0.5] # with guess rate
+
 
 #    # quick runthrough - without multiple starting point
 #    method = ['Nelder-Mead', 'SLSQP', 'L-BFGS-B'][0]
@@ -151,13 +158,10 @@ for iSub in range(1, 34):
 
     # looping through starts
     starts = []
-    startsb1 = np.arange(15., 345., 60)  # 60 orig, trying 45
+    startsb1 = np.arange(15., 345., 60)
     startsb2 = np.arange(45., 360., 60)-360
-    sds = [.5, 1, 2, 5, 10, 15]
-#    sds = [.1, .5, 1, 1.5, 2, 3.5, 5, 7.5, 10, 15]  #trying more
-#    sds = [.1, .5, 1, 1.5, 2, 3, 3.5, 5, 6, 7.5, 10, 11, 12, 13, 15, 17]  #trying even more
+#    sds = [.5, 1, 2, 5, 10, 15]
     sds = [.5, 1, 2, 3, 5, 8, 10, 15]
-    
 
     guess = False
     if guess:
@@ -175,20 +179,25 @@ for iSub in range(1, 34):
                     for g in gs:
                         starts.append([b1, b2, sd, g])
 
-    # use objective bounds ±30 as starting points
-    starts = []
-    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
-          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
-          [-15., 165.], [75., 255.], [165., -15.], [225., 75.]]
+#    # use objective bounds ±30 as starting points
+#    starts = []
+#    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
+#          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
+#          [-15., 165.], [75., 255.], [165., -15.], [225., 75.],
+#          [-345., -165.], [-255.,  -75.], [-165., -345.], [-75., -255.]]
+#    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
 
     for b in bs:
         for sd in sds:
             starts.append([b[0], b[1], sd])
 
     negloglik = np.inf
+    res = []
     method = ['SLSQP', 'L-BFGS-B'][0]
 
     for startparams in starts:
+
+        # start optimization
         res = opt.minimize(runit, startparams, method=method, bounds=bounds)
 
         if res.fun < negloglik:  # if new result is smaller, replace it
@@ -247,25 +256,31 @@ for iSub in range(1, 34):
                         (dat['direction'] < bestparams[1]),
                         'key'].values == 1).sum()
 
-    print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
+#    print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
     if bestparams[0] < bestparams[1]:
-        print('catA %s' % np.array2string(conds[(conds > bestparams[0]) &
-                                                (conds <= bestparams[1])]))
-        print('catB %s' % np.array2string(conds[(conds > bestparams[1]) |
-                                                (conds <= bestparams[0])]))
+        catA = conds[(conds > bestparams[0]) & (conds <= bestparams[1])]
+        catB = conds[(conds > bestparams[1]) | (conds <= bestparams[0])]
+        print('catA %s' % np.array2string(catA))
+        print('catB %s' % np.array2string(catB))
     elif bestparams[0] > bestparams[1]:
-        print('catA: %s' % np.array2string(conds[(conds <= bestparams[0]) &
-                                                 (conds > bestparams[1])]))
-        print('catB: %s' % np.array2string(conds[(conds <= bestparams[1]) |
-                                                 (conds > bestparams[0])]))
+        catA = conds[(conds <= bestparams[0]) & (conds > bestparams[1])]
+        catB = conds[(conds <= bestparams[1]) | (conds > bestparams[0])]      
+        print('catA %s' % np.array2string(catA))
+        print('catB %s' % np.array2string(catB))
 
     # correct, incorrect, corr, inc (most resps should be on the correct side)
-#    print([n_cata_resps_side1, n_cata_resps_side2,
-#           n_catb_resps_side2, n_catb_resps_side1])
+    ncorr_inc = [n_cata_resps_side1, n_cata_resps_side2,
+                 n_catb_resps_side2, n_catb_resps_side1]
+    print(ncorr_inc)
 
-    # checking how it matches up
-    print('subjCat catA: %s' % subjCat[iSub-1][0])
-    print('subjCat catB: %s' % subjCat[iSub-1][1])
+#    # checking how it matches up
+#    print('subjCat catA: %s' % subjCat[iSub-1][0])
+#    print('subjCat catB: %s' % subjCat[iSub-1][1])
+
+    dfres['bestparams'].loc[iSub-1] = bestparams
+    dfres['a'].loc[iSub-1] = catA
+    dfres['b'].loc[iSub-1] = catB
+    dfres['modelacc'].loc[iSub-1] = ncorr_inc
 
 t1 = time.time()
 print(t1-t0)
