@@ -45,6 +45,9 @@ lock2resp = False  # if loading in lock2resp glms (to get motor effect)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 # subjCat-resp - decode on category subject responded
 
+# model estimated subjective category
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
+
 decodeFeature = 'subjCat'
 
 decodeFromFeedback = False
@@ -147,39 +150,45 @@ for iSub in range(1, nSubs+1):
     if decodeFeature == 'subjCat-minus-motor':
         dfCondResp = dfCond['key']
 
-    # get subjective category based on responses
-    if (decodeFeature[0:7]=='subjCat')|(decodeFeature=='dir-all'):
-        #flip responses for runs - need double check if keymap is what i think it is. looks ok
-        ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
-        ind2=dfCond['key']==6
-        ind3=dfCond['key']==1
-        dfCond.loc[ind1&ind2,'key']=5
-        dfCond.loc[ind1&ind3,'key']=6
-        dfCond.loc[ind1&ind2,'key']=1
-        #get subjective category
-        conds=dfCond.direction.unique()
-        conds.sort()
-        respPr = pd.Series(index=conds)
-        for iCond in conds:
-            respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
-        subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
-        subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-        # unless:   
-        if iSub == 5:  # move 240 and 270 to catA
-            subjCatAconds = np.append(subjCatAconds,[240,270])
-            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-        elif iSub == 10:  # move 270 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
-            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-        elif iSub == 17:  # move 30 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
-            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-        elif iSub == 24:  # move 120 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
-            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-        elif iSub == 27:  # move 270 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
-            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+#    # get subjective category based on responses
+#    if (decodeFeature[0:7]=='subjCat')|(decodeFeature=='dir-all'):
+#        #flip responses for runs - need double check if keymap is what i think it is. looks ok
+#        ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
+#        ind2=dfCond['key']==6
+#        ind3=dfCond['key']==1
+#        dfCond.loc[ind1&ind2,'key']=5
+#        dfCond.loc[ind1&ind3,'key']=6
+#        dfCond.loc[ind1&ind2,'key']=1
+#        #get subjective category
+#        conds=dfCond.direction.unique()
+#        conds.sort()
+#        respPr = pd.Series(index=conds)
+#        for iCond in conds:
+#            respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
+#        subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
+#        subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+#        # unless:   
+#        if iSub == 5:  # move 240 and 270 to catA
+#            subjCatAconds = np.append(subjCatAconds,[240,270])
+#            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
+#        elif iSub == 10:  # move 270 to cat B
+#            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
+#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
+#        elif iSub == 17:  # move 30 to cat B
+#            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
+#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
+#        elif iSub == 24:  # move 120 to cat A
+#            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
+#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
+#        elif iSub == 27:  # move 270 to cat A
+#            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
+#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+
+    # get subjective category based on model
+
+    if (decodeFeature[0:7]=='subjCat'):
+        subjCatAconds = dfmodel['a'].loc[iSub-1]
+        subjCatBconds = dfmodel['b'].loc[iSub-1]
 
     # =============================================================================
     # set up brain data

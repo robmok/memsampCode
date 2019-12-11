@@ -44,7 +44,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
+#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
 behavDir=os.path.join(mainDir,'behav')
 eventsDir=os.path.join(mainDir,'orig_events')
 behavFigDir=os.path.join(mainDir,'behav')
@@ -206,6 +206,6 @@ if saveFigs:
     
 # conds sorted from 0 to 330 for all subs, check if matches up
     
-iSub=0
+iSub=6-1
 plt.plot(range(0,12),respPrAllsorted.loc[iSub],alpha=0.2)
 

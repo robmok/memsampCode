@@ -27,7 +27,7 @@ subjCat = pd.read_pickle(mainDir + 'mvpa_roi/subjCat.pkl')
 import time
 t0 = time.time()
 
-dfres = pd.DataFrame(columns=['bestparams','a','b', 'modelacc'], index=range(0, 34))
+dfres = pd.DataFrame(columns=['bestparams','a','b', 'modelacc'], index=range(0, 33))
 
 for iSub in range(1, 34):
 #iSub = 2
@@ -284,6 +284,36 @@ for iSub in range(1, 34):
 
 t1 = time.time()
 print(t1-t0)
+
+fnamesave = mainDir + 'behav/modelsubjcat1'
+dfres.to_pickle(fnamesave + '.pkl')
+
+#for iSub in [5, 6, 11, 13, 17, 18, 24, 27]: #range(1,34):
+#    print(iSub)
+#    print('catA %s' % np.array2string(dfres['a'].loc[iSub-1]))
+#    print('catA %s' % np.array2string(dfres['b'].loc[iSub-1]))
+#    print('subjCat catA: %s' % subjCat[iSub-1][0])
+#    print('subjCat catB: %s' % subjCat[iSub-1][1])
+#    
+##    print(np.all(dfres['a'].loc[iSub-1]==subjCat[iSub-1][0]))
+##    print(np.all(dfres['b'].loc[iSub-1]==subjCat[iSub-1][1]))
+#    
+#    print('')
+
+#iSub = 5-1
+#dfres['bestparams'].loc[iSub] = np.array([281.00275998, 120.00000211,   1.26222814])
+#dfres['a'].loc[iSub] = np.array([150., 180., 210., 240., 270.])
+#dfres['b'].loc[iSub] = np.array([  0.,  30.,  60.,  90., 120., 300., 330.])
+#dfres['modelacc'].loc[iSub] = []
+#
+#iSub = 6-1
+#dfres['bestparams'].loc[iSub] = np.array([281.00275998, 120.00000211,   1.26222814])
+#dfres['a'].loc[iSub] = np.array([150., 180., 210., 240., 270., 300.])
+#dfres['b'].loc[iSub] = np.array([0.,  30.,  60.,  90., 120., 330])
+#dfres['modelacc'].loc[iSub] = []
+
+
+
 # %%
 
 ## testing activations make sense

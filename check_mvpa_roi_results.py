@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'objCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -43,9 +43,23 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 ##decoding at feedback time
 #fname = fname + '_fromfeedback'
 
-
-df=pd.read_pickle(fname + '.pkl')
+#
+#df=pd.read_pickle(fname + '_1.pkl')
+df=pd.read_pickle(fname + '_new_need_fix_other_rois.pkl')
 print(df.loc['stats'])
+
+
+
+
+#df1 = df.copy()
+
+#roi = 'MDroi_area8c_lh'
+#roi = 'hMT_lh'
+#ind = np.array([5, 6, 11, 13, 17, 18, 24, 27])-1
+#for roi in roinames:
+#        df[roi].loc[ind] = df1[roi].loc[ind]
+
+
 
 
 pvals=np.empty((len(list(df))))
@@ -54,17 +68,17 @@ for iRoi in range(0,len(list(df))):
 
 # correcting
 # all rois apart from motor (12 ROIS)
-print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
-multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+#print(fdr(pvals[0:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#multest(pvals[0:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 # all rois apart from EVC and motor (10 ROIS)
-print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
-multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
+#print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
+#multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
 
 
 # no EVC and motor - after added ffa/ppa (and also evc, but drop later):
-#ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
-ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
+ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
+#ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
 print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 #multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
@@ -93,13 +107,13 @@ print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 
 
 # recomputing tstat and pvals and savings to df
-#chance=0.5
-#indSubs=np.ones(33,dtype=bool)
-#for roi in list(df):
-#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
-##
-#print(df.loc['stats'])
-#df.to_pickle(fname + '.pkl')
+chance=0
+indSubs=np.ones(33,dtype=bool)
+for roi in list(df):
+    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
+#
+print(df.loc['stats'])
+df.to_pickle(fname + '.pkl') # _orig_plus_new_
 
 #%% exclude subs
 
