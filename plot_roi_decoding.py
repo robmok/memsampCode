@@ -54,12 +54,24 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
+df=pd.read_pickle(fname + '_model.pkl')
+
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
 
 #load in subjCat
-subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
+#subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 #load in behav acc
-behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
+#behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
+behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat_model.npz'))
 locals().update(behav) #load in each variable into workspace
+
+#%% outliers
+
+sd=np.empty(33)
+for iSub in range(0,33):
+    sd[iSub] = 1/dfmodel['bestparams'].loc[iSub][2]
+
+outliers = np.where(sd > sd.mean()+np.std(sd)*2)
 
 #%% plot bar / errorbar plot
 #plt.rcdefaults()
@@ -67,15 +79,18 @@ plt.style.use('seaborn-darkgrid')
 
 saveFigs = False
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-#    indSubs[:]=True # reset if don't include excl above
-    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+#    nDirInCat=np.empty((2,33))
+#    for iSub in range(0,33):
+#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+##    indSubs[:]=True # reset if don't include excl above
+#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -124,15 +139,18 @@ sns.set_style("ticks")
 
 saveFigs = False
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-#    indSubs[:]=True # reset if don't include excl above
-#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+#    nDirInCat=np.empty((2,33))
+#    for iSub in range(0,33):
+#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+##    indSubs[:]=True # reset if don't include excl above
+##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -351,13 +369,16 @@ sns.set_style("ticks")
 
 saveFigs = False
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+#    nDirInCat=np.empty((2,33))
+#    for iSub in range(0,33):
+#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+    
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -423,15 +444,17 @@ greycol=tuple([0.5,0.5,0.5])
 
 plt.style.use('seaborn-darkgrid')
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-#    indSubs[:]=True # reset if don't include excl above
-#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+#    nDirInCat=np.empty((2,33))
+#    for iSub in range(0,33):
+#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+##    indSubs[:]=True # reset if don't include excl above
+##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -545,6 +568,21 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
     
 #%% #robust regression
+
+exclSubs = True
+if exclSubs:
+#    nDirInCat=np.empty((2,33))
+#    for iSub in range(0,33):
+#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+##    indSubs[:]=True # reset if don't include excl above
+##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+else:
+    indSubs=np.ones(33,dtype=bool)
+    
 #y=acc[indSubs]
 ##x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
 ###x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
@@ -566,7 +604,7 @@ fntSiz = 14  # fntSiz>10 cuts offf...
 legFntSiz = 12
 saveFigs = False
 
-robustPlot = False  # set to false when testing out things in plotting (takes time) 
+robustPlot = True  # set to false when testing out things in plotting (takes time) 
 
 # plot with CIs of the slopes
 roi = 'MDroi_area8c_lh'

@@ -15,8 +15,10 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 #decode feedback stimulus - smmothed (larger) FFA/PPA rois
 
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
+    -e s:"bilateralRois = False":"bilateralRois = True":g \
         < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
+
 
 
 # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \

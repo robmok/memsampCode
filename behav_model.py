@@ -156,36 +156,36 @@ for iSub in range(1, 34):
     bounds = [(-359, 359), (-359, 359), (0., 50.)]
 #    bounds = [(-np.radians(359), np.radians(359)), (-np.radians(359), np.radians(359)), (0., 20.), (0., 1.)]
 
-#    # looping through starts
-#    starts = []
-#    startsb1 = np.arange(15., 345., 60)
-#    startsb2 = np.arange(45., 360., 60)-360
-##    sds = [.5, 1, 2, 5, 10, 15]
-#    sds = [.5, 1, 2, 3, 5, 8, 10, 15]
-#
-#    guess = False
-#    if guess:
-#        gs = [.1, .3, .6, .8]
-#        bounds.append((0., 1.))
-#    if not guess:
-#        for b1 in startsb1:
-#            for b2 in startsb2:
-#                for sd in sds:
-#                    starts.append([b1, b2, sd])
-#    else:
-#        for b1 in startsb1:
-#            for b2 in startsb2:
-#                for sd in sds:
-#                    for g in gs:
-#                        starts.append([b1, b2, sd, g])
+    # looping through starts
+    starts = []
+    startsb1 = np.arange(15., 345., 60)
+    startsb2 = np.arange(45., 360., 60)-360
+#    sds = [.5, 1, 2, 5, 10, 15]
+    sds = [.5, 1, 2, 3, 5, 8, 10, 15]
+
+    guess = False
+    if guess:
+        gs = [.1, .3, .6, .8]
+        bounds.append((0., 1.))
+    if not guess:
+        for b1 in startsb1:
+            for b2 in startsb2:
+                for sd in sds:
+                    starts.append([b1, b2, sd])
+    else:
+        for b1 in startsb1:
+            for b2 in startsb2:
+                for sd in sds:
+                    for g in gs:
+                        starts.append([b1, b2, sd, g])
 
 #    # use objective bounds ±30 as starting points
-    starts = []
-    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
-          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
-          [-15., 165.], [75., 255.], [165., -15.], [225., 75.],
-          [-345., -165.], [-255.,  -75.], [-165., -345.], [-75., -255.]]
-    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
+#    starts = []
+#    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
+#          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
+#          [-15., 165.], [75., 255.], [165., -15.], [225., 75.],
+#          [-345., -165.], [-255.,  -75.], [-165., -345.], [-75., -255.]]
+#    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
 
     for b in bs:
         for sd in sds:
@@ -256,7 +256,7 @@ for iSub in range(1, 34):
                         (dat['direction'] < bestparams[1]),
                         'key'].values == 1).sum()
 
-#    print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
+    print('sub %d bestparams: %s' % (iSub, np.array2string(bestparams)))
     if bestparams[0] < bestparams[1]:
         catA = conds[(conds > bestparams[0]) & (conds <= bestparams[1])]
         catB = conds[(conds > bestparams[1]) | (conds <= bestparams[0])]
@@ -272,6 +272,7 @@ for iSub in range(1, 34):
     ncorr_inc = [n_cata_resps_side1, n_cata_resps_side2,
                  n_catb_resps_side2, n_catb_resps_side1]
     print(ncorr_inc)
+    print('')
 
 #    # checking how it matches up
 #    print('subjCat catA: %s' % subjCat[iSub-1][0])

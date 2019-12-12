@@ -44,8 +44,9 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #fname = fname + '_fromfeedback'
 
 #
-#df=pd.read_pickle(fname + '_1.pkl')
-df=pd.read_pickle(fname + '_new_need_fix_other_rois.pkl')
+#df=pd.read_pickle(fname + '.pkl')
+#df=pd.read_pickle(fname + '_new_need_fix_other_rois.pkl')
+df=pd.read_pickle(fname + '_orig_plus_new.pkl')
 print(df.loc['stats'])
 
 
@@ -107,28 +108,30 @@ print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 
 
 # recomputing tstat and pvals and savings to df
-chance=0
-indSubs=np.ones(33,dtype=bool)
-for roi in list(df):
-    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
-#
-print(df.loc['stats'])
-df.to_pickle(fname + '.pkl') # _orig_plus_new_
+#chance=0
+#indSubs=np.ones(33,dtype=bool)
+#for roi in list(df):
+#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
+##
+#print(df.loc['stats'])
+#df.to_pickle(fname + '.pkl') # _orig_plus_new_
 
 #%% exclude subs
 
 exclSubs = True
 exclParietalSubs = False
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+#    nDirInCat=np.empty((2,33))
+#    for iSub in range(0,33):
+#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
+#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
+#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
         
 #    indSubs[:]=True # reset if don't include excl above
 #    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
-    
+
+    indSubs=np.ones(33,dtype=bool)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 #exclude parietal cutoff subs
 elif exclParietalSubs: # same, IPS no diff, others no diff
     indSubs=np.ones(33,dtype=bool)
@@ -147,7 +150,7 @@ print(newStats.T)
 pvals=newStats.iloc[1].values
 
 #subjCat-orth without unequal conds subs
-ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
-print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
+#ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
+#print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 
 

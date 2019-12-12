@@ -54,6 +54,8 @@ behavFigDir=os.path.join(mainDir,'behav')
 #mainDir='/Users/robertmok/Downloads'
 #eventsDir=os.path.join(mainDir,'orig_events')
 
+
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
@@ -121,13 +123,16 @@ for iSub in range(1,34):
         respPrAll[cnt].iloc[iSub-1] = respPr[iCond]
         cnt=cnt+1
         
+    #no sorting - just to plot 0:330 for everyone at the bottom of the script
     cnt=0
-    #no sorting
     for iCond in conds:
         respPrAllsorted[cnt].iloc[iSub-1] = respPr[iCond]
         cnt=cnt+1
 
     #accuracy
+    # NEW: subjCat based on model
+    subjCatAconds = dfmodel['a'].loc[iSub-1]
+    subjCatBconds = dfmodel['b'].loc[iSub-1]
     respA=np.empty(0) 
     respB=np.empty(0) 
     for iCond in subjCatAconds:
@@ -142,7 +147,7 @@ for iSub in range(1,34):
     objAcc[iSub-1]=np.nansum(dfCond['resp'])/len(dfCond['resp'])
 
 #save
-#np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
+#np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat_model'),acc=acc,accA=accA,accB=accB,objAcc=objAcc)
 
 
 #    if np.any((dfCond['direction']==0)&(dfCond['rawdirection']==135)):
