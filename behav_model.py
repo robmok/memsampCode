@@ -120,6 +120,9 @@ for iSub in range(1, 34):
             if len(params) < 4:
                 resps1pr = 1-rv.pdf(resps1)
                 resps2pr = rv.pdf(resps2)
+                # one-tailed
+#                resps1pr = 1-(rv.pdf(resps1)*2)
+#                resps2pr = rv.pdf(resps2)*2
             else:  # guess rate
                 alpha = params[3]  # guess rate
                 resps1pr = alpha * 0.5 + (1-alpha) * (1-rv.pdf(resps1))
@@ -187,9 +190,9 @@ for iSub in range(1, 34):
 #          [-345., -165.], [-255.,  -75.], [-165., -345.], [-75., -255.]]
 #    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
 
-    for b in bs:
-        for sd in sds:
-            starts.append([b[0], b[1], sd])
+#    for b in bs:
+#        for sd in sds:
+#            starts.append([b[0], b[1], sd])
 
     negloglik = np.inf
     res = []
@@ -264,7 +267,7 @@ for iSub in range(1, 34):
         print('catB %s' % np.array2string(catB))
     elif bestparams[0] > bestparams[1]:
         catA = conds[(conds <= bestparams[0]) & (conds > bestparams[1])]
-        catB = conds[(conds <= bestparams[1]) | (conds > bestparams[0])]      
+        catB = conds[(conds <= bestparams[1]) | (conds > bestparams[0])] 
         print('catA %s' % np.array2string(catA))
         print('catB %s' % np.array2string(catB))
 
@@ -286,7 +289,7 @@ for iSub in range(1, 34):
 t1 = time.time()
 print(t1-t0)
 
-fnamesave = mainDir + 'behav/modelsubjcat2'
+fnamesave = mainDir + 'behav/modelsubjcat3'
 dfres.to_pickle(fnamesave + '.pkl')
 
 #for iSub in [5, 6, 11, 13, 17, 18, 24, 27]: #range(1,34):

@@ -131,7 +131,7 @@ if exclSubs:
 #    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
 
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18) - <2SD
 #exclude parietal cutoff subs
 elif exclParietalSubs: # same, IPS no diff, others no diff
     indSubs=np.ones(33,dtype=bool)

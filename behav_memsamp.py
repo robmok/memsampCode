@@ -211,6 +211,8 @@ if saveFigs:
     
 # conds sorted from 0 to 330 for all subs, check if matches up
     
-iSub=6-1
-plt.plot(range(0,12),respPrAllsorted.loc[iSub],alpha=0.2)
-
+for iSub in range(1,34):
+    print(iSub)
+    print(dfmodel.loc[iSub-1])
+    plt.plot(range(0, 12), respPrAllsorted.loc[iSub], alpha=0.2)
+    plt.show()
