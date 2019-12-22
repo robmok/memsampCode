@@ -211,8 +211,9 @@ if saveFigs:
     
 # conds sorted from 0 to 330 for all subs, check if matches up
     
-for iSub in range(1,34):
+for iSub in range(0,33):
     print(iSub)
-    print(dfmodel.loc[iSub-1])
+#    print(dfmodel.loc[iSub])
+#    print(dfmodel['bestparams'].loc[iSub][2])
     plt.plot(range(0, 12), respPrAllsorted.loc[iSub], alpha=0.2)
     plt.show()

@@ -153,7 +153,6 @@ for iSub in range(1, 34):
     starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
 #    bounds = [(None, None), (None, None), (0., 50.)]
     bounds = [(-359, 359), (-359, 359), (0., 20.)]
-#    bounds = [(-359, 359), (-359, 359), (0., 20.), (0., 1.)]
 #
     # looping through starts
     starts = []
@@ -178,29 +177,36 @@ for iSub in range(1, 34):
                     for g in gs:
                         starts.append([b1, b2, sd, g])
 
-    # use objective bounds ±30 as starting points
-    starts = []
+#    # use objective bounds ±30 as starting points
+#    starts = []
 #    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
 #          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
 #          [-15., 165.], [75., 255.], [165., -15.], [225., 75.],
 #          [-345., -165.], [-255.,  -75.], [-165., -345.], [-75., -255.]]
+#
+##    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
+##          [45., 225.], [135., 315.], [225., 45.], [315., 135.]]
+#
+#    sds = [.5, 1., 5., 8., 10.]
+##    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
+#    gs = [.1, .5, .9]
+#
+#    guess = True
+#    if guess:
+#        gs = [.1, .3, .6, .8]
+#        bounds.append((0., 1.))
+#    if not guess:
+#        for b in bs:
+#            for sd in sds:
+#                starts.append([b[0], b[1], sd])
+#    else:
+#        for b in bs:
+#            for sd in sds:
+#                for g in gs:
+#                    starts.append([b[0], b[1], sd, g])
 
-    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
-          [45., 225.], [135., 315.], [225., 45.], [315., 135.]]
-    sds = [.5, 1., 5., 8., 10.]
-#    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
-    gs = [.1, .5, .9]
 
-    for b in bs:
-        for sd in sds:
-            starts.append([b[0], b[1], sd])
-
-#    for b in bs:
-#        for sd in sds:
-#            for g in gs:
-#                starts.append([b1, b2, sd, g])
-
-    starts = [[15, 195, 2]]
+#    starts = [[15, 195, 2]]
 
     negloglik = np.inf
     res = []
