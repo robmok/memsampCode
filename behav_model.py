@@ -30,7 +30,7 @@ t0 = time.time()
 dfres = pd.DataFrame(columns=['bestparams','a','b', 'modelacc'], index=range(0, 33))
 
 for iSub in range(1, 34):
-#iSub = 2
+#iSub = 1
 
     subNum = f'{iSub:02d}'
     dfCond = pd.DataFrame()  # main df with all runs
@@ -96,41 +96,37 @@ for iSub in range(1, 34):
             catB1 = sorted(dat['direction'][ind1 & ind1neg].unique())
             catB2 = sorted(dat['direction'][ind2 & ind2pos].unique())
 
-            # normal distribution
-            rv = norm(0, params[2])
-        #        rv = vonmises(startparams[2], 0)
+            # acc to boundary, resps1==correct, resps2==incorrect
+            r1a = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
+                                           (dat['key'] == 1)],
+                                  angdiff2[(dat['direction'].isin(catB2)) &
+                                           (dat['key'] == 6)]))
+            r1b = np.concatenate((angdiff2[(dat['direction'].isin(catA2)) &
+                                           (dat['key'] == 1)],
+                                  angdiff1[(dat['direction'].isin(catB1)) &
+                                           (dat['key'] == 6)]))
 
-            resps1 = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
-                                              (dat['key'] == 1)],
-                                     angdiff2[(dat['direction'].isin(catA2)) &
-                                              (dat['key'] == 1)],
-                                     angdiff1[(dat['direction'].isin(catB1)) &
-                                              (dat['key'] == 6)],
-                                     angdiff2[(dat['direction'].isin(catB2)) &
-                                              (dat['key'] == 6)]))
+            r2a = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
+                                           (dat['key'] == 6)],
+                                  angdiff2[(dat['direction'].isin(catB2)) &
+                                           (dat['key'] == 1)]))
+            r2b = np.concatenate((angdiff2[(dat['direction'].isin(catA2)) &
+                                           (dat['key'] == 6)],
+                                  angdiff1[(dat['direction'].isin(catB1)) &
+                                           (dat['key'] == 1)]))
 
-            resps2 = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
-                                              (dat['key'] == 6)],
-                                     angdiff2[(dat['direction'].isin(catA2)) &
-                                              (dat['key'] == 6)],
-                                     angdiff1[(dat['direction'].isin(catB1)) &
-                                              (dat['key'] == 1)],
-                                     angdiff2[(dat['direction'].isin(catB2)) &
-                                              (dat['key'] == 1)]))
-            if len(params) < 4:
-                resps1pr = 1-rv.pdf(resps1)
-                resps2pr = rv.pdf(resps2)
-                # one-tailed
-#                resps1pr = 1-(rv.pdf(resps1)*2)
-#                resps2pr = rv.pdf(resps2)*2
-            else:  # guess rate
+            # put through cdfå
+            allresps = np.concatenate((1-norm.cdf(r1a, 0, params[2]),
+                                       norm.cdf(r1b, 0, params[2]),
+                                       norm.cdf(r2a, 0, params[2]),
+                                       1-norm.cdf(r2b, 0, params[2])))
+
+            if len(params) == 4:  # with guess rate
                 alpha = params[3]  # guess rate
-                resps1pr = alpha * 0.5 + (1-alpha) * (1-rv.pdf(resps1))
-                resps2pr = alpha * 0.5 + (1-alpha) * rv.pdf(resps2)
+                allresps = alpha * 0.5 + (1-alpha) * (allresps)
 
             # sum logpr (to check exp this result, comp w np.prod of pr's)
-            negloglik = -np.sum(np.log(
-                    np.concatenate((resps1pr, resps2pr))))
+            negloglik = -np.sum(np.log(allresps))
 
         return negloglik
 
@@ -153,16 +149,16 @@ for iSub in range(1, 34):
 #                         minimizer_kwargs=minimizer_kwargs)
 #    bestparams = res.x
 
-    # multiple starting point (self)
-#    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
+#    # multiple starting point (self)
+    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
 #    bounds = [(None, None), (None, None), (0., 50.)]
-    bounds = [(-359, 359), (-359, 359), (0., 50.)]
-#    bounds = [(-np.radians(359), np.radians(359)), (-np.radians(359), np.radians(359)), (0., 20.), (0., 1.)]
-
+    bounds = [(-359, 359), (-359, 359), (0., 20.)]
+#    bounds = [(-359, 359), (-359, 359), (0., 20.), (0., 1.)]
+#
     # looping through starts
     starts = []
     startsb1 = np.arange(15., 345., 60)
-    startsb2 = np.arange(45., 360., 60)-360
+    startsb2 = np.arange(45., 360., 60)  # -360
 #    sds = [.5, 1, 2, 5, 10, 15]
     sds = [.5, 1, 2, 3, 5, 8, 10, 15]
 
@@ -182,17 +178,29 @@ for iSub in range(1, 34):
                     for g in gs:
                         starts.append([b1, b2, sd, g])
 
-#    # use objective bounds ±30 as starting points
-#    starts = []
+    # use objective bounds ±30 as starting points
+    starts = []
 #    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
 #          [45., 225.], [135., 315.], [225., 45.], [315., 135.],
 #          [-15., 165.], [75., 255.], [165., -15.], [225., 75.],
 #          [-345., -165.], [-255.,  -75.], [-165., -345.], [-75., -255.]]
+
+    bs = [[15., 195.], [105., 285.], [195., 15.], [285., 105.],
+          [45., 225.], [135., 315.], [225., 45.], [315., 135.]]
+    sds = [.5, 1., 5., 8., 10.]
 #    sds = [.5, 1., 2., 3., 5., 8., 10., 15.]
+    gs = [.1, .5, .9]
+
+    for b in bs:
+        for sd in sds:
+            starts.append([b[0], b[1], sd])
 
 #    for b in bs:
 #        for sd in sds:
-#            starts.append([b[0], b[1], sd])
+#            for g in gs:
+#                starts.append([b1, b2, sd, g])
+
+    starts = [[15, 195, 2]]
 
     negloglik = np.inf
     res = []
@@ -202,7 +210,6 @@ for iSub in range(1, 34):
 
         # start optimization
         res = opt.minimize(runit, startparams, method=method, bounds=bounds)
-
         if res.fun < negloglik:  # if new result is smaller, replace it
             negloglik = res.fun
             bestparams = res.x
@@ -267,19 +274,19 @@ for iSub in range(1, 34):
         print('catB %s' % np.array2string(catB))
     elif bestparams[0] > bestparams[1]:
         catA = conds[(conds <= bestparams[0]) & (conds > bestparams[1])]
-        catB = conds[(conds <= bestparams[1]) | (conds > bestparams[0])] 
+        catB = conds[(conds <= bestparams[1]) | (conds > bestparams[0])]
         print('catA %s' % np.array2string(catA))
         print('catB %s' % np.array2string(catB))
 
-    # correct, incorrect, corr, inc (most resps should be on the correct side)
+    # incorrect, correct, inc, corr (most resps should be on the correct side)
     ncorr_inc = [n_cata_resps_side1, n_cata_resps_side2,
                  n_catb_resps_side2, n_catb_resps_side1]
     print(ncorr_inc)
-    print('')
+#    print('')
 
 #    # checking how it matches up
-#    print('subjCat catA: %s' % subjCat[iSub-1][0])
-#    print('subjCat catB: %s' % subjCat[iSub-1][1])
+    print('subjCat catA: %s' % subjCat[iSub-1][0])
+    print('subjCat catB: %s' % subjCat[iSub-1][1])
 
     dfres['bestparams'].loc[iSub-1] = bestparams
     dfres['a'].loc[iSub-1] = catA
@@ -290,7 +297,7 @@ t1 = time.time()
 print(t1-t0)
 
 fnamesave = mainDir + 'behav/modelsubjcat3'
-dfres.to_pickle(fnamesave + '.pkl')
+#dfres.to_pickle(fnamesave + '.pkl')
 
 #for iSub in [5, 6, 11, 13, 17, 18, 24, 27]: #range(1,34):
 #    print(iSub)
