@@ -2,16 +2,12 @@
 # Rois
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
-mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
+# mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
-#motor
-#svm subjCat-all
-sed -e s:"#mainDir":"mainDir":g \
-    -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-all'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois = ['SPL1_lh','SPL1_rh']":"rois = ['motor_lh', 'motor_rh']":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+# subjCat guess model
+sed -e s:"guessmodel = False":"guessmodel = True":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py

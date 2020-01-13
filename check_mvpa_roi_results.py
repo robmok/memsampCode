@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -45,20 +45,51 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 
 #
 df=pd.read_pickle(fname + '.pkl')
-#df=pd.read_pickle(fname + '_new_need_fix_other_rois.pkl')
-#df=pd.read_pickle(fname + '_orig_plus_new.pkl')
+#df=pd.read_pickle(fname + '_model.pkl')
+#df=pd.read_pickle(fname + '_1.pkl')
+#df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 print(df.loc['stats'])
 
 
 
+# subjCat-orth
 
-#df1 = df.copy()
-
-#roi = 'MDroi_area8c_lh'
-#roi = 'hMT_lh'
-#ind = np.array([5, 6, 11, 13, 17, 18, 24, 27])-1
+#df=pd.read_pickle(fname + '_RMsubjCat.pkl')
+#df1=pd.read_pickle(fname + '_model.pkl')    # MT:.017, mMFG: .00519
+#df1=pd.read_pickle(fname + '_2.pkl')  # MT:.035, mMFG: .00569
+#df1=pd.read_pickle(fname + '_3.pkl')  # MT:.047, mMFG: .00416
+#roinames = list(df)
+#
+#ind = np.array([3, 4, 5, 12,14,16,23, 26, 28, 31])  # subjCat vs model diffs
+#chance = 0
 #for roi in roinames:
-#        df[roi].loc[ind] = df1[roi].loc[ind]
+#    df[roi].loc[ind] = df1[roi].loc[ind]
+#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[0:33].astype(float), chance, nan_policy='omit')
+#print(df.loc['stats'])
+
+
+
+# subjCat-orth - guess model
+
+
+
+# subjCat-minus-motor
+# _1: mMFG: .0265
+
+
+
+
+
+# subjCat-minus-motor - guess model
+
+
+
+
+
+#subjCat only - standard model
+# _1: mMFG: 0.027
+
+
 
 
 

@@ -8,49 +8,5 @@ codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 
-#lock2resp ffa/ppa/evc
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'motor'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = '12-way'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
-
-
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat'":g \
-    -e s:"reRun = False":"reRun = True":g \
-    -e s:"#rois":"rois":g \
-    -e s:"lock2resp = False":"lock2resp = True":g \
-    < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
-python ${tmpScrDir}/mvpa_memsamp1.py
+# subjCat standard model
+python ${codeDir}/mvpa_memsamp.py

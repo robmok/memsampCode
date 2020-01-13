@@ -23,9 +23,9 @@ mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
 
 sys.path.append(mainDir)
 
-featDir=os.path.join(mainDir,'memsampFeat')
-roiDir=os.path.join(mainDir,'rois')
-codeDir=os.path.join(mainDir,'memsampCode')
+featDir = os.path.join(mainDir, 'memsampFeat')
+roiDir = os.path.join(mainDir, 'rois')
+codeDir = os.path.join(mainDir, 'memsampCode')
 os.chdir(codeDir)
 
 from memsamp_RM import crossEuclid, mNobis, compCovMat, getConds2comp
@@ -47,6 +47,10 @@ lock2resp = False  # if loading in lock2resp glms (to get motor effect)
 
 # model estimated subjective category
 dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
+
+guessmodel = False
+if guessmodel:
+    dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat_guess.pkl')
 
 decodeFeature = 'subjCat'
 
@@ -426,6 +430,10 @@ if reRun is True:
     for roi in rois:
         dfTmp[roi] = dfDecode[roi]
     dfDecode = dfTmp
+
+
+if guessmodel:
+    fnameSave = fnameSave + '_guess'
 
 # save df
 dfDecode.to_pickle(fnameSave + '.pkl')

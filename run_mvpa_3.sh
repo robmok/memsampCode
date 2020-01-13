@@ -7,6 +7,7 @@ mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 codeDir=${mainDir}/'memsampCode'
 tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
+# subjCat-minus-motor standard model
 sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-minus-motor'":g \
         < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
