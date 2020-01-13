@@ -55,7 +55,7 @@ behavFigDir=os.path.join(mainDir,'behav')
 #eventsDir=os.path.join(mainDir,'orig_events')
 
 
-dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
 #%%
 
 subs = range(1,34) #33 subs - range doesn't include last number
@@ -94,36 +94,27 @@ for iSub in range(1,34):
     respPr = pd.Series(index=conds)
     for iCond in conds:
         respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
+#    
+#    subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
+#    subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
+
+    #for respPrAll plot    
+    #sort based on subjCat
+#    subjCatBcondsSorted=np.concatenate([subjCatBconds[subjCatBconds>=300],subjCatBconds[subjCatBconds<300]]) #rearrange to make the directions within a cat next to each other (300 and 330 need to be next to 0)
+#    subjCatConds = np.concatenate([subjCatBcondsSorted, subjCatAconds])
+#    cnt=0
+#    for iCond in subjCatConds:
+#        respPrAll[cnt].iloc[iSub-1] = respPr[iCond]
+#        cnt=cnt+1
     
-    subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
-    subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-        
-#    #unless:   
-#    if iSub==5: #move 240 and 270 to catA
-#        subjCatAconds = np.append(subjCatAconds,[240,270])
-#        subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-#    elif iSub==10: #move 270 to cat B
-#        subjCatBconds = np.sort(np.append(subjCatBconds,270))
-#        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-#    elif iSub == 17:#move 30 to cat B
-#        subjCatBconds = np.sort(np.append(subjCatBconds,30))
-#        subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-#    elif iSub==24: #move 120 to cat A
-#        subjCatAconds = np.sort(np.append(subjCatAconds,120))
-#        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-#    elif iSub==27:#move 270 to cat A
-#        subjCatAconds = np.sort(np.append(subjCatAconds,270))
-#        subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
-    
-    #for respPrAll plot
-    subjCatBcondsSorted=np.concatenate([subjCatBconds[subjCatBconds>=300],subjCatBconds[subjCatBconds<300]]) #rearrange to make the directions within a cat next to each other (300 and 330 need to be next to 0)
-    subjCatConds = np.concatenate([subjCatBcondsSorted, subjCatAconds])
+    # sort based on model
+    subjCatConds=np.concatenate([dfmodel['b'].loc[iSub-1], dfmodel['a'].loc[iSub-1]]) #rearrange to make the directions within a cat next to each other
     cnt=0
     for iCond in subjCatConds:
         respPrAll[cnt].iloc[iSub-1] = respPr[iCond]
         cnt=cnt+1
-        
-    #no sorting - just to plot 0:330 for everyone at the bottom of the script
+    
+    #sort to plot 0:330 for everyone at the bottom of the script
     cnt=0
     for iCond in conds:
         respPrAllsorted[cnt].iloc[iSub-1] = respPr[iCond]
@@ -198,22 +189,46 @@ fntSiz=18
 #ax = respPrAll.T.plot(legend=False)
 
 fig1, ax1 = plt.subplots()
-ax1.plot(range(0,12),respPrAll.T,alpha=0.2)
-ax1.errorbar(range(0,12),respPrAll.mean(), yerr=respPrAll.sem(), fmt='-o',color='b')
+ax1.errorbar(range(0, 12),respPrAll.mean(), yerr=respPrAll.sem(), fmt='-o')
+ax1.plot(range(0, 12), respPrAll.T, '-', alpha=0.15)
 ax1.set_xlabel('Direction',fontsize=fntSiz)
-ax1.set_ylabel("Proportion Responded Category 'Face'",fontsize=fntSiz)
+ax1.set_ylabel("Proportion Responded Category A",fontsize=fntSiz)
 ax1.tick_params(axis='both', which='major', labelsize=fntSiz-2.5)
 
 if saveFigs:
-    plt.savefig(os.path.join(behavFigDir,'behav_subjCat_response_curve.pdf'))
-    
-# %%
-    
-# conds sorted from 0 to 330 for all subs, check if matches up
-    
+    plt.savefig(os.path.join(behavFigDir,'behav_subjCat_response_curve_model.svg'))
+
+# %% plot single subs - plot according to model estimation
+        
+for iSub in range(0,33):
+    plt.plot(range(0, 12), respPrAll.loc[iSub], alpha=0.2)
+    plt.show()
+
+# %% plot single subs - conds sorted from 0 to 330 for all subs, check if matches up
+
+ylims = (-.05, 1.05)
+
 for iSub in range(0,33):
     print(iSub)
 #    print(dfmodel.loc[iSub])
 #    print(dfmodel['bestparams'].loc[iSub][2])
-    plt.plot(range(0, 12), respPrAllsorted.loc[iSub], alpha=0.2)
+    plt.plot(range(0, 360, 30), respPrAllsorted.loc[iSub])
+    plt.ylim(ylims)
     plt.show()
+
+# %%
+saveFigs = False
+
+ylims = (-.05, 1.05)
+for isub in 24, 27, 32:
+    fig1, ax1 = plt.subplots()
+    ax1.plot(range(0, 360, 30), respPrAllsorted.loc[isub])
+    plt.ylim(ylims)
+    ax1.set_xlabel('Direction',fontsize=fntSiz)
+    ax1.set_ylabel("Proportion Responded Category A",fontsize=fntSiz)
+    ax1.tick_params(axis='both', which='major', labelsize=fntSiz-2.5)
+
+#    plt.show()
+#    print(dfmodel.loc[isub])
+    if saveFigs:
+        plt.savefig(os.path.join(behavFigDir,'behav_subjCat_response_curve_model_sub%s.svg' % isub))

@@ -54,9 +54,9 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
-df=pd.read_pickle(fname + '_model.pkl')
+#df=pd.read_pickle(fname + '_model.pkl')
 
-dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
 
 #load in subjCat
 #subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
@@ -65,21 +65,13 @@ dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
 behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat_model.npz'))
 locals().update(behav) #load in each variable into workspace
 
-#%% outliers
-
-sd=np.empty(33)
-for iSub in range(0,33):
-    sd[iSub] = 1/dfmodel['bestparams'].loc[iSub][2]
-
-outliers = np.where(sd > sd.mean()+np.std(sd)*2)
-
 #%% plot bar / errorbar plot
 #plt.rcdefaults()
 plt.style.use('seaborn-darkgrid')
 
 saveFigs = False
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
 #    nDirInCat=np.empty((2,33))
 #    for iSub in range(0,33):
@@ -90,7 +82,7 @@ if exclSubs:
 #    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
     
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -139,7 +131,7 @@ sns.set_style("ticks")
 
 saveFigs = False
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
 #    nDirInCat=np.empty((2,33))
 #    for iSub in range(0,33):
@@ -150,7 +142,7 @@ if exclSubs:
 ##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
     
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -369,7 +361,7 @@ sns.set_style("ticks")
 
 saveFigs = False
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
 #    nDirInCat=np.empty((2,33))
 #    for iSub in range(0,33):
@@ -377,7 +369,7 @@ if exclSubs:
 #        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
 #    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
     
 else:
     indSubs=np.ones(33,dtype=bool)
@@ -404,7 +396,7 @@ plt.title('Left mMFG (area 8)', fontsize=fntSiz)
 g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
@@ -418,7 +410,7 @@ plt.title('Left MT', fontsize=fntSiz)
 g.set_ylabels('Decoding Accuracy (normalized)',fontsize=fntSiz-1)
 plt.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
 plt.show()
 
 roi='motor_rh'
@@ -431,8 +423,10 @@ plt.title('Right M1', fontsize=fntSiz)
 g.set_ylabels('Decoding Accuracy (normalized)',fontsize=fntSiz-1)
 plt.tight_layout()
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
 plt.show()
+
+
 
 #%% behav corr svm
 
@@ -444,7 +438,7 @@ greycol=tuple([0.5,0.5,0.5])
 
 plt.style.use('seaborn-darkgrid')
 
-exclSubs = True
+exclSubs = False
 if exclSubs:
 #    nDirInCat=np.empty((2,33))
 #    for iSub in range(0,33):
@@ -454,7 +448,7 @@ if exclSubs:
 ##    indSubs[:]=True # reset if don't include excl above
 ##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     
@@ -569,7 +563,9 @@ if saveFigs:
     
 #%% #robust regression
 
-exclSubs = True
+decodeFeature = 'subjCat-orth'
+
+exclSubs = False
 if exclSubs:
 #    nDirInCat=np.empty((2,33))
 #    for iSub in range(0,33):
@@ -579,7 +575,7 @@ if exclSubs:
 ##    indSubs[:]=True # reset if don't include excl above
 ##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
+#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
 else:
     indSubs=np.ones(33,dtype=bool)
     

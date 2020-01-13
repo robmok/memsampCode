@@ -46,6 +46,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #
 df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_model.pkl')
+df=pd.read_pickle(fname + '_guess.pkl')
 #df=pd.read_pickle(fname + '_1.pkl')
 #df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 print(df.loc['stats'])
@@ -53,43 +54,54 @@ print(df.loc['stats'])
 
 
 # subjCat-orth
+# _model: with replacement: # MT:.017, mMFG: .00519
+#_1: MT 0.18, mMFG: 0.04; after replace: mMFG 0.0095
+#_2: MT 0.82, mMFG: 0.03885; RIGHT mMFG: 0.07 after replace: mMFG 0.01; right 0.0469
 
 #df=pd.read_pickle(fname + '_RMsubjCat.pkl')
-#df1=pd.read_pickle(fname + '_model.pkl')    # MT:.017, mMFG: .00519
-#df1=pd.read_pickle(fname + '_2.pkl')  # MT:.035, mMFG: .00569
-#df1=pd.read_pickle(fname + '_3.pkl')  # MT:.047, mMFG: .00416
-#roinames = list(df)
+#df1=pd.read_pickle(fname + '.pkl')    # MT:.017, mMFG: .00519
+##
+##df1=pd.read_pickle(fname + '_1.pkl')
+#ind = np.array([3, 4, 5, 12, 14, 16, 23, 26, 28, 31])  # subjCat vs model diffs
+#df1=pd.read_pickle(fname + '_guess.pkl')
+#ind = np.array([4, 5, 12, 23, 26])  # subjCat vs guess diffs
 #
-#ind = np.array([3, 4, 5, 12,14,16,23, 26, 28, 31])  # subjCat vs model diffs
+#
+#roinames = list(df)
 #chance = 0
 #for roi in roinames:
 #    df[roi].loc[ind] = df1[roi].loc[ind]
 #    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[0:33].astype(float), chance, nan_policy='omit')
 #print(df.loc['stats'])
 
+#df.to_pickle(fname + '.pkl')
 
 
 # subjCat-orth - guess model
-
+# _1: mMFG: .10
+# _2: mMFG: .05
 
 
 # subjCat-minus-motor
-# _1: mMFG: .0265
-
-
+# _1: mMFG: .0265; replace: mMFG: .015
+# _2: mMFG: 0.0334; replace: mMFG: .0286
+# _3: mMFG: 0.014; replace: mMFG: .016
 
 
 
 # subjCat-minus-motor - guess model
-
-
+# _1: mMFG: 0.0154; replace: MT: .08; mMFG: .02
+# _2: mMFG: 0.038; replace: mMFG: .015
 
 
 
 #subjCat only - standard model
 # _1: mMFG: 0.027
+# _2: mMFG: 0.08
+# _3: mMFG: 0.0387
 
-
+#subjCat only - guess model
+# _1: mMFG: 0.1
 
 
 
