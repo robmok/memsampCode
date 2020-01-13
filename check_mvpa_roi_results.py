@@ -44,9 +44,9 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #fname = fname + '_fromfeedback'
 
 #
-#df=pd.read_pickle(fname + '.pkl')
+df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_new_need_fix_other_rois.pkl')
-df=pd.read_pickle(fname + '_orig_plus_new.pkl')
+#df=pd.read_pickle(fname + '_orig_plus_new.pkl')
 print(df.loc['stats'])
 
 
@@ -131,8 +131,7 @@ if exclSubs:
 #    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
 
     indSubs=np.ones(33,dtype=bool)
-    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18) - <2SD
-#exclude parietal cutoff subs
+    indSubs[[15, 30]] = False # outliers from model SD param 
 elif exclParietalSubs: # same, IPS no diff, others no diff
     indSubs=np.ones(33,dtype=bool)
     indSubs[[0,2,19,23]] = False #subs 1,3,20,24

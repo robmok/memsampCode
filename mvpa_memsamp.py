@@ -46,7 +46,7 @@ lock2resp = False  # if loading in lock2resp glms (to get motor effect)
 # subjCat-resp - decode on category subject responded
 
 # model estimated subjective category
-dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat1.pkl')
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
 
 decodeFeature = 'subjCat'
 

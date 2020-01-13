@@ -63,70 +63,67 @@ for iSub in range(1, 34):
 
     # objective function - can i add dat in a different way?
     def runit(params, dat=dat):
-
         import numpy as np
-        if np.any(np.isnan(params)):
-            negloglik = np.inf
-        else:
-            def angdiff(x, y):
-                return np.arctan2(np.sin(x-y), np.cos(x-y))
 
-            # distance from bound 1 and 2
-            angdiff1 = angdiff(
-                    np.radians(dat['direction'].values),
-                    np.radians(params[0]))
+        def angdiff(x, y):
+            return np.arctan2(np.sin(x-y), np.cos(x-y))
 
-            angdiff2 = angdiff(
-                    np.radians(dat['direction'].values),
-                    np.radians(params[1]))
+        # distance from bound 1 and 2
+        angdiff1 = angdiff(
+                np.radians(dat['direction'].values),
+                np.radians(params[0]))
 
-            # find out if closer to bound 1 or 2, if same, include both
-            ind1 = abs(angdiff1) <= abs(angdiff2)  # closer to bound 1
-            ind2 = abs(angdiff1) >= abs(angdiff2)
+        angdiff2 = angdiff(
+                np.radians(dat['direction'].values),
+                np.radians(params[1]))
 
-            # clockwise or counterclowise to bound
-            ind1pos = angdiff1 >= 0  # = so if on bound, count on bound as pos
-            ind1neg = angdiff1 < 0
-            ind2pos = angdiff2 >= 0
-            ind2neg = angdiff2 < 0
+        # find out if closer to bound 1 or 2, if same, include both
+        ind1 = abs(angdiff1) <= abs(angdiff2)  # closer to bound 1
+        ind2 = abs(angdiff1) >= abs(angdiff2)
 
-            # conditions
-            catA1 = sorted(dat['direction'][ind1 & ind1pos].unique())  # A one side
-            catA2 = sorted(dat['direction'][ind2 & ind2neg].unique())  # other side
-            catB1 = sorted(dat['direction'][ind1 & ind1neg].unique())
-            catB2 = sorted(dat['direction'][ind2 & ind2pos].unique())
+        # clockwise or counterclowise to bound
+        ind1pos = angdiff1 >= 0  # = so if on bound, count on bound as pos
+        ind1neg = angdiff1 < 0
+        ind2pos = angdiff2 >= 0
+        ind2neg = angdiff2 < 0
 
-            # acc to boundary, resps1==correct, resps2==incorrect
-            r1a = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
-                                           (dat['key'] == 1)],
-                                  angdiff2[(dat['direction'].isin(catB2)) &
-                                           (dat['key'] == 6)]))
-            r1b = np.concatenate((angdiff2[(dat['direction'].isin(catA2)) &
-                                           (dat['key'] == 1)],
-                                  angdiff1[(dat['direction'].isin(catB1)) &
-                                           (dat['key'] == 6)]))
+        # conditions
+        catA1 = sorted(dat['direction'][ind1 & ind1pos].unique())  # A one side
+        catA2 = sorted(dat['direction'][ind2 & ind2neg].unique())  # other side
+        catB1 = sorted(dat['direction'][ind1 & ind1neg].unique())
+        catB2 = sorted(dat['direction'][ind2 & ind2pos].unique())
 
-            r2a = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
-                                           (dat['key'] == 6)],
-                                  angdiff2[(dat['direction'].isin(catB2)) &
-                                           (dat['key'] == 1)]))
-            r2b = np.concatenate((angdiff2[(dat['direction'].isin(catA2)) &
-                                           (dat['key'] == 6)],
-                                  angdiff1[(dat['direction'].isin(catB1)) &
-                                           (dat['key'] == 1)]))
+        # acc to boundary, resps1==correct, resps2==incorrect
+        r1a = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
+                                       (dat['key'] == 1)],
+                              angdiff2[(dat['direction'].isin(catB2)) &
+                                       (dat['key'] == 6)]))
+        r1b = np.concatenate((angdiff2[(dat['direction'].isin(catA2)) &
+                                       (dat['key'] == 1)],
+                              angdiff1[(dat['direction'].isin(catB1)) &
+                                       (dat['key'] == 6)]))
 
-            # put through cdfå
-            allresps = np.concatenate((1-norm.cdf(r1a, 0, params[2]),
-                                       norm.cdf(r1b, 0, params[2]),
-                                       norm.cdf(r2a, 0, params[2]),
-                                       1-norm.cdf(r2b, 0, params[2])))
+        r2a = np.concatenate((angdiff1[(dat['direction'].isin(catA1)) &
+                                       (dat['key'] == 6)],
+                              angdiff2[(dat['direction'].isin(catB2)) &
+                                       (dat['key'] == 1)]))
+        r2b = np.concatenate((angdiff2[(dat['direction'].isin(catA2)) &
+                                       (dat['key'] == 6)],
+                              angdiff1[(dat['direction'].isin(catB1)) &
+                                       (dat['key'] == 1)]))
 
-            if len(params) == 4:  # with guess rate
-                alpha = params[3]  # guess rate
-                allresps = alpha * 0.5 + (1-alpha) * (allresps)
+        # put through cdfå
+        allresps = np.concatenate((1-norm.cdf(r1a, 0, params[2]),
+                                   norm.cdf(r1b, 0, params[2]),
+                                   norm.cdf(r2a, 0, params[2]),
+                                   1-norm.cdf(r2b, 0, params[2])))
 
-            # sum logpr (to check exp this result, comp w np.prod of pr's)
-            negloglik = -np.sum(np.log(allresps))
+        if len(params) == 4:  # with guess rate
+            alpha = params[3]  # guess rate
+            allresps = alpha * 0.5 + (1-alpha) * (allresps)
+
+        # sum logpr (to check exp this result, comp w np.prod of pr's)
+        negloglik = -np.sum(np.log(allresps))
 
         return negloglik
 
@@ -150,7 +147,7 @@ for iSub in range(1, 34):
 #    bestparams = res.x
 
 #    # multiple starting point (self)
-    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
+#    starts = [[0, 180, .5], [270, 90, 1], [45, 225, .5], [135, 315, 2]]
 #    bounds = [(None, None), (None, None), (0., 50.)]
     bounds = [(-359, 359), (-359, 359), (0., 20.)]
 #
@@ -159,11 +156,11 @@ for iSub in range(1, 34):
     startsb1 = np.arange(15., 345., 60)
     startsb2 = np.arange(45., 360., 60)  # -360
 #    sds = [.5, 1, 2, 5, 10, 15]
-    sds = [.5, 1, 2, 3, 5, 8, 10, 15]
+    sds = [.5, 1, 2, 3, 5]
 
-    guess = False
+    guess = True
     if guess:
-        gs = [.1, .3, .6, .8]
+        gs = [.1, .3, .7]
         bounds.append((0., 1.))
     if not guess:
         for b1 in startsb1:
@@ -302,8 +299,8 @@ for iSub in range(1, 34):
 t1 = time.time()
 print(t1-t0)
 
-fnamesave = mainDir + 'behav/modelsubjcat3'
-#dfres.to_pickle(fnamesave + '.pkl')
+fnamesave = mainDir + 'behav/modelsubjcat_guess'
+dfres.to_pickle(fnamesave + '.pkl')
 
 #for iSub in [5, 6, 11, 13, 17, 18, 24, 27]: #range(1,34):
 #    print(iSub)
