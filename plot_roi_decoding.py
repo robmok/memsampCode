@@ -61,7 +61,6 @@ dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
 #load in subjCat
 #subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 #load in behav acc
-#behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
 behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat_model.npz'))
 locals().update(behav) #load in each variable into workspace
 

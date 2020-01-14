@@ -3,6 +3,22 @@
 """
 Created on Mon Feb 25 22:48:06 2019
 
+imDat - input data: # cope or tstat images
+normMeth - normalization of fMRI data. used noNorm for all
+    optionss: 'niNormalised','demeaned','demeaned_stdNorm','noNorm','dCentred'
+
+distMeth - classifier / distance measure. used svm for all
+    options: 'svm', 'lda', 'crossEuclid', 'crossNobis',
+    'mNobis'-only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
+
+# decoding: 
+'12-way' (12-way dir decoding - only svm), 
+'12-way-all' (output single decoder for each dir vs all)
+'dir' (opposite dirs), 'ori' (orthogonal angles)
+category: 'objCat' (objective catgeory), 'subjCat', subjCat-orth 
+subjCat-resp - decode on category subject responded
+
+
 @author: robert.mok
 """
 import sys
@@ -11,8 +27,8 @@ import numpy as np
 from nilearn import image as nli  # Import image processing tool
 import pandas as pd
 import nibabel as nib
-from nilearn.masking import apply_mask 
-from nilearn.signal import clean 
+from nilearn.masking import apply_mask
+from nilearn.signal import clean
 from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -30,20 +46,16 @@ os.chdir(codeDir)
 
 from memsamp_RM import crossEuclid, mNobis, compCovMat, getConds2comp
 
-#set to true if rerunning only a few rois, appending it to old df
+# set to true if rerunning only a few rois, appending it to old df
 reRun = False
 
-imDat = 'cope'  # cope or tstat images
-normMeth = 'noNorm'  # 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'noNorm' # demeaned_stdNorm, 'dCentred' (niNorm & demeaned_std)
-distMeth = 'svm'  # 'svm', 'lda' 'crossEuclid', 'crossNobis' # 'mNobis' - only subjCat-all, 12-way-all, and subjCat-orth (else no baseline)
-trainSetMeth = 'trials'  # 'trials' or 'block' - only tirals in this script
+imDat = 'cope'
+normMeth = 'noNorm'
+distMeth = 'svm'
+trainSetMeth = 'trials'  # 'trials' or 'block' - only trials in this script
 fwhm = None  # optional smoothing param - 1, or None
 
 lock2resp = False  # if loading in lock2resp glms (to get motor effect)
-
-# stimulus decoding: '12-way' (12-way dir decoding - only svm), '12-way-all' (output single decoder for each dir vs all), 'dir' (opposite dirs), 'ori' (orthogonal angles)
-# category: 'objCat' (objective catgeory), 'subjCat' 
-# subjCat-resp - decode on category subject responded
 
 # model estimated subjective category
 dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
@@ -57,22 +69,21 @@ decodeFeature = 'subjCat'
 decodeFromFeedback = False
 
 bilateralRois = False
-#%%
+# %%
 # =============================================================================
-# Set up decoding accuracy dataframe 
+# Set up decoding accuracy dataframe
 # =============================================================================
-nSubs=33                                                           
-
-rois = ['EVC_lh','EVC_rh', 'V3a_lh','V3a_rh', 'hMT_lh','hMT_rh', 'IPS1-5_lh','IPS1-5_rh', 
-        'MDroi_ifg_lh','MDroi_ifg_rh', 'MDroi_area8c_lh', 'MDroi_area8c_rh', 'MDroi_area9_lh',
-        'MDroi_area9_rh', 'motor_lh', 'motor_rh', 'FFA_lrh', 'PPA_lrh', 'evc_lrh'] # 'FFA_lrh', 'PPA_lrh', 'evc_lrh' added 191118
+nSubs = 33
+rois = ['EVC_lh', 'EVC_rh', 'V3a_lh', 'V3a_rh', 'hMT_lh', 'hMT_rh',
+        'IPS1-5_lh', 'IPS1-5_rh', 'MDroi_ifg_lh', 'MDroi_ifg_rh',
+        'MDroi_area8c_lh', 'MDroi_area8c_rh', 'MDroi_area9_lh',
+        'MDroi_area9_rh', 'motor_lh', 'motor_rh', 'FFA_lrh', 'PPA_lrh']
 
 if bilateralRois:
-   rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
-           'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh'] 
+    rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
+            'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh']
 
-
-#reRunROIs
+# reRunROIs
 #rois = ['FFA_lrh_sm', 'PPA_lrh_sm'] #functional localisers
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0, nSubs+1))
@@ -92,9 +103,9 @@ for iSub in range(1, nSubs+1):
     else:
         runs = range(1, 4)  # 3 runs
     for iRun in runs:
-        condPath = os.path.join(mainDir, 'orig_events','sub-' + subNum +
+        condPath = os.path.join(mainDir, 'orig_events', 'sub-' + subNum +
                               '_task-memsamp_run-0' + str(iRun) +'_events.tsv')
-        
+
         # df to load in and organise run-wise data
         df = pd.read_csv(condPath, sep='\t')
         df['run'] = pd.Series(np.ones((len(df)))*iRun, index=df.index)  # add run number
@@ -103,10 +114,10 @@ for iSub in range(1, nSubs+1):
         # add path to match cue cond and trial num - cope1:7 is dir0 trial1:7
         conds = df.direction.unique()
         conds.sort()
-        #sort - arrange df so it matches cope1:84 image structure
+        # sort - arrange df so it matches cope1:84 image structure
         df2 = pd.DataFrame()
         for iCond in conds:
-            df2 = df2.append(df[df['direction']==iCond])
+            df2 = df2.append(df[df['direction'] == iCond])
 
         copeNum = 1  # counter
         imPath = []
@@ -135,14 +146,14 @@ for iSub in range(1, nSubs+1):
     print('subject %s, length of df %s' % (subNum, len(dfCond)))
 
     # only get 2 out of 3/4 runs that share same response (no counterbalance)
-    if (decodeFeature=='subjCat-motor')|(decodeFeature=='subjCat-orth-motor'):
-        if sum(dfCond['keymap']==0)>sum(dfCond['keymap']==1):
-            dfCond=dfCond[dfCond['keymap']==0]
-        elif sum(dfCond['keymap']==0)<sum(dfCond['keymap']==1):
-            dfCond=dfCond[dfCond['keymap']==1]
+    if (decodeFeature=='subjCat-motor') | (decodeFeature=='subjCat-orth-motor'):
+        if sum(dfCond['keymap'] == 0) > sum(dfCond['keymap'] == 1):
+            dfCond = dfCond[dfCond['keymap'] == 0]
+        elif sum(dfCond['keymap'] == 0) < sum(dfCond['keymap'] == 1):
+            dfCond = dfCond[dfCond['keymap'] == 1]
         else:  # if 4 runs, just select one set
-            dfCond=dfCond[dfCond['keymap']==1]
-         
+            dfCond = dfCond[dfCond['keymap'] == 1]
+
     if lock2resp:  # remove trials without responses
         indResp = np.where(~np.isnan(dfCond['rt']))
         dfCond = dfCond.iloc[indResp[0]]
@@ -154,43 +165,8 @@ for iSub in range(1, nSubs+1):
     if decodeFeature == 'subjCat-minus-motor':
         dfCondResp = dfCond['key']
 
-#    # get subjective category based on responses
-#    if (decodeFeature[0:7]=='subjCat')|(decodeFeature=='dir-all'):
-#        #flip responses for runs - need double check if keymap is what i think it is. looks ok
-#        ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
-#        ind2=dfCond['key']==6
-#        ind3=dfCond['key']==1
-#        dfCond.loc[ind1&ind2,'key']=5
-#        dfCond.loc[ind1&ind3,'key']=6
-#        dfCond.loc[ind1&ind2,'key']=1
-#        #get subjective category
-#        conds=dfCond.direction.unique()
-#        conds.sort()
-#        respPr = pd.Series(index=conds)
-#        for iCond in conds:
-#            respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
-#        subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
-#        subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-#        # unless:   
-#        if iSub == 5:  # move 240 and 270 to catA
-#            subjCatAconds = np.append(subjCatAconds,[240,270])
-#            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-#        elif iSub == 10:  # move 270 to cat B
-#            subjCatBconds = np.sort(np.append(subjCatBconds, 270))
-#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-#        elif iSub == 17:  # move 30 to cat B
-#            subjCatBconds = np.sort(np.append(subjCatBconds, 30))
-#            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-#        elif iSub == 24:  # move 120 to cat A
-#            subjCatAconds = np.sort(np.append(subjCatAconds, 120))
-#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-#        elif iSub == 27:  # move 270 to cat A
-#            subjCatAconds = np.sort(np.append(subjCatAconds, 270))
-#            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
-
     # get subjective category based on model
-
-    if (decodeFeature[0:7]=='subjCat'):
+    if (decodeFeature[0:7] == 'subjCat'):
         subjCatAconds = dfmodel['a'].loc[iSub-1]
         subjCatBconds = dfmodel['b'].loc[iSub-1]
 
@@ -217,7 +193,7 @@ for iSub in range(1, nSubs+1):
             fmri_masked = apply_mask(dat, maskROI, smoothing_fwhm=fwhm)
         else:
             fmri_masked = dat
-            
+    
         if normMeth == 'niNormalised':
             fmri_masked_cleaned = clean(fmri_masked, sessions=groups, detrend=False, standardize=True)
         elif normMeth == 'demeaned':
@@ -430,7 +406,6 @@ if reRun is True:
     for roi in rois:
         dfTmp[roi] = dfDecode[roi]
     dfDecode = dfTmp
-
 
 if guessmodel:
     fnameSave = fnameSave + '_guess'
