@@ -53,10 +53,6 @@ print(df.loc['stats'])
 
 
 # subjCat-orth
-# _model: with replacement: # MT:.017, mMFG: .00519
-#_1: MT 0.18, mMFG: 0.04; after replace: mMFG 0.0095
-#_2: MT 0.82, mMFG: 0.03885; RIGHT mMFG: 0.07 after replace: mMFG 0.01; right 0.0469
-
 #df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 #df1=pd.read_pickle(fname + '_model.pkl')    # MT:.017, mMFG: .00519
 ###
@@ -66,6 +62,7 @@ print(df.loc['stats'])
 ##ind = np.array([4, 5, 12, 23, 26])  # subjCat vs guess diffs
 ##
 ##
+# recomputing tstat and pvals and savings to df
 #roinames = list(df)
 #chance = 0
 #for roi in roinames:
@@ -96,29 +93,6 @@ ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
 #ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
 print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 #multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
-
-
-#EVC, MT, and IPS - 6 ROIs
-#print(fdr(pvals[0:6]/2,alpha=0.05,method='indep',is_sorted=False))
-#multest(pvals[0:6]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
-
-#first bunch for ori/12-way
-#print(fdr(pvals[0:16]/2,alpha=0.05,method='indep',is_sorted=False))
-#multest(pvals[0:16]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
-
-
-#pSorted=np.sort(pvals)
-#fdr(pSorted[0:22]/2,alpha=0.05,method='indep',is_sorted=True)
-#multest(pSorted[0:22]/2, alpha=0.05, method='bonferroni', is_sorted=True, returnsorted=False)
-
-# recomputing tstat and pvals and savings to df
-#chance=0
-#indSubs=np.ones(33,dtype=bool)
-#for roi in list(df):
-#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
-##
-#print(df.loc['stats'])
-#df.to_pickle(fname + '.pkl') # _orig_plus_new_
 
 #%% exclude subs
 

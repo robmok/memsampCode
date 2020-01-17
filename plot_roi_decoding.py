@@ -69,21 +69,6 @@ locals().update(behav) #load in each variable into workspace
 plt.style.use('seaborn-darkgrid')
 
 saveFigs = False
-
-exclSubs = False
-if exclSubs:
-#    nDirInCat=np.empty((2,33))
-#    for iSub in range(0,33):
-#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-##    indSubs[:]=True # reset if don't include excl above
-#    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
-    
-    indSubs=np.ones(33,dtype=bool)
-#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
-else:
-    indSubs=np.ones(33,dtype=bool)
     
 stdAll = df.iloc[indSubs,:].sem()
 
@@ -104,23 +89,9 @@ plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barPlot_allROIs_' + decodeFeature + '.pdf'))
 
-# without excluding, V2 p=0.1 MT: p=0.02715; area8c_lhp= 0.00855  - NOTE: pvals are 2-tailed; should be 1, so halve them
-# after excluding, V2 p=0.3449, MT: p=0.0346, area8c_lh: p=0.00337 
-#print(stats.ttest_1samp(df['V2vd_rh'].iloc[indSubs],0))
-#print(stats.ttest_1samp(df['hMT_lh'].iloc[indSubs],0))
-#print(stats.ttest_1samp(df['MDroi_area8c_lh'].iloc[indSubs],0))
-
 #loaded in subjCat-orth first, saved to df1, then loaded in dir to compare. MT and PFC sig
 #stats.ttest_rel(df1['hMT_lh'].iloc[indSubs],df['hMT_lh'].iloc[indSubs]-.5)
 #stats.ttest_rel(df1['MDroi_area8c_lh'].iloc[indSubs],df['MDroi_area8c_lh'].iloc[indSubs]-.5)
-
-#%% univariate scatter plots, violin plots
-
-ax = sns.catplot(data=df.iloc[indSubs,:],height=3.5,aspect=4.25, kind="swarm")
-df.iloc[indSubs,:].mean().plot(yerr=stdAll, fmt='o')
-
-g = sns.catplot(data=df.iloc[indSubs,:],height=3,aspect=5, kind="violin", inner=None)
-sns.swarmplot(color="k", size=3, data=df.iloc[indSubs,:], ax=g.ax);
 
 #%% plotting within area, across decoders
 
@@ -129,21 +100,6 @@ sns.set(font_scale=1.2) #set font scale for sns
 sns.set_style("ticks")
 
 saveFigs = False
-
-exclSubs = False
-if exclSubs:
-#    nDirInCat=np.empty((2,33))
-#    for iSub in range(0,33):
-#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-##    indSubs[:]=True # reset if don't include excl above
-##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
-    
-    indSubs=np.ones(33,dtype=bool)
-#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
-else:
-    indSubs=np.ones(33,dtype=bool)
     
 decodeFeature = 'subjCat-orth'
 dfSubjCat=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
@@ -359,19 +315,6 @@ sns.set(font_scale=1.4) #set font scale for sns
 sns.set_style("ticks")
 
 saveFigs = False
-
-exclSubs = False
-if exclSubs:
-#    nDirInCat=np.empty((2,33))
-#    for iSub in range(0,33):
-#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-    indSubs=np.ones(33,dtype=bool)
-#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
-    
-else:
-    indSubs=np.ones(33,dtype=bool)
     
 decodeFeature = 'subjCat-orth'
 dfSubjCat=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
@@ -436,20 +379,6 @@ fntSiz=14
 greycol=tuple([0.5,0.5,0.5])
 
 plt.style.use('seaborn-darkgrid')
-
-exclSubs = False
-if exclSubs:
-#    nDirInCat=np.empty((2,33))
-#    for iSub in range(0,33):
-#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-##    indSubs[:]=True # reset if don't include excl above
-##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
-    indSubs=np.ones(33,dtype=bool)
-#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
-else:
-    indSubs=np.ones(33,dtype=bool)
     
 roiList=list(df)
 rAcc=pd.DataFrame(columns=roiList,index=range(0,2))
@@ -458,8 +387,6 @@ rAccB=pd.DataFrame(columns=roiList,index=range(0,2))
 rObjAcc=pd.DataFrame(columns=roiList,index=range(0,2))
 for roi in roiList:
     rAcc[roi][0], rAcc[roi][1]=stats.pearsonr(acc[indSubs],df[roi].iloc[indSubs])
-#    rAccA[roi][0], rAccA[roi][1]=stats.pearsonr(accA[indSubs],df[roi].iloc[indSubs])
-#    rAccB[roi][0], rAccB[roi][1]=stats.pearsonr(accB[indSubs],df[roi].iloc[indSubs])
 #    rObjAcc[roi][0], rObjAcc[roi][1]=stats.pearsonr(objAcc[indSubs],df[roi].iloc[indSubs])
 
 roi = 'MDroi_area8c_lh'
@@ -481,28 +408,7 @@ fig.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
-roi = 'MDroi_area9_rh'
-
-x=acc[indSubs]
-y=np.array(df[roi].iloc[indSubs],dtype=float)
-b, m = polyfit(x,y, 1) 
-xAx=np.linspace(min(x),max(x))
-fig, ax = plt.subplots(figsize=(5,3.5))
-ax.plot(xAx, b + m * xAx,'-',color=greycol,linewidth=1,alpha=0.5)
-ax.scatter(x,y,s=mrkSiz)
-ax.set_xlabel('Behavioral Accuracy')
-ax.set_ylabel('Decoding Accuracy (normalized)')
-ax.set_title('Right dlPFC (area 9)',fontsize=fntSiz)
-legTxt='\n'.join(('r = %.2f' % (rAcc[roi][0]), 'p = %.2f' % (rAcc[roi][1]/2)))
-props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-ax.text(0.05, 0.95, legTxt, transform=ax.transAxes, fontsize=14,
-        verticalalignment='top', bbox=props)
-fig.tight_layout()
-if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
-    
 roi = 'hMT_lh'
-
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -522,7 +428,6 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
 roi = 'hMT_rh'
-
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -563,20 +468,6 @@ if saveFigs:
 #%% #robust regression
 
 decodeFeature = 'subjCat-orth'
-
-exclSubs = False
-if exclSubs:
-#    nDirInCat=np.empty((2,33))
-#    for iSub in range(0,33):
-#        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-#        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-#    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-##    indSubs[:]=True # reset if don't include excl above
-##    indSubs[[8,11,15,30]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
-    indSubs=np.ones(33,dtype=bool)
-#    indSubs[[10, 17]] = False # outliers from model SD param (iSubs 11 and 18)
-else:
-    indSubs=np.ones(33,dtype=bool)
     
 #y=acc[indSubs]
 ##x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T

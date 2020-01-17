@@ -3,6 +3,9 @@
 """
 Created on Mon Feb 25 22:48:06 2019
 
+MVPA across ROIs
+
+Options:
 imDat - input data: # cope or tstat images
 normMeth - normalization of fMRI data. used noNorm for all
     optionss: 'niNormalised','demeaned','demeaned_stdNorm','noNorm','dCentred'
