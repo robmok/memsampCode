@@ -7,11 +7,11 @@ Created on Tue Dec  4 13:36:03 2018
 
 Compute plots and accuracy based on model estimated subjective category
 
-Notes on dataframe
-- category - category of the feedback on that trial (not necessarily the dominant category for that direction). 0 for scene, 1 for face.                                         
-- cat - 1 if the current category corresponds to the dominant category for this direction      
-- resp - 1 if the subject responded according to the currently dominant category
-        
+Notes on df:
+- 'category': category of the feedback  0 for scene, 1 for face
+Not necessarily the dominant/correct category for that direction - A/B                        
+- 'cat' - 1 if  current category corresponds to the dominant category (A/B)
+- 'resp' - 1 if responded according to the dominant category (correct)
 """
 import os
 import glob
@@ -19,22 +19,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-#mainDir = '/Users/robertmok/Documents/Postdoc_ucl/'  # mac laptop
-behavDir=os.path.join(mainDir,'behav')
-eventsDir=os.path.join(mainDir,'orig_events')
-behavFigDir=os.path.join(mainDir,'behav')
+mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
+behavDir = os.path.join(mainDir, 'behav')
+eventsDir = os.path.join(mainDir, 'orig_events')
+behavFigDir = os.path.join(mainDir, 'behav')
 
-#laptop
-#mainDir='/Users/robertmok/Downloads'
-#eventsDir=os.path.join(mainDir,'orig_events')
-
-dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
-#%%
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
+# %%
 
 saveaccdata = False
 
-subs = range(1,34) #33 subs - range doesn't include last number
+subs = range(1, 34) #33 subs
 accA = np.empty(33)
 accB = np.empty(33)
 acc = np.empty(33)
@@ -64,11 +59,12 @@ for iSub in range(1, 34):
     conds.sort()
     respPr = pd.Series(index=conds)
     for iCond in conds:
+        # this count nans (no resp) as incorrect
         respPr[iCond] = np.divide(
                 (dfCond.loc[dfCond['direction'] == iCond, 'key'] == 6).sum(),
-                len(dfCond.loc[dfCond['direction'] == iCond]))  # this count nans (prob no resp) as incorrect
+                len(dfCond.loc[dfCond['direction'] == iCond]))
 
-    # for respPrAll plot   
+    # for main plot (respPrAll)
     # sort conditions based on model estimated subjective cats
     subjCatConds = np.concatenate(
             [dfmodel['b'].loc[iSub-1], dfmodel['a'].loc[iSub-1]])
@@ -77,6 +73,7 @@ for iSub in range(1, 34):
         respPrAll[cnt].iloc[iSub-1] = respPr[iCond]
         cnt = cnt+1
 
+    # for plotting based on direction
     # sort to plot 0:330 for everyone at the bottom of the script
     cnt = 0
     for iCond in conds:
@@ -90,10 +87,10 @@ for iSub in range(1, 34):
     respB = np.empty(0)
     for iCond in subjCatAconds:
         respA = np.append(respA,
-                          dfCond.loc[dfCond['direction'] == iCond,'key'].values)
+                          dfCond.loc[dfCond['direction'] == iCond, 'key'].values)
     for iCond in subjCatBconds:
         respB = np.append(respB,
-                          dfCond.loc[dfCond['direction'] == iCond,'key'].values)
+                          dfCond.loc[dfCond['direction'] == iCond, 'key'].values)
     accA[iSub-1] = sum(respA == 6)/len(respA)
     accB[iSub-1] = sum(respB == 1)/len(respB)
     acc[iSub-1] = (sum(respA == 6)+sum(respB == 1))/(len(respA)+len(respB))
@@ -104,7 +101,7 @@ if saveaccdata:
     np.savez(os.path.join(behavDir, 'memsamp_acc_subjCat_model'),
              acc=acc, accA=accA, accB=accB, objAcc=objAcc)
 
-# %%
+# %% plot
 #plt.rcdefaults()
 plt.style.use('seaborn-darkgrid')
 #
@@ -140,7 +137,7 @@ for iSub in range(0, 33):
     plt.ylim(ylims)
     plt.show()
 
-# %%
+# %% plot and save several subs for figure
 saveFigs = False
 
 ylims = (-.05, 1.05)

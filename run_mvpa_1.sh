@@ -12,9 +12,7 @@ tmpScrDir=${mainDir}/'mvpaTmpScripts'
 
 # -e s:"decodeFromFeedback = False":"decodeFromFeedback = True":g \
 
-# subjCat-orth standard model
-sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
-    -e s:"bilateralRois = False":"bilateralRois = True":g \
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat'":g \
         < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 

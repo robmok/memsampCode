@@ -14,8 +14,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(style="ticks", color_codes=True)
-#import bootstrapped.bootstrap as bs
-#import bootstrapped.stats_functions as bs_stats
 import scipy.stats as stats
 from statsmodels.stats.multitest import fdrcorrection as fdr
 #from statsmodels.stats.multitest import multipletests as multest
@@ -23,19 +21,11 @@ from numpy.polynomial.polynomial import polyfit
 
 import statsmodels.api as sm
 
-mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-
-codeDir=os.path.join(mainDir,'memsampCode')
-#codeDir='/Users/robertmok/Documents/Postdoc_ucl/memsampCode' #laptop
-
-roiDir=os.path.join(mainDir,'mvpa_roi')
-
-figDir=os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
-behavDir=os.path.join(mainDir,'behav')
-
-# laptop
-#roiDir='/Users/robertmok/Documents/Postdoc_ucl/mvpa_roi/' 
-                                
+mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
+codeDir = os.path.join(mainDir,'memsampCode')
+roiDir = os.path.join(mainDir,'mvpa_roi')
+figDir = os.path.join(mainDir,'mvpa_roi/figs_mvpa_roi')
+behavDir = os.path.join(mainDir,'behav')
 os.chdir(codeDir)
 
 imDat    = 'cope' # cope or tstat images
@@ -56,7 +46,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_model.pkl')
 
-dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 
 #load in subjCat
 #subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
@@ -290,19 +280,6 @@ plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
 plt.show()
-
-
-#roi='EVC_rh'
-#svm_V1_rh = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
-#                       dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
-#svm_V1_rh.columns=dfHeader[0:4]
-#g = sns.catplot(data=svm_V1_rh,height=5,aspect=1, kind="bar", ci=None)
-#svm_V1_rh.mean().plot(yerr=svm_V1_rh.sem(),ylim=(-.06,.1), title='Right Early Visual Cortex',elinewidth=2.5,fmt='k,',alpha=0.8)
-#sns.stripplot(color="k", alpha=0.2, size=3, data=svm_V1_rh, ax=g.ax);
-#plt.tight_layout()
-##if saveFigs:
-##    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '_subjCat-minus-motor.pdf'))
-#plt.show()
 
 #%% Plot only cat, dir, motor
 
