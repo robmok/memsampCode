@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth-ctrl' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -44,10 +44,10 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #fname = fname + '_fromfeedback'
 
 #
-df=pd.read_pickle(fname + '.pkl')
+#df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_model.pkl')
 #df=pd.read_pickle(fname + '_guess.pkl')
-#df=pd.read_pickle(fname + '_1.pkl')
+#df=pd.read_pickle(fname + '_v2.pkl')
 #df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 print(df.loc['stats'])
 

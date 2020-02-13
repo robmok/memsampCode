@@ -8,7 +8,10 @@ fwhm=0 #0/2
 standardScript="memsamp_run-01_trial_fwhm2_T1"
 
 #for feedback decoding
-standardScript="memsamp_run-01_trial_fwhm2_T1_feedback"
+# standardScript="memsamp_run-01_trial_fwhm2_T1_feedback"
+
+#modelling feedback with face and building stimuli with 2 EVs
+standardScript="memsamp_run-01_trial_fwhm2_T1_v2"
 
 # single trial in T1 space
 # - code for each trial as an EV - looks like 7 trials per run (even run 4)

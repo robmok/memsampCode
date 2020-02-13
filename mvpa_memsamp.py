@@ -61,7 +61,7 @@ fwhm = None  # optional smoothing param - 1, or None
 lock2resp = False  # if loading in lock2resp glms (to get motor effect)
 
 # model estimated subjective category
-dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat4.pkl')
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 
 guessmodel = False
 if guessmodel:

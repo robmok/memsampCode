@@ -16,6 +16,40 @@ sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat'":g \
         < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
 python ${tmpScrDir}/mvpa_memsamp1.py
 
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-minus-motor'":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat'":g \
+    -e s:"bilateralRois = False":"bilateralRois = True":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-minus-motor'":g \
+    -e s:"bilateralRois = False":"bilateralRois = True":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+
+#from 3
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'ori'":g \
+    -e s:"bilateralRois = False":"bilateralRois = True":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
+sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'dir'":g \
+    -e s:"bilateralRois = False":"bilateralRois = True":g \
+        < ${codeDir}/mvpa_memsamp.py > ${tmpScrDir}/mvpa_memsamp1.py
+python ${tmpScrDir}/mvpa_memsamp1.py
+
 
 
 # sed -e s:"decodeFeature = 'subjCat'":"decodeFeature = 'subjCat-orth'":g \
