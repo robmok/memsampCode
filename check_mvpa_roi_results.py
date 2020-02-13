@@ -47,7 +47,7 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_model.pkl')
 #df=pd.read_pickle(fname + '_guess.pkl')
-#df=pd.read_pickle(fname + '_v2.pkl')
+df=pd.read_pickle(fname + '_v2.pkl')
 #df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 print(df.loc['stats'])
 
