@@ -27,7 +27,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from nilearn.masking import apply_mask 
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
-#mainDir='/home/robmok/Documents/memsamp_fMRI' #love01
 
 featDir=os.path.join(mainDir,'memsampFeat')
 fmriprepDir=os.path.join(mainDir,'fmriprep_output/fmriprep')
@@ -43,13 +42,15 @@ normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm 
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 24 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
 decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 
 lock2resp = False # if loading in lock2resp glms (to get motor effect)
 
+# model estimated subjective category
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 
 # subjCat, subjCatRaw-orth, objCat, objCatRaw-orth # subtract these SL images from one another later to create subjCat-orth
 
@@ -105,39 +106,10 @@ for iSub in range(1,34):
     catAconds=np.array((range(120,271,30))) 
     catBconds=np.append(np.array((range(0,91,30))),[300,330])
 
-    #get subjective category based on responses
+    #get subjective category based on model
     if decodeFeature[0:7] == 'subjCat':
-        #flip responses for runs - need double check if keymap is what i think it is. looks ok
-        ind1=dfCond['keymap']==1 #if dat['keymap'] == 1: #flip, if 0, no need flip
-        ind2=dfCond['key']==6
-        ind3=dfCond['key']==1
-        dfCond.loc[ind1&ind2,'key']=5
-        dfCond.loc[ind1&ind3,'key']=6
-        dfCond.loc[ind1&ind2,'key']=1
-        #get subjective category
-        conds=dfCond.direction.unique()
-        conds.sort()
-        respPr = pd.Series(index=conds)
-        for iCond in conds:
-            respPr[iCond] = np.divide((dfCond.loc[dfCond['direction']==iCond,'key']==6).sum(),len(dfCond.loc[dfCond['direction']==iCond])) #this count nans (prob no resp) as incorrect
-        subjCatAconds=np.sort(respPr.index[respPr>0.5].values.astype(int))
-        subjCatBconds=np.sort(respPr.index[respPr<0.5].values.astype(int))
-        #unless:   
-        if iSub==5: #move 240 and 270 to catA
-            subjCatAconds = np.append(subjCatAconds,[240,270])
-            subjCatBconds = subjCatBconds[np.invert((subjCatBconds==240)|(subjCatBconds==270))] #remove
-        elif iSub==10: #move 270 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds,270))
-            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==270)]
-        elif iSub == 17:#move 30 to cat B
-            subjCatBconds = np.sort(np.append(subjCatBconds,30))
-            subjCatAconds = subjCatAconds[np.invert(subjCatAconds==30)]
-        elif iSub==24: #move 120 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds,120))
-            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==120)]
-        elif iSub==27:#move 270 to cat A
-            subjCatAconds = np.sort(np.append(subjCatAconds,270))
-            subjCatBconds = subjCatBconds[np.invert(subjCatBconds==270)]
+        subjCatAconds = dfmodel['a'].loc[iSub-1]
+        subjCatBconds = dfmodel['b'].loc[iSub-1]
 
     #start setting up brain data
     T1_mask_path = os.path.join(fmriprepDir,'sub-' + subNum, 'anat', 'sub-' + subNum + '_desc-brain_mask.nii.gz')
