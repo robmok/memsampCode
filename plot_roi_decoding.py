@@ -34,14 +34,14 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
                       str(fwhm) + '_' + imDat)
 
 #if looking at motor, uncomment:
-#fname = fname + '_lock2resp'
+fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_model.pkl')
@@ -54,13 +54,15 @@ dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat_model.npz'))
 locals().update(behav) #load in each variable into workspace
 
+#df = df.drop(columns='evc_lrh')
+#df = df.drop(columns=['V3a_lh', 'V3a_rh'])
+#df.to_pickle(fname + '.pkl')
+
 #%% plot bar / errorbar plot
-#plt.rcdefaults()
-plt.style.use('seaborn-darkgrid')
+plt.rcdefaults()
+#plt.style.use('seaborn-darkgrid')
 
 saveFigs = False
-    
-stdAll = df.iloc[indSubs,:].sem()
 
 #barplot
 if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-minus-motor"):
@@ -69,19 +71,37 @@ elif decodeFeature == "12-way":
     chance = 1/12
 else:
     chance = .5    
-    
-ylims = [-.0275,.0375]
+
+# edit ROI names for plotting
+df.columns = ['EVC L', 'EVC R', 'MT L', 'MT R', 'IPS1-5 L', 'IPS1-5 R', 'pMFG L', 'pMFG R',
+              'mMFG L', 'mMFG R','aMFG L', 'aMFG R', 'motor L', 'motor R', 'FFA', 'PPA']
+
+#if (decodeFeature=="subjCat-orth"):
+#    ylims = [-.03,.0375]
+#elif (decodeFeature=="dir"):
+#    ylims = [-.02,.02]
+#elif (decodeFeature=="12-way"):
+#    ylims = [-.01,.015]
+ylims = [-.03,.0375]  # all same
+
 fig, ax = plt.subplots(figsize=(8,5))
-(df.iloc[indSubs,:].mean()-chance).plot(ax=ax,kind="bar",yerr=stdAll,ylim=ylims,title=decodeFeature)
-plt.tight_layout()
-#ax=df.iloc[indSubs,:].mean().plot(figsize=(20,5),yerr=stdAll, fmt='o')
+(df.iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df.iloc[0:33].sem() ,ylim=ylims)
+fig.tight_layout()
 
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barPlot_allROIs_' + decodeFeature + '.pdf'))
 
-#loaded in subjCat-orth first, saved to df1, then loaded in dir to compare. MT and PFC sig
-#stats.ttest_rel(df1['hMT_lh'].iloc[indSubs],df['hMT_lh'].iloc[indSubs]-.5)
-#stats.ttest_rel(df1['MDroi_area8c_lh'].iloc[indSubs],df['MDroi_area8c_lh'].iloc[indSubs]-.5)
+
+if (decodeFeature=="ori"):
+    fig, ax = plt.subplots(figsize=(5,5))
+    (df[['EVC L', 'EVC R']].iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df[['EVC L', 'EVC R']].iloc[0:33].sem(),ylim=[-.0024, .015], title='orientation')
+    plt.tight_layout()
+
+if (decodeFeature=="motor"):
+    fig, ax = plt.subplots(figsize=(5,5))
+    (df[['motor L', 'motor R']].iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df[['motor L', 'motor R']].iloc[0:33].sem(),ylim=[-.0024, .025], title='motor')
+    plt.tight_layout()
+
 
 #%% plotting within area, across decoders
 
@@ -445,14 +465,16 @@ if saveFigs:
 #%% #robust regression
 
 decodeFeature = 'subjCat-orth'
-    
+
+
+#indSubs = np.arange(0,33) # allsubs
 #y=acc[indSubs]
-##x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
+#x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
 ###x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
-#x=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
+##x=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
 ###x=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
 ###x=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
-##
+#
 #x = sm.add_constant(x)
 #huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
 #hub_results = huber_t.fit()
@@ -471,8 +493,15 @@ robustPlot = True  # set to false when testing out things in plotting (takes tim
 
 # plot with CIs of the slopes
 roi = 'MDroi_area8c_lh'
+indSubs = np.arange(0,33) # allsubs
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
+
+# outliers
+indSubs = x < x.mean()+(x.std()*2)
+y = acc[indSubs]
+x = np.array(df[roi].iloc[indSubs], dtype=float)
+
 if decodeFeature == '12-way':
     x = x-1/12
 x = sm.add_constant(x)
@@ -511,8 +540,14 @@ if saveFigs:
                              decodeFeature + '_' + roi + '.pdf'))
     
 roi = 'hMT_lh'
+indSubs = np.arange(0,33)  # allsubs
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
+# outliers
+indSubs = ~((x > x.mean()+(x.std()*2)) | (x < x.mean()-(x.std()*2)))
+y = acc[indSubs]
+x = np.array(df[roi].iloc[indSubs], dtype=float)
+
 if decodeFeature == '12-way':
     x = x-1/12
 x = sm.add_constant(x)

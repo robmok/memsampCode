@@ -21,15 +21,15 @@ slDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_searchlight'
 
 at = ants.ApplyTransforms() #define function
 imDat   = 'cope' # cope or tstat images
-slSiz = 8 #searchlight size
+slSiz = 12 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'blocks' 
 fwhm = None # smoothing - set to None if no smoothing
 
-decodeFeature = 'motor' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
+decodeFeature = 'subjCat-orth' #'12-way', 'dir', 'ori', ..., 'subjCat', 'objCat'
 
-lock2resp = True #only with motor
+lock2resp = False  #only with motor
 
 exclSubs = False #only  with subjCat - include only subs with equal nDirs within a category
 

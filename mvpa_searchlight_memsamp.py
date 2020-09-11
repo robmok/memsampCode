@@ -37,14 +37,14 @@ os.chdir(codeDir)
 from memsamp_RM import crossEuclid, mNobis, getConds2comp, compCovMat
 
 imDat = 'cope' # cope or tstat images
-slSiz = 6 #searchlight size
+slSiz = 12 #searchlight size
 normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossNobis'
 trainSetMeth = 'trials' # 'trials' or 'block'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 6 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
 
-decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCatRaw-orth' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # category: 'objCat' (objective catgeory), 'subjCat' 
 
 lock2resp = False # if loading in lock2resp glms (to get motor effect)
@@ -57,7 +57,7 @@ dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 # subjCat-resp - decode on category subject responded
 #%% load in trial log and append image paths
 
-for iSub in range(1,34):
+for iSub in range(1, 34):
     subNum=f'{iSub:02d}'
     dfCond=pd.DataFrame() #main df with all runs
     if iSub in {9,12,16,26}:
