@@ -91,7 +91,7 @@ if bilateralRois:
 
 dfDecode = pd.DataFrame(columns=rois, index=range(0, nSubs+1))
 dfDecode.rename(index={nSubs: 'stats'}, inplace=True)
-if decodeFeature == "subjCat-all":
+if (decodeFeature == "subjCat-all") | (decodeFeature=="subCat-wb"):
     dfDecode['subjCat'] = ""
 
 # =============================================================================
