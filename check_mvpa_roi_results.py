@@ -27,7 +27,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-orth' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-minus-motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
 # others: 
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
@@ -43,42 +43,16 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 ##decoding at feedback time
 #fname = fname + '_fromfeedback'
 
-#
-#df=pd.read_pickle(fname + '.pkl')
-#df=pd.read_pickle(fname + '_model.pkl')
-#df=pd.read_pickle(fname + '_guess.pkl')
-df=pd.read_pickle(fname + '_v2.pkl')
-#df=pd.read_pickle(fname + '_RMsubjCat.pkl')
+df=pd.read_pickle(fname + '.pkl')
+##df=pd.read_pickle(fname + '_model.pkl')
+##df=pd.read_pickle(fname + '_guess.pkl')
+##df=pd.read_pickle(fname + '_v2.pkl')
+##df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 print(df.loc['stats'])
 
-
-# subjCat-orth
-#df=pd.read_pickle(fname + '_RMsubjCat.pkl')
-#df1=pd.read_pickle(fname + '_model.pkl')    # MT:.017, mMFG: .00519
-###
-###df1=pd.read_pickle(fname + '_1.pkl')
-#ind = np.array([3, 4, 5, 12, 14, 16, 23, 26, 28, 31])  # subjCat vs model diffs
-##df1=pd.read_pickle(fname + '_guess.pkl')
-##ind = np.array([4, 5, 12, 23, 26])  # subjCat vs guess diffs
-##
-##
-# recomputing tstat and pvals and savings to df
-#roinames = list(df)
-#chance = 0
-#for roi in roinames:
-#    df[roi].loc[ind] = df1[roi].loc[ind]
-#    df[roi].loc['stats']=stats.ttest_1samp(df[roi].iloc[0:33].astype(float), chance, nan_policy='omit')
-#
-## add FFA/PPA
-#for roi in ['FFA_lrh', 'PPA_lrh']:
-#    df[roi] = df1[roi]
-#print(df.loc['stats'])
-#
-#df.to_pickle(fname + '.pkl')
-
-#pvals=np.empty((len(list(df))))
-#for iRoi in range(0,len(list(df))):
-#    pvals[iRoi]= df.loc['stats'][iRoi].pvalue
+pvals=np.empty((len(list(df))))
+for iRoi in range(0,len(list(df))):
+    pvals[iRoi]= df.loc['stats'][iRoi].pvalue
 
 # correcting
 # all rois apart from motor (12 ROIS)
@@ -88,9 +62,10 @@ print(df.loc['stats'])
 #print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
-# no EVC and motor - after added ffa/ppa (and also evc, but drop later):
-ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
-#ind = np.concatenate([np.arange(2,11), [len(pvals)-2, len(pvals)-1]]) #after drop evc
+# no EVC and motor - after added ffa/ppa
+#ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
+ind = np.concatenate([np.arange(2,12), [len(pvals)-2, len(pvals)-1]]) # new
+ind = np.concatenate([np.arange(2,12)]) # without FFA/PPA
 print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 #multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 

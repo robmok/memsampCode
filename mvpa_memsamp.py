@@ -67,7 +67,7 @@ guessmodel = False
 if guessmodel:
     dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat_guess.pkl')
 
-decodeFeature = 'subjCat'
+decodeFeature = 'subjCat-wb'
 
 decodeFromFeedback = False
 
@@ -77,7 +77,7 @@ bilateralRois = False
 # Set up decoding accuracy dataframe
 # =============================================================================
 nSubs = 33
-rois = ['EVC_lh', 'EVC_rh', 'V3a_lh', 'V3a_rh', 'hMT_lh', 'hMT_rh',
+rois = ['EVC_lh', 'EVC_rh', 'hMT_lh', 'hMT_rh',
         'IPS1-5_lh', 'IPS1-5_rh', 'MDroi_ifg_lh', 'MDroi_ifg_rh',
         'MDroi_area8c_lh', 'MDroi_area8c_rh', 'MDroi_area9_lh',
         'MDroi_area9_rh', 'motor_lh', 'motor_rh', 'FFA_lrh', 'PPA_lrh']
@@ -169,7 +169,7 @@ for iSub in range(1, nSubs+1):
         dfCondResp = dfCond['key']
 
     # get subjective category based on model
-    if (decodeFeature[0:7] == 'subjCat'):
+    if (decodeFeature[0:7] == 'subjCat') | (decodeFeature == 'dir-all'):
         subjCatAconds = dfmodel['a'].loc[iSub-1]
         subjCatBconds = dfmodel['b'].loc[iSub-1]
 
@@ -260,6 +260,22 @@ for iSub in range(1, nSubs+1):
             conds2comp = []
             for iDirPairs in range(0,np.size(oppDirs,1)):
                 conds2comp.append(oppDirs[:,iDirPairs])
+        elif decodeFeature == "subjCat-wb":  # within-between cateory
+            conds2comp = []
+            # within
+            for icond in range(len(subjCatAconds)): 
+                ind = np.ones(len(subjCatAconds), dtype='bool')
+                ind[icond] = False
+                conds2comp.append([subjCatAconds[icond], subjCatAconds[ind]])
+            for icond in range(len(subjCatBconds)): 
+                ind = np.ones(len(subjCatBconds), dtype='bool')
+                ind[icond] = False
+                conds2comp.append([subjCatBconds[icond], subjCatBconds[ind]])
+            # between
+            for icond in range(len(subjCatBconds)): 
+                conds2comp.append([subjCatAconds[icond], subjCatBconds[ind]])
+            for icond in range(len(subjCatAconds)): 
+                conds2comp.append([subjCatBconds[icond], subjCatAconds[ind]])
         else:  # stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         
@@ -283,7 +299,7 @@ for iSub in range(1, nSubs+1):
             cvAccTmp = np.empty(len(conds2comp))
             for iPair in range(0,len(conds2comp)):
                 ytmp=y.copy()
-                if decodeFeature == "12-way-all": 
+                if (decodeFeature == "12-way-all")|(decodeFeature=="subjCat-wb"): 
                     condInd=np.where(y==conds2comp[iPair][0])
                     for iVal in conds2comp[iPair][1]:
                         condInd=np.append(condInd, np.where(y==iVal))
@@ -371,7 +387,7 @@ for iSub in range(1, nSubs+1):
                             cvAccTmp90[iPair] = mNobis(fmri_masked_cleaned_indexed,y_indexed)                    
                 cvAccTmp = cvAccTmp-cvAccTmp90
         
-        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): 
+        if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all")|(decodeFeature=="subjCat-wb"): 
             cvAcc = cvAccTmp.mean()  # mean over pairs
             print('ROI: %s, Sub-%s %s measure = %0.3f' % (roi, subNum, distMeth, cvAcc))    
         else:
@@ -379,7 +395,7 @@ for iSub in range(1, nSubs+1):
         if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
             dfDecode[roi].iloc[iSub-1]=cvAcc #store to main df
         
-    if decodeFeature=="subjCat-all":  # add subjCat info to df
+    if (decodeFeature=="subjCat-all") | (decodeFeature=="subjCat-wb"):  # add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
 # compute t-test, append to df
 if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")&(decodeFeature!="subjCat-orth-motor")&(decodeFeature!="subjCat-minus-motor")):
@@ -387,7 +403,7 @@ if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decod
 else: 
     chance = 0  # for crossvalidated distances or subtractions (e.g. subjCat-orth)
 
-if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all"): #stores several values in each cell, so can't do t-test here
+if not (decodeFeature=="12-way-all")|(decodeFeature=="subjCat-all")|(decodeFeature=="objCat-all")|(decodeFeature=="dir-all")|(decodeFeature=="subjCat-wb"): #stores several values in each cell, so can't do t-test here
     for roi in rois:
         dfDecode[roi].iloc[-1]=stats.ttest_1samp(dfDecode[roi].iloc[0:nSubs].astype(float), chance, nan_policy='omit') #compute t-test, append to df
 

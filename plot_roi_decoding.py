@@ -34,14 +34,14 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'motor' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = '12-way' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
                       str(fwhm) + '_' + imDat)
 
 #if looking at motor, uncomment:
-fname = fname + '_lock2resp'
+#fname = fname + '_lock2resp'
 
 df=pd.read_pickle(fname + '.pkl')
 #df=pd.read_pickle(fname + '_model.pkl')
@@ -62,7 +62,9 @@ locals().update(behav) #load in each variable into workspace
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
 
-saveFigs = False
+fntSiz = 20  # fntSiz>10 cuts offf...
+
+saveFigs = True
 
 #barplot
 if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-minus-motor"):
@@ -76,17 +78,34 @@ else:
 df.columns = ['EVC L', 'EVC R', 'MT L', 'MT R', 'IPS1-5 L', 'IPS1-5 R', 'pMFG L', 'pMFG R',
               'mMFG L', 'mMFG R','aMFG L', 'aMFG R', 'motor L', 'motor R', 'FFA', 'PPA']
 
+if decodeFeature=="subjCat-orth":
+    decode_title = 'Category'
+elif decodeFeature=="dir":
+    decode_title = 'Direction'
+elif decodeFeature=="12-way":
+    decode_title = '12-way'
+elif decodeFeature=="motor":
+    decode_title = 'Motor'
+else:
+    decode_title = ''
+
 #if (decodeFeature=="subjCat-orth"):
 #    ylims = [-.03,.0375]
 #elif (decodeFeature=="dir"):
 #    ylims = [-.02,.02]
 #elif (decodeFeature=="12-way"):
 #    ylims = [-.01,.015]
-ylims = [-.03,.0375]  # all same
-
-fig, ax = plt.subplots(figsize=(8,5))
-(df.iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df.iloc[0:33].sem() ,ylim=ylims)
+ylims = [-.03,.0375]  # keep all same
+fig, ax = plt.subplots(figsize=(10,7))
+(df.iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df.iloc[0:33].sem() ,ylim=ylims, title=decode_title, fontsize=fntSiz)
+ax.title.set_size(fntSiz + 10)
+#ax.tick_params(axis='both', which='major', labelsize=fntSiz)  # axis=both/x/y 
 fig.tight_layout()
+
+#df_dat = (df.iloc[0:33].mean()-chance)
+#g = sns.barplot(data=df_dat)
+#df_dat.plot(yerr=df.iloc[0:33].sem(),ylim=ylims, elinewidth=2.5,fmt='k,',alpha=0.8)
+#sns.stripplot(color="k", alpha=0.2, size=3, data=df.iloc[0:33].mean()-chance, ax=g.ax)
 
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barPlot_allROIs_' + decodeFeature + '.pdf'))
@@ -94,13 +113,20 @@ if saveFigs:
 
 if (decodeFeature=="ori"):
     fig, ax = plt.subplots(figsize=(5,5))
-    (df[['EVC L', 'EVC R']].iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df[['EVC L', 'EVC R']].iloc[0:33].sem(),ylim=[-.0024, .015], title='orientation')
+    (df[['EVC L', 'EVC R']].iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df[['EVC L', 'EVC R']].iloc[0:33].sem(),ylim=[-.0024, .015], title='Orientation', fontsize=fntSiz-5)
+    ax.title.set_size(fntSiz -5 + 4)
     plt.tight_layout()
+    if saveFigs:
+        plt.savefig(os.path.join(figDir,'mvpaROI_barPlot_EVC_' + decodeFeature + '.pdf'))
 
 if (decodeFeature=="motor"):
     fig, ax = plt.subplots(figsize=(5,5))
-    (df[['motor L', 'motor R']].iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df[['motor L', 'motor R']].iloc[0:33].sem(),ylim=[-.0024, .025], title='motor')
+    (df[['motor L', 'motor R']].iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df[['motor L', 'motor R']].iloc[0:33].sem(),ylim=[-.0024, .025], title='Motor', fontsize=fntSiz-5)
+    ax.title.set_size(fntSiz - 5 + 4)
     plt.tight_layout()
+    if saveFigs:
+        plt.savefig(os.path.join(figDir,'mvpaROI_barPlot_motor_' + decodeFeature + '.pdf'))
+
 
 
 #%% plotting within area, across decoders
@@ -489,18 +515,19 @@ fntSiz = 14  # fntSiz>10 cuts offf...
 legFntSiz = 12
 saveFigs = False
 
-robustPlot = True  # set to false when testing out things in plotting (takes time) 
+robustPlot = False  # set to false when testing out things in plotting (takes time) 
 
 # plot with CIs of the slopes
-roi = 'MDroi_area8c_lh'
+roi = 'mMFG L'
+#roi = 'MDroi_area8c_lh'
 indSubs = np.arange(0,33) # allsubs
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
 
-# outliers
-indSubs = x < x.mean()+(x.std()*2)
-y = acc[indSubs]
-x = np.array(df[roi].iloc[indSubs], dtype=float)
+## outliers
+indSubs = ~((x > x.mean()+(x.std()*2)) | (x < x.mean()-(x.std()*2)))
+#y = acc[indSubs]
+#x = np.array(df[roi].iloc[indSubs], dtype=float)
 
 if decodeFeature == '12-way':
     x = x-1/12
@@ -525,28 +552,31 @@ props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 if decodeFeature[0:7] == 'subjCat':
     legTxt = '\n'.join(
             ('b = %.2f' % hub_results.params[1],
-             'p < %.3f' % (hub_results.pvalues[1]/2)))
-    ax.fig.text(0.2, 0.94, legTxt, fontsize=legFntSiz,verticalalignment='top',
-                bbox=props) #rcdefaults - white bg
+             'p = %.3f' % (hub_results.pvalues[1]/2)))
+#    ax.fig.text(0.2, 0.94, legTxt, fontsize=legFntSiz,verticalalignment='top',
+#                bbox=props) #rcdefaults - white bg
+    ax.fig.text(0.75, 0.17, legTxt, fontsize=legFntSiz, verticalalignment='bottom', bbox=props) #rcdefaults - white bg
+
 elif decodeFeature == "12-way":
     legTxt = '\n'.join(
             ('b = %.2f' % hub_results.params[1],
              'p = %.3f' % (hub_results.pvalues[1]/2)))
     ax.fig.text(0.2, 0.94, legTxt, fontsize=legFntSiz, verticalalignment='top', bbox=props) #rcdefaults - white bg
-ax.set(ylim=(0.605, 1.02))
+ax.set(ylim=(0.605, 1))  # 1.02
 ax.fig.tight_layout
 if saveFigs:
     plt.savefig(os.path.join(figDir, 'mvpaROI_behavDecodeCorr_robustReg_' +
                              decodeFeature + '_' + roi + '.pdf'))
     
 roi = 'hMT_lh'
+roi = 'MT L'
 indSubs = np.arange(0,33)  # allsubs
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
-# outliers
-indSubs = ~((x > x.mean()+(x.std()*2)) | (x < x.mean()-(x.std()*2)))
-y = acc[indSubs]
-x = np.array(df[roi].iloc[indSubs], dtype=float)
+## outliers
+#indSubs = ~((x > x.mean()+(x.std()*2)) | (x < x.mean()-(x.std()*2)))
+#y = acc[indSubs]
+#x = np.array(df[roi].iloc[indSubs], dtype=float)
 
 if decodeFeature == '12-way':
     x = x-1/12

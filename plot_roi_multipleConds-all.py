@@ -43,17 +43,24 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'dir-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                                 '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
 
 #load in subjCat
-subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
+#subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 #load in behav acc
-behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
+#behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat.npz'))
+behav=np.load(os.path.join(behavDir, 'memsamp_acc_subjCat_model.npz'))
 locals().update(behav) #load in each variable into workspace
+
+
+## model estimated subjective category
+dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
+
+
 
 #%% subjCat-all - organise
 plt.style.use('seaborn-darkgrid')
@@ -62,37 +69,37 @@ fntSiz=14
 
 saveFigs = False
 
+# exclude subs with unequal conds in each cat for now
 exclSubs = True
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+    indSubs=np.zeros(33,dtype=bool)
+    for iSub in range(33):
+        if len(dfmodel['a'].loc[iSub]) == len(dfmodel['b'].loc[iSub]):
+            indSubs[iSub] = 1
 else:
     indSubs=np.ones(33,dtype=bool)
-    
 #df1 = pd.DataFrame(columns=df.columns,index=['mean', 'sem'])
 #for roi in df.columns.values[0:-1]:
 
 #subjCat sig
 roi='hMT_lh'
-roi='MDroi_area8c_lh'
+#roi='MDroi_area8c_lh'
 
-#RDM cat sig
-roi='MDroi_area9_rh'
-
-#12-way sig
-roi='hMT_rh'
-
-#ori sig
-roi='EVC_lh'
+##RDM cat sig
+#roi='MDroi_area9_rh'
+#
+##12-way sig
+#roi='hMT_rh'
+#
+##ori sig
+#roi='EVC_lh'
 
 ylims = [0.4875, 0.5225]
+ylims = [0.48, 0.53]  # nanmedian below
 
 # plot mean and std across subs and plot (if including all subs, this ignores that some might have diff nConds per cat)
 nCond=12
-nSubs=33
+nSubs=33  # uses indSubs below to remove excluded subs
 rdmAll = np.zeros((nCond,nCond,nSubs))
 rdm = np.zeros((nCond,nCond))
 iu = np.triu_indices(nCond,1) #upper triangle, 1 from the diagonal (i.e. ignores diagonal)
@@ -127,8 +134,8 @@ rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
 #    ax = plt.figure(figsize=(4,3))
 #    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
 #    ctuple = ctuple+0.05
-#    ylim1, ylim2 = plt.ylim()
-#    plt.ylim(ylims[0],ylims[1])
+##    ylim1, ylim2 = plt.ylim()
+##    plt.ylim(ylims[0],ylims[1])
 #
 #ax = plt.figure(figsize=(8,4))
 #ctuple=np.array((0.5,0.3,0.1))
@@ -136,8 +143,8 @@ rdmSE  = rdmAll[:,:,indSubs].std(axis=2)/np.sqrt(sum(indSubs))
 #    ax = plt.figure(figsize=(4,3))
 #    ax = plt.errorbar(range(0,12),rdmMean[iCond,:], yerr=rdmSE[iCond,:], fmt='-o', color=ctuple)
 #    ctuple = ctuple+0.05
-#    ylim1, ylim2 = plt.ylim()
-#    plt.ylim(ylims[0],ylims[1])
+##    ylim1, ylim2 = plt.ylim()
+##    plt.ylim(ylims[0],ylims[1])
     
 #average values, ignoring the current training category (values 0)
 rdmAll[rdmAll==0]=np.nan #so can nanmean
@@ -145,6 +152,7 @@ rdmAll[rdmAll==0]=np.nan #so can nanmean
 ctuple=np.array((0.1,0.3,0.5))
 #rdmMeanA = np.nanmean(rdmMean[0:nCond//2,0:nCond],axis=0)
 rdmMeanA = np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0).mean(axis=1)
+#rdmMeanA = np.nanmedian(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0), axis=1)
 rdmSEA = np.nanstd(np.nanmean(rdmAll[0:nCond//2,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 
 ax = plt.figure(figsize=(4,3))
@@ -155,6 +163,7 @@ plt.ylim(ylims[0],ylims[1])
 ctuple=np.array((0.5,0.3,0.1))
 #rdmMeanB = np.nanmean(rdmMean[nCond//2:nCond,0:nCond],axis=0)
 rdmMeanB = np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0).mean(axis=1)
+#rdmMeanB = np.nanmedian(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0), axis=1)
 rdmSEB = np.nanstd(np.nanmean(rdmAll[nCond//2:nCond,0:nCond,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 
 ax = plt.figure(figsize=(4,3))
@@ -165,6 +174,7 @@ plt.ylim(ylims[0],ylims[1])
 #average across conds
 ctuple=np.array((0.1,0.3,0.5))
 rdmMeanAll = np.nanmean(rdmAll[:,:,indSubs],axis=0).mean(axis=1)
+#rdmMeanAll = np.nanmedian(np.nanmean(rdmAll[:,:,indSubs],axis=0), axis=1)
 rdmSEAll = np.nanstd(np.nanmean(rdmAll[:,:,indSubs],axis=0),axis=1)/np.sqrt(sum(indSubs))
 ax = plt.figure(figsize=(4,3))
 ax = plt.errorbar(range(0,12),rdmMeanAll, yerr=rdmSEAll, fmt='-o', color=ctuple)
@@ -172,20 +182,117 @@ ylim1, ylim2 = plt.ylim()
 plt.ylim(ylims[0],ylims[1])
 plt.title(roi,fontsize=fntSiz)
 
+
+
+# %% new subjcat-all replotting
+
+iSub = 0
+# each dir is compared to 11 directions, from itself (if dir is 150, the first one is 150-180)
+
+# cats for iSub=0
+#[[150.0, 180.0, 210.0, 240.0, 270.0, 300.0],
+# [0.0, 30.0, 60.0, 90.0, 120.0, 330.0]]
+
+# for first dir, first 5 will be within, next 6 between
+df[roi].iloc[iSub][0:0+5]  # 5 stim
+df[roi].iloc[iSub][0+5:5+6]  # 6 stim
+
+# second dir
+df[roi].iloc[iSub][11:11+4] # 4 stim. misses first one, since above did 150-180
+df[roi].iloc[iSub][15:15+6]
+
+# 3rd
+df[roi].iloc[iSub][21:21+3]
+df[roi].iloc[iSub][24:24+6]
+
+#  4th
+df[roi].iloc[iSub][30:30+2]
+df[roi].iloc[iSub][32:32+6]
+
+# 5th
+df[roi].iloc[iSub][38:38+1]
+df[roi].iloc[iSub][39:39+6]
+
+# 6th - only between cats
+df[roi].iloc[iSub][45:45+6]
+
+
+# next cat - within only
+df[roi].iloc[iSub][51:51+5]
+
+df[roi].iloc[iSub][56:56+4]
+
+df[roi].iloc[iSub][60:60+3]
+
+df[roi].iloc[iSub][63:63+2]
+
+df[roi].iloc[iSub][65:66]
+
+# %% making indices
+
+roi='hMT_lh'
+roi='MDroi_area8c_lh'
+
+within_a_1 = np.arange(0, 5)
+within_a_2 = np.arange(11, 15)
+within_a_3 = np.arange(21, 24)
+within_a_4 = np.arange(30, 32)
+within_a_5 = np.arange(38, 39)
+
+between1 = np.arange(6, 11)
+between2 = np.arange(15, 21)
+between3 = np.arange(24, 30)
+between4 = np.arange(32, 38)
+between5 = np.arange(39, 45)
+between6 = np.arange(45, 51)
+
+within_b_1 = np.arange(51, 56)
+within_b_2 = np.arange(56, 60)
+within_b_3 = np.arange(60, 63)
+within_b_4 = np.arange(63, 65)
+within_b_5 = np.arange(65, 66)
+
+within_a_all = np.concatenate([within_a_1, within_a_2, within_a_3, within_a_4, within_a_5])
+within_b_all = np.concatenate([within_b_1, within_b_2, within_b_3, within_b_4, within_b_5])
+within_all = np.concatenate([within_a_all, within_b_all])
+between_all = np.concatenate([between1, between2, between3, between4, between5, between6])
+
+
+# need to do for subs with unequal conds per cat (harder to align directions, but can compute mean within-between)?
+
+#print(df[roi].iloc[iSub][within_a_all].mean())
+#print(df[roi].iloc[iSub][within_b_all].mean())
+#print(df[roi].iloc[iSub][within_all].mean())
+#print(df[roi].iloc[iSub][between_all].mean())
+
+within_a = np.zeros(33)
+within_b = np.zeros(33)
+within = np.zeros(33)
+between = np.zeros(33)
+for iSub in range(0,33):
+    within_a[iSub] = df[roi].iloc[iSub][within_a_all].mean()
+    within_b[iSub] = df[roi].iloc[iSub][within_b_all].mean()
+    within[iSub] = df[roi].iloc[iSub][within_all].mean()
+    between[iSub] = df[roi].iloc[iSub][between_all].mean()
+
+print(within_a[indSubs].mean())
+print(within_b[indSubs].mean())
+print(within[indSubs].mean())
+print(between[indSubs].mean())
+
 #%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
 plt.style.use('seaborn-darkgrid')
 
 fntSiz=14
 
-saveFigs = True
+saveFigs = False
 
-exclSubs = False
+exclSubs = True
 if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
+    indSubs=np.zeros(33,dtype=bool)
+    for iSub in range(33):
+        if len(dfmodel['a'].loc[iSub]) == len(dfmodel['b'].loc[iSub]):
+            indSubs[iSub] = 1
 else:
     indSubs=np.ones(33,dtype=bool)
 
@@ -434,15 +541,7 @@ ax = plt.errorbar(range(0,np.size(dfMean,axis=0)),dfMean[roi], yerr=dfSem[roi], 
 #%%dir-all
 plt.style.use('seaborn-darkgrid')
 
-exclSubs = True
-if exclSubs:
-    nDirInCat=np.empty((2,33))
-    for iSub in range(0,33):
-        nDirInCat[0,iSub]=len(subjCat.loc[iSub][0])
-        nDirInCat[1,iSub]=len(subjCat.loc[iSub][1])
-    indSubs=nDirInCat[0,:]==nDirInCat[1,:]
-else:
-    indSubs=np.ones(33,dtype=bool)
+indSubs=np.ones(33,dtype=bool)
 
 rois = list(df)
 dfMean = pd.DataFrame(columns=rois,index=range(0,6))
