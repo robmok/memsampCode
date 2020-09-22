@@ -273,9 +273,9 @@ for iSub in range(1, nSubs+1):
                 conds2comp.append([subjCatBconds[icond], subjCatBconds[ind]])
             # between
             for icond in range(len(subjCatBconds)): 
-                conds2comp.append([subjCatAconds[icond], subjCatBconds[ind]])
+                conds2comp.append([subjCatAconds[icond], subjCatBconds])
             for icond in range(len(subjCatAconds)): 
-                conds2comp.append([subjCatBconds[icond], subjCatAconds[ind]])
+                conds2comp.append([subjCatBconds[icond], subjCatAconds])
         else:  # stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
         
