@@ -89,6 +89,7 @@ if bilateralRois:
 
 # temp
 rois = ['hMT_lh', 'MDroi_area8c_lh']
+rois = ['hMT_lh']
 
 # reRunROIs
 #rois = ['FFA_lrh_sm', 'PPA_lrh_sm'] #functional localisers
@@ -98,6 +99,9 @@ dfDecode.rename(index={nSubs: 'stats'}, inplace=True)
 if (decodeFeature == "subjCat-all") | (decodeFeature=="subjCat-wb"):
     dfDecode['subjCat'] = ""
 
+if decodeFeature=="subjCat":
+    dfDecode['acc_per_dir'] = ""
+    dfDecode['proba_per_dir'] = ""
 # =============================================================================
 # load in trial log and append image paths
 # =============================================================================
@@ -336,8 +340,8 @@ for iSub in range(1, nSubs+1):
                 cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed)    
                 if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
                     if distMeth == 'svm':
-                        clf   = LinearSVC(C=.1)
-                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean()
+#                        clf   = LinearSVC(C=.1)
+#                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean()
                         
 #                        clf   = LinearSVC(C=.1)
 #                        cv    = LeaveOneGroupOut()
@@ -346,9 +350,10 @@ for iSub in range(1, nSubs+1):
 #                        tmp = cross_val_predict(clf,fmri_masked_cleaned_indexed,y=y_indexed,cv=cv)
 #                        trl_acc = tmp == y_indexed
 #                        print(np.mean(tmp==y_indexed))
-#                        
-                        # manual -and getting single trial probabilities
-                        svm   = LinearSVC(C=.1, random_state=0)
+
+                        
+                        # new - manual: getting single trial acc/probabilities
+                        svm   = LinearSVC(C=.1)
                         clf = CalibratedClassifierCV(svm)
                         trl_acc = []
                         trl_pr = []
@@ -358,11 +363,26 @@ for iSub in range(1, nSubs+1):
                             trl_acc.append(clf.predict(fmri_masked_cleaned_indexed[ind]) == y_indexed[ind])  # mean of this is acc
                             trl_pr.append(clf.predict_proba(fmri_masked_cleaned_indexed[ind]))
                         
+                        # get mean acc - like above
+                        cvAccTmp[iPair] = np.mean(np.array(trl_acc).mean(axis=1))
+                        
 #                        # get accuracies for individual trials
 #                        # - save y (directions), y_indexed (category), groups_indexed (block index)
                         trl_acc = np.reshape(np.array(trl_acc), np.array(trl_acc).shape[0] * np.array(trl_acc).shape[1])
                         trl_pr = np.reshape(np.array(trl_pr), [np.array(trl_pr).shape[0] * np.array(trl_pr).shape[1], 2])
                         
+                        # get directions unsorted in case
+#                        indexes = np.unique(y, return_index=True)[1]
+#                        yy = [y[index] for index in sorted(indexes)]
+                        
+                        # get directions by subjCat
+                        yy = np.concatenate([subjCatAconds, subjCatBconds])
+                        
+                        acc_per_dir = np.zeros(len(yy))
+                        proba_per_dir = np.zeros(len(yy))
+                        for i in range(len(yy)):
+                            acc_per_dir[i] = trl_acc[y == yy[i]].mean()
+                            proba_per_dir[i] = trl_pr[y == yy[i], 0].mean()
 
                     elif distMeth == 'lda':
                         clf = LinearDiscriminantAnalysis()
@@ -427,6 +447,11 @@ for iSub in range(1, nSubs+1):
         
     if (decodeFeature=="subjCat-all") | (decodeFeature=="subjCat-wb"):  # add subjCat info to df
         dfDecode['subjCat'][iSub-1] = [list(subjCatAconds), list(subjCatBconds)]
+    
+    if decodeFeature=="subjCat":  # new
+        dfDecode['acc_per_dir'][iSub-1] = acc_per_dir
+        dfDecode['proba_per_dir'][iSub-1] = proba_per_dir
+        
 # compute t-test, append to df
 if ((distMeth=='svm')|(distMeth=='lda'))&((decodeFeature!="subjCat-orth")&(decodeFeature!="objCat-orth")&(decodeFeature!="subjCat-orth-motor")&(decodeFeature!="subjCat-minus-motor")):
     chance = 1/len(np.unique(y_indexed))
@@ -459,5 +484,9 @@ if reRun is True:
 if guessmodel:
     fnameSave = fnameSave + '_guess'
 
+
+# tmp
+fnameSave = fnameSave + '_trialwise_outputs'
+
 # save df
-#dfDecode.to_pickle(fnameSave + '.pkl')
+dfDecode.to_pickle(fnameSave + '.pkl')

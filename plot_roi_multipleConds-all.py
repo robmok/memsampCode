@@ -43,11 +43,18 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-wb' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
-df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
-                                distMeth + '_' + normMeth + '_'  + trainSetMeth + 
-                                '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
+fname = (os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
+                      distMeth + '_' + normMeth + '_'  + trainSetMeth + 
+                      '_fwhm' + str(fwhm) + '_' + imDat))
+
+fname = fname + '_trialwise_outputs_MT_lh'  # new, just with subjCat
+#fname = fname + '_trialwise_outputs_mMFG_lh'
+#
+fname = fname + '.pkl'
+
+df=pd.read_pickle(fname)
 
 #load in subjCat
 #subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
@@ -59,6 +66,60 @@ locals().update(behav) #load in each variable into workspace
 
 ## model estimated subjective category
 dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
+
+
+# %% plot subjCat condition wise classifier predictions / probabilities
+
+
+saveFigs = False
+
+# exclude subs with unequal conds in each cat for now
+exclSubs = False
+if exclSubs:
+    indSubs=np.zeros(33,dtype=bool)
+    for iSub in range(33):
+        if len(dfmodel['a'].loc[iSub]) == len(dfmodel['b'].loc[iSub]):
+            indSubs[iSub] = 1
+else:
+    indSubs=np.ones(33,dtype=bool)
+
+acc_per_dir = np.zeros([33, 12])
+proba_per_dir = np.zeros([33, 12])
+for iSub in range(0,33):
+    acc_per_dir[iSub] = df['acc_per_dir'][iSub]
+    proba_per_dir[iSub] = df['proba_per_dir'][iSub]
+
+#plt.plot(acc_per_dir[indSubs].mean(axis=0))
+#plt.show()
+#
+#plt.plot(proba_per_dir[indSubs].mean(axis=0))
+#plt.show()
+#
+#roi = 'mMFG_lh'
+roi = 'MT_lh'
+
+acc_mean = acc_per_dir[indSubs].mean(axis=0)
+acc_sem = np.std(acc_per_dir[indSubs], axis=0) / np.sqrt(indSubs.sum())
+
+plt.errorbar(np.arange(12), acc_mean, acc_sem)
+plt.ylim([.33, .66])
+plt.title('Left MT')
+#plt.title('Left mMFG')
+plt.xlabel('Direction')
+plt.ylabel('Mean Decoding Accuracy')
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat_12dirs_outputs_' + roi + '.pdf'))
+plt.show()
+
+
+
+# t-test on acc
+import scipy.stats as stats
+stats.ttest_1samp(acc_per_dir[indSubs], .5)
+#stats.ttest_1samp(proba_per_dir[indSubs], .5)
+
+
+
 
 #%% subjCat-all - organise
 plt.style.use('seaborn-darkgrid')
