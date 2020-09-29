@@ -36,6 +36,7 @@ from sklearn.model_selection import cross_val_score, cross_val_predict, LeaveOne
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import scipy.stats as stats
+from sklearn.calibration import CalibratedClassifierCV
 
 mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
 #mainDir = '/home/robmok/Documents/memsamp_fMRI' #love01
@@ -337,24 +338,32 @@ for iSub in range(1, nSubs+1):
                     if distMeth == 'svm':
                         clf   = LinearSVC(C=.1)
                         cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean()
-                        print(cvAccTmp)
                         
 #                        clf   = LinearSVC(C=.1)
 #                        cv    = LeaveOneGroupOut()
 #                        cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
 #                        cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed) 
-#                        xx = cross_val_predict(clf,fmri_masked_cleaned_indexed,y=y_indexed,cv=cv)
-#                        print(np.mean(xx==y_indexed))
+#                        tmp = cross_val_predict(clf,fmri_masked_cleaned_indexed,y=y_indexed,cv=cv)
+#                        trl_acc = tmp == y_indexed
+#                        print(np.mean(tmp==y_indexed))
 #                        
+                        # manual -and getting single trial probabilities
+                        svm   = LinearSVC(C=.1, random_state=0)
+                        clf = CalibratedClassifierCV(svm)
+                        trl_acc = []
+                        trl_pr = []
+                        for i in range(int(max(groups_indexed))):
+                            ind = groups_indexed == i+1  # test ind
+                            clf.fit(fmri_masked_cleaned_indexed[~ind], y_indexed[~ind])  # need to only inlude train set here for both fmri and y
+                            trl_acc.append(clf.predict(fmri_masked_cleaned_indexed[ind]) == y_indexed[ind])  # mean of this is acc
+                            trl_pr.append(clf.predict_proba(fmri_masked_cleaned_indexed[ind]))
+                        
 #                        # get accuracies for individual trials
 #                        # - save y (directions), y_indexed (category), groups_indexed (block index)
-#                        clf   = LinearSVC(C=.1, random_state=0)
-#                        for i in range(int(max(groups_indexed))):
-#                            ind = groups_indexed == i+1  # test ind
-#                            clf.fit(fmri_masked_cleaned_indexed[~ind], y_indexed[~ind])  # need to only inlude train set here for both fmri and y
-#                            trl_acc = clf.predict(fmri_masked_cleaned_indexed[ind]) == y_indexed[ind]
-#                            print(trl_acc.mean())
-#                        
+                        trl_acc = np.reshape(np.array(trl_acc), np.array(trl_acc).shape[0] * np.array(trl_acc).shape[1])
+                        trl_pr = np.reshape(np.array(trl_pr), [np.array(trl_pr).shape[0] * np.array(trl_pr).shape[1], 2])
+                        
+
                     elif distMeth == 'lda':
                         clf = LinearDiscriminantAnalysis()
                         clf.fit(fmri_masked_cleaned, y) 
