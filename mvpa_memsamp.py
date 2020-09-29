@@ -32,7 +32,7 @@ import pandas as pd
 import nibabel as nib
 from nilearn.masking import apply_mask
 from nilearn.signal import clean
-from sklearn.model_selection import cross_val_score, LeaveOneGroupOut
+from sklearn.model_selection import cross_val_score, cross_val_predict, LeaveOneGroupOut
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import scipy.stats as stats
@@ -67,7 +67,7 @@ guessmodel = False
 if guessmodel:
     dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcat_guess.pkl')
 
-decodeFeature = 'subjCat-wb'
+decodeFeature = 'subjCat'
 
 decodeFromFeedback = False
 
@@ -85,6 +85,9 @@ rois = ['EVC_lh', 'EVC_rh', 'hMT_lh', 'hMT_rh',
 if bilateralRois:
     rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
             'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh']
+
+# temp
+rois = ['hMT_lh', 'MDroi_area8c_lh']
 
 # reRunROIs
 #rois = ['FFA_lrh_sm', 'PPA_lrh_sm'] #functional localisers
@@ -263,18 +266,18 @@ for iSub in range(1, nSubs+1):
         elif decodeFeature == "subjCat-wb":  # within-between cateory
             conds2comp = []
             # within
-            for icond in range(len(subjCatAconds)): 
+            for icond in range(len(subjCatAconds)):
                 ind = np.ones(len(subjCatAconds), dtype='bool')
                 ind[icond] = False
                 conds2comp.append([subjCatAconds[icond], subjCatAconds[ind]])
-            for icond in range(len(subjCatBconds)): 
+            for icond in range(len(subjCatBconds)):
                 ind = np.ones(len(subjCatBconds), dtype='bool')
                 ind[icond] = False
                 conds2comp.append([subjCatBconds[icond], subjCatBconds[ind]])
             # between
-            for icond in range(len(subjCatBconds)): 
+            for icond in range(len(subjCatAconds)):
                 conds2comp.append([subjCatAconds[icond], subjCatBconds])
-            for icond in range(len(subjCatAconds)): 
+            for icond in range(len(subjCatBconds)):
                 conds2comp.append([subjCatBconds[icond], subjCatAconds])
         else:  # stimulus decoding
             conds2comp = getConds2comp(decodeFeature)
@@ -333,7 +336,25 @@ for iSub in range(1, nSubs+1):
                 if not (((roi[0:7] == 'PPA_lrh') & (subNum in ('05', '08', '09', '24'))) | ((roi[0:7] == 'FFA_lrh') & (subNum in ('08', '15')))):  # no PPA / FFA for these people
                     if distMeth == 'svm':
                         clf   = LinearSVC(C=.1)
-                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean() 
+                        cvAccTmp[iPair] = cross_val_score(clf,fmri_masked_cleaned_indexed,y=y_indexed,scoring='accuracy',cv=cv).mean()
+                        print(cvAccTmp)
+                        
+#                        clf   = LinearSVC(C=.1)
+#                        cv    = LeaveOneGroupOut()
+#                        cv.get_n_splits(fmri_masked_cleaned_indexed, y_indexed, groups_indexed)
+#                        cv    = cv.split(fmri_masked_cleaned_indexed,y_indexed,groups_indexed) 
+#                        xx = cross_val_predict(clf,fmri_masked_cleaned_indexed,y=y_indexed,cv=cv)
+#                        print(np.mean(xx==y_indexed))
+#                        
+#                        # get accuracies for individual trials
+#                        # - save y (directions), y_indexed (category), groups_indexed (block index)
+#                        clf   = LinearSVC(C=.1, random_state=0)
+#                        for i in range(int(max(groups_indexed))):
+#                            ind = groups_indexed == i+1  # test ind
+#                            clf.fit(fmri_masked_cleaned_indexed[~ind], y_indexed[~ind])  # need to only inlude train set here for both fmri and y
+#                            trl_acc = clf.predict(fmri_masked_cleaned_indexed[ind]) == y_indexed[ind]
+#                            print(trl_acc.mean())
+#                        
                     elif distMeth == 'lda':
                         clf = LinearDiscriminantAnalysis()
                         clf.fit(fmri_masked_cleaned, y) 
@@ -430,4 +451,4 @@ if guessmodel:
     fnameSave = fnameSave + '_guess'
 
 # save df
-dfDecode.to_pickle(fnameSave + '.pkl')
+#dfDecode.to_pickle(fnameSave + '.pkl')

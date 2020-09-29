@@ -43,7 +43,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-all' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-wb' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 df=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                                 distMeth + '_' + normMeth + '_'  + trainSetMeth + 
@@ -59,8 +59,6 @@ locals().update(behav) #load in each variable into workspace
 
 ## model estimated subjective category
 dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
-
-
 
 #%% subjCat-all - organise
 plt.style.use('seaborn-darkgrid')
@@ -183,56 +181,17 @@ plt.ylim(ylims[0],ylims[1])
 plt.title(roi,fontsize=fntSiz)
 
 
-
 # %% new subjcat-all replotting
 
-iSub = 0
 # each dir is compared to 11 directions, from itself (if dir is 150, the first one is 150-180)
-
-# cats for iSub=0
+# e.g. cats for iSub=0
 #[[150.0, 180.0, 210.0, 240.0, 270.0, 300.0],
 # [0.0, 30.0, 60.0, 90.0, 120.0, 330.0]]
 
-# for first dir, first 5 will be within, next 6 between
-df[roi].iloc[iSub][0:0+5]  # 5 stim
-df[roi].iloc[iSub][0+5:5+6]  # 6 stim
+roi = 'hMT_lh'
+roi = 'MDroi_area8c_lh'
 
-# second dir
-df[roi].iloc[iSub][11:11+4] # 4 stim. misses first one, since above did 150-180
-df[roi].iloc[iSub][15:15+6]
-
-# 3rd
-df[roi].iloc[iSub][21:21+3]
-df[roi].iloc[iSub][24:24+6]
-
-#  4th
-df[roi].iloc[iSub][30:30+2]
-df[roi].iloc[iSub][32:32+6]
-
-# 5th
-df[roi].iloc[iSub][38:38+1]
-df[roi].iloc[iSub][39:39+6]
-
-# 6th - only between cats
-df[roi].iloc[iSub][45:45+6]
-
-
-# next cat - within only
-df[roi].iloc[iSub][51:51+5]
-
-df[roi].iloc[iSub][56:56+4]
-
-df[roi].iloc[iSub][60:60+3]
-
-df[roi].iloc[iSub][63:63+2]
-
-df[roi].iloc[iSub][65:66]
-
-# %% making indices
-
-roi='hMT_lh'
-roi='MDroi_area8c_lh'
-
+# indices - within is 5, 4, 3, 2, 1 stim. between is always 6
 within_a_1 = np.arange(0, 5)
 within_a_2 = np.arange(11, 15)
 within_a_3 = np.arange(21, 24)
@@ -257,9 +216,6 @@ within_b_all = np.concatenate([within_b_1, within_b_2, within_b_3, within_b_4, w
 within_all = np.concatenate([within_a_all, within_b_all])
 between_all = np.concatenate([between1, between2, between3, between4, between5, between6])
 
-
-# need to do for subs with unequal conds per cat (harder to align directions, but can compute mean within-between)?
-
 #print(df[roi].iloc[iSub][within_a_all].mean())
 #print(df[roi].iloc[iSub][within_b_all].mean())
 #print(df[roi].iloc[iSub][within_all].mean())
@@ -279,6 +235,100 @@ print(within_a[indSubs].mean())
 print(within_b[indSubs].mean())
 print(within[indSubs].mean())
 print(between[indSubs].mean())
+
+
+# %% plot subjCat-wb
+
+saveFigs = False
+
+# exclude subs with unequal conds in each cat for now
+exclSubs = True
+if exclSubs:
+    indSubs=np.zeros(33,dtype=bool)
+    for iSub in range(33):
+        if len(dfmodel['a'].loc[iSub]) == len(dfmodel['b'].loc[iSub]):
+            indSubs[iSub] = 1
+else:
+    indSubs=np.ones(33,dtype=bool)
+
+#subjCat sig
+roi='hMT_lh'
+#roi='MDroi_area8c_lh'
+
+#within = np.zeros(33)
+#between = np.zeros(33)
+#for iSub in range(33):
+#    within_a[iSub] = df[roi].iloc[iSub][0:6].mean()
+#    within_b[iSub] = df[roi].iloc[iSub][6:12].mean()
+#    within[iSub] = df[roi].iloc[iSub][0:12].mean()
+#    between[iSub] = df[roi].iloc[iSub][12:24].mean()
+#print(within[indSubs].mean())
+#print(between[indSubs].mean())
+
+# inds - need to code to arrange directions when sorted (e.g. [0, 30, 60, 90, 300, 330]), put 300/339 to front
+# - just cat B - A all fine
+indsort = []
+for iSub in range(33):
+    indsort.append(np.array(df['subjCat'][iSub][1]) >= 240)
+
+# a keep the same
+ind1 = np.arange(0, 6)
+ind3 = np.arange(12, 18)
+# b diff
+ind2 = []
+ind4 = []
+for iSub in range(33):
+    tmp = np.array(df['subjCat'][iSub][1]) >= 240
+    ind2.append(np.concatenate([np.nonzero(tmp)[0], np.nonzero(~tmp)[0]]) + 6)
+    ind4.append(np.concatenate([np.nonzero(tmp)[0], np.nonzero(~tmp)[0]]) + 18)
+
+within_a = np.zeros([33, 6])
+within_b = np.zeros([33, 6])
+between_a = np.zeros([33, 6])
+between_b = np.zeros([33, 6])
+for iSub in np.nonzero(indSubs)[0]:
+    within_a[iSub] = df[roi].iloc[iSub][ind1]
+    within_b[iSub] = df[roi].iloc[iSub][ind2[iSub]]
+    between_a[iSub] = df[roi].iloc[iSub][ind3]
+    between_b[iSub] = df[roi].iloc[iSub][ind4[iSub]]
+    
+within_mean = np.mean(np.mean(np.stack([within_a[indSubs], within_b[indSubs]]), axis=0), axis=0)
+between_mean = np.mean(np.mean(np.stack([between_a[indSubs], between_b[indSubs]]), axis=0), axis=0)
+
+within_sem = np.std(np.mean(np.stack([within_a[indSubs], within_b[indSubs]]), axis=0), axis=0) / np.sqrt(indSubs.sum())
+between_sem = np.std(np.mean(np.stack([between_a[indSubs], between_b[indSubs]]), axis=0), axis=0) / np.sqrt(indSubs.sum())
+
+plt.errorbar(np.arange(6), within_mean, within_sem, label='within category')
+plt.errorbar(np.arange(6), between_mean, between_sem, label='between category')
+plt.ylim([.5, .59])
+plt.legend(loc="upper left")
+#plt.title('Left mMFG')
+#plt.title('Left MT')
+plt.xlabel('Direction')
+plt.ylabel('Decoding Accuracy')
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat-wb_6dirs_' + roi + '.pdf'))
+plt.show()
+
+
+# 12 dirs
+within_mean = np.mean(np.concatenate([within_a[indSubs], within_b[indSubs]], axis=1), axis=0)
+between_mean = np.mean(np.concatenate([between_a[indSubs], between_b[indSubs]], axis=1), axis=0)
+within_sem = np.std(np.concatenate([within_a[indSubs], within_b[indSubs]], axis=1), axis=0) / np.sqrt(indSubs.sum())
+between_sem = np.std(np.concatenate([between_a[indSubs], between_b[indSubs]], axis=1), axis=0) / np.sqrt(indSubs.sum())
+
+plt.errorbar(np.arange(12), within_mean, within_sem, label='within category')
+plt.errorbar(np.arange(12), between_mean, between_sem, label='between category')
+plt.ylim([.47, .62])
+plt.legend(loc="upper right")
+#plt.title('Left mMFG')
+#plt.title('Left MT')
+plt.xlabel('Direction')
+plt.ylabel('Decoding Accuracy')
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat-wb_12dirs_' + roi + '.pdf'))
+plt.show()
+
 
 #%% all dirs - plotting to show above chance decoding for stimulus (similar to 12-way but averaging pair-wise svms)
 plt.style.use('seaborn-darkgrid')
