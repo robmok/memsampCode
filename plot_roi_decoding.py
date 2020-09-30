@@ -34,7 +34,7 @@ distMeth = 'svm' # 'svm', 'crossNobis', 'mNobis' - for subjCat-orth and -all
 trainSetMeth = 'trials' # 'trials' or 'block' 
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = '12-way' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
+decodeFeature = 'subjCat-orth' # subjCat-orth, '12-way', 'dir' (opposite dirs), 'ori' (orthogonal angles)
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
@@ -62,7 +62,7 @@ locals().update(behav) #load in each variable into workspace
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
 
-fntSiz = 20  # fntSiz>10 cuts offf...
+fntSiz = 20
 
 saveFigs = True
 
@@ -79,7 +79,7 @@ df.columns = ['EVC L', 'EVC R', 'MT L', 'MT R', 'IPS1-5 L', 'IPS1-5 R', 'pMFG L'
               'mMFG L', 'mMFG R','aMFG L', 'aMFG R', 'motor L', 'motor R', 'FFA', 'PPA']
 
 if decodeFeature=="subjCat-orth":
-    decode_title = 'Category'
+    decode_title = 'Abstract Category'
 elif decodeFeature=="dir":
     decode_title = 'Direction'
 elif decodeFeature=="12-way":
@@ -95,7 +95,7 @@ else:
 #    ylims = [-.02,.02]
 #elif (decodeFeature=="12-way"):
 #    ylims = [-.01,.015]
-ylims = [-.03,.0375]  # keep all same
+ylims = [-.03,.0425]  # keep all same
 fig, ax = plt.subplots(figsize=(10,7))
 (df.iloc[0:33].mean()-chance).plot(ax=ax,kind="bar",yerr=df.iloc[0:33].sem() ,ylim=ylims, title=decode_title, fontsize=fntSiz)
 ax.title.set_size(fntSiz + 10)
@@ -165,9 +165,19 @@ decodeFeature = 'subjCat-minus-motor'
 dfSubjCatMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
                                         + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '.pkl')))
  
+columns = ['EVC L', 'EVC R', 'MT L', 'MT R', 'IPS1-5 L', 'IPS1-5 R', 'pMFG L', 'pMFG R',
+          'mMFG L', 'mMFG R','aMFG L', 'aMFG R', 'motor L', 'motor R', 'FFA', 'PPA']
+
+dfSubjCat.columns = columns
+df12way.columns = columns
+dfOri.columns = columns
+dfDir.columns = columns
+dfMotorCue.columns = columns
+dfSubjCatMotor.columns = columns
+
 #subjCat-orth
 #combining - seaborn colours, sem errorbars
-roi='MDroi_area8c_lh'
+roi='mMFG L'
 svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader
@@ -182,7 +192,7 @@ if saveFigs:
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
-roi='hMT_lh' #category
+roi='MT L' #category
 svm_MT_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_lh.columns=dfHeader
@@ -196,7 +206,7 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
-roi='hMT_rh' #12-way (ori is p=0.04, one-tailed, uncorrected)
+roi='MT R' #12-way (ori is p=0.04, one-tailed, uncorrected)
 svm_MT_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_rh.columns=dfHeader
@@ -211,7 +221,7 @@ if saveFigs:
 plt.show()
 
 
-roi='EVC_rh'
+roi='EVC R'
 svm_V1_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_V1_rh.columns=dfHeader
@@ -225,7 +235,7 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
-roi='motor_rh'
+roi='motor R'
 svm_motor_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_motor_rh.columns=dfHeader
@@ -239,7 +249,7 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
-roi='motor_lh'
+roi='motor L'
 svm_motor_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_motor_lh.columns=dfHeader
@@ -253,19 +263,19 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.pdf'))
 plt.show()
 
-roi='MDroi_area8c_lh'
+roi='mMFG L'
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.003
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.003
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.0035
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfMotor[roi].iloc[indSubs]-.5) # one-tailed p=0.049
 
-roi='hMT_lh'
+roi='MT L'
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.03
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.03
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.019
 stats.ttest_rel(dfSubjCat[roi].iloc[indSubs],dfMotor[roi].iloc[indSubs]-.5) # one-tailed p=0.42
 
-roi='hMT_rh' #pairwise all n.s.
+roi='MT R' #pairwise all n.s.
 stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfDir[roi].iloc[indSubs]-.5) #
 stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfOri[roi].iloc[indSubs]-.5) # 
 stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfSubjCat[roi].iloc[indSubs]) #
@@ -273,7 +283,7 @@ stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfMotor[roi].iloc[indSubs]-.5) #
 #stats.ttest_rel(df12way[roi].iloc[indSubs]-1/12,dfSubjCatMotor[roi].iloc[indSubs]) #0.06
 
 
-roi='EVC_rh'
+roi='EVC R'
 stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.0487
 stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfSubjCat[roi].iloc[indSubs]) 
 stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,df12way[roi].iloc[indSubs]-1/12)
@@ -284,12 +294,12 @@ stats.ttest_rel(dfOri[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5) #
 
 #extra:
 #subjCat-minus-motor
-roi='MDroi_area8c_lh'
+roi='mMFG L'
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.004
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.01
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.005
 
-roi='hMT_lh'
+roi='MT L'
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5) # one-tailed p=0.07
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],dfOri[roi].iloc[indSubs]-.5) # one-tailed p=0.075
 stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12) #one-tailed 0.055
@@ -298,14 +308,14 @@ stats.ttest_rel(dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/1
 
 
 #subjCat-minus-motor
-roi='MDroi_area8c_lh'
+roi='mMFG L'
 svm_area8c = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader[0:4]
 g = sns.catplot(data=svm_area8c,height=5,aspect=1, kind="bar", ci=None)
 svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15), elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
-plt.title('Left mMFG (area 8)', fontsize=fntSiz)
+plt.title('Left mMFG', fontsize=fntSiz)
 g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
@@ -313,7 +323,7 @@ if saveFigs:
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
-roi='hMT_lh' #category
+roi='MT L' #category
 svm_MT_lh = pd.concat([dfSubjCatMotor[roi].iloc[indSubs],df12way[roi].iloc[indSubs]-1/12, 
                         dfOri[roi].iloc[indSubs]-.5,dfDir[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_lh.columns=dfHeader[0:4]
@@ -349,15 +359,23 @@ decodeFeature = 'motor'
 dfMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth  
                                         + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_lock2resp.pkl')))
 
-dfHeader=['Category','Direction','Motor']
+dfHeader=['Abstract \nCategory','Direction','Motor']
 
-roi='MDroi_area8c_lh'
+ 
+columns = ['EVC L', 'EVC R', 'MT L', 'MT R', 'IPS1-5 L', 'IPS1-5 R', 'pMFG L', 'pMFG R',
+          'mMFG L', 'mMFG R','aMFG L', 'aMFG R', 'motor L', 'motor R', 'FFA', 'PPA']
+
+dfSubjCat.columns = columns
+dfDir.columns = columns
+dfMotor.columns = columns
+
+roi='mMFG L'
 svm_area8c = pd.concat([dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_area8c.columns=dfHeader
 g = sns.catplot(data=svm_area8c,height=5,aspect=1, kind="bar", ci=None)
 svm_area8c.mean().plot(yerr=svm_area8c.sem(),ylim=(-.115,.15),elinewidth=2.5,fmt='k,',alpha=0.8)
 sns.stripplot(color="k", alpha=0.2, size=3, data=svm_area8c, ax=g.ax);
-plt.title('Left mMFG (area 8)', fontsize=fntSiz)
+plt.title('Left mMFG', fontsize=fntSiz)
 g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
@@ -365,7 +383,7 @@ if saveFigs:
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
-roi='hMT_lh' #category
+roi='MT L' #category
 svm_MT_lh = pd.concat([dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_MT_lh.columns=dfHeader
 g = sns.catplot(data=svm_MT_lh,height=5,aspect=1, kind="bar", ci=None)
@@ -378,7 +396,7 @@ if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
 plt.show()
 
-roi='motor_rh'
+roi='motor R'
 svm_motor_rh = pd.concat([dfSubjCat[roi].iloc[indSubs],dfDir[roi].iloc[indSubs]-.5,dfMotor[roi].iloc[indSubs]-.5],axis=1)
 svm_motor_rh.columns=dfHeader
 g = sns.catplot(data=svm_motor_rh,height=5,aspect=1, kind="bar", ci=None)
@@ -412,7 +430,7 @@ for roi in roiList:
     rAcc[roi][0], rAcc[roi][1]=stats.pearsonr(acc[indSubs],df[roi].iloc[indSubs])
 #    rObjAcc[roi][0], rObjAcc[roi][1]=stats.pearsonr(objAcc[indSubs],df[roi].iloc[indSubs])
 
-roi = 'MDroi_area8c_lh'
+roi = 'mMFG L'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -431,7 +449,7 @@ fig.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
-roi = 'hMT_lh'
+roi = 'MT L'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -450,7 +468,7 @@ fig.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
-roi = 'hMT_rh'
+roi = 'MT R'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -469,7 +487,7 @@ fig.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_pearson_' + decodeFeature + '_' + roi + '.pdf'))
 
-roi = 'EVC_rh'
+roi = 'EVC R'
 x=acc[indSubs]
 y=np.array(df[roi].iloc[indSubs],dtype=float)
 b, m = polyfit(x,y, 1) 
@@ -495,11 +513,11 @@ decodeFeature = 'subjCat-orth'
 
 #indSubs = np.arange(0,33) # allsubs
 #y=acc[indSubs]
-#x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
-###x=np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float),np.array(df['EVC_rh'].iloc[indSubs],dtype=float)]).T
-##x=np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float)
-###x=np.array(df['hMT_lh'].iloc[indSubs],dtype=float)
-###x=np.array(df['EVC_rh'].iloc[indSubs],dtype=float)
+#x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float)]).T
+###x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float),np.array(df['EVC R'].iloc[indSubs],dtype=float)]).T
+##x=np.array(df['mMFG L'].iloc[indSubs],dtype=float)
+###x=np.array(df['MT L'].iloc[indSubs],dtype=float)
+###x=np.array(df['EVC R'].iloc[indSubs],dtype=float)
 #
 #x = sm.add_constant(x)
 #huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
@@ -519,7 +537,7 @@ robustPlot = False  # set to false when testing out things in plotting (takes ti
 
 # plot with CIs of the slopes
 roi = 'mMFG L'
-#roi = 'MDroi_area8c_lh'
+#roi = 'mMFG L'
 indSubs = np.arange(0,33) # allsubs
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
@@ -568,7 +586,7 @@ if saveFigs:
     plt.savefig(os.path.join(figDir, 'mvpaROI_behavDecodeCorr_robustReg_' +
                              decodeFeature + '_' + roi + '.pdf'))
     
-roi = 'hMT_lh'
+roi = 'MT L'
 roi = 'MT L'
 indSubs = np.arange(0,33)  # allsubs
 y = acc[indSubs]
@@ -614,7 +632,7 @@ ax.fig.tight_layout
 if saveFigs:
     plt.savefig(os.path.join(figDir, 'mvpaROI_behavDecodeCorr_robustReg_' +
                              decodeFeature + '_' + roi + '.pdf'))
-roi = 'hMT_rh'
+roi = 'MT R'
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs],dtype=float)
 if decodeFeature == '12-way':
@@ -652,7 +670,7 @@ ax.fig.tight_layout
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_behavDecodeCorr_robustReg_' + decodeFeature + '_' + roi + '.pdf'))
 
-roi = 'EVC_rh'
+roi = 'EVC R'
 y = acc[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
 if decodeFeature == '12-way':
@@ -695,8 +713,8 @@ if saveFigs:
 
 ##corr between 2 areas
 #
-#roi1 = 'MDroi_area8c_lh'
-#roi2 = 'hMT_lh'
+#roi1 = 'mMFG L'
+#roi2 = 'MT L'
 #x=np.array(df[roi1].iloc[indSubs],dtype=float)
 #y=np.array(df[roi2].iloc[indSubs],dtype=float)
 #b, m = polyfit(x,y, 1) 
@@ -716,23 +734,23 @@ if saveFigs:
 #%% #testing if coeffcients are significant different - needs having loaded in multiple dfs
 y=acc[indSubs]
 
-roi = 'hMT_lh' #p=0.54
-#roi = 'hMT_rh' # p=0.04 subjCat vs 12-way
-#roi = 'EVC_rh' # p=0.11
+roi = 'MT L' #p=0.54
+#roi = 'MT R' # p=0.04 subjCat vs 12-way
+#roi = 'EVC R' # p=0.11
 
-#x = np.array([np.array(df['MDroi_area8c_lh'].iloc[indSubs],dtype=float),np.array(df['hMT_lh'].iloc[indSubs],dtype=float)]).T
+#x = np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float)]).T
 #x = np.array([np.array(dfSubjCat[roi].iloc[indSubs].values,dtype=float),np.array(df12way[roi].iloc[indSubs].values,dtype=float)]).T
 
 #with pfc - everything slightly worse
-#x = np.array([np.array(dfSubjCat['MDroi_area8c_lh'].iloc[indSubs].values,dtype=float),np.array(dfSubjCat['hMT_lh'].iloc[indSubs].values,dtype=float),
-#              np.array(dfSubjCat['hMT_rh'].iloc[indSubs].values,dtype=float), np.array(dfSubjCat['EVC_rh'].iloc[indSubs].values,dtype=float),
-#              np.array(df12way['MDroi_area8c_lh'].iloc[indSubs].values,dtype=float), np.array(df12way['hMT_lh'].iloc[indSubs].values,dtype=float),
-#              np.array(df12way['hMT_rh'].iloc[indSubs].values,dtype=float),np.array(df12way['EVC_rh'].iloc[indSubs].values,dtype=float)]).T
+#x = np.array([np.array(dfSubjCat['mMFG L'].iloc[indSubs].values,dtype=float),np.array(dfSubjCat['MT L'].iloc[indSubs].values,dtype=float),
+#              np.array(dfSubjCat['MT R'].iloc[indSubs].values,dtype=float), np.array(dfSubjCat['EVC R'].iloc[indSubs].values,dtype=float),
+#              np.array(df12way['mMFG L'].iloc[indSubs].values,dtype=float), np.array(df12way['MT L'].iloc[indSubs].values,dtype=float),
+#              np.array(df12way['MT R'].iloc[indSubs].values,dtype=float),np.array(df12way['EVC R'].iloc[indSubs].values,dtype=float)]).T
 
 #only sig behavioural corrs - without pfc
-x = np.array([np.array(dfSubjCat['hMT_lh'].iloc[indSubs].values,dtype=float),np.array(dfSubjCat['hMT_rh'].iloc[indSubs].values,dtype=float),
-              np.array(dfSubjCat['EVC_rh'].iloc[indSubs].values,dtype=float),np.array(df12way['hMT_lh'].iloc[indSubs].values,dtype=float),
-              np.array(df12way['hMT_rh'].iloc[indSubs].values,dtype=float),np.array(df12way['EVC_rh'].iloc[indSubs].values,dtype=float)]).T
+x = np.array([np.array(dfSubjCat['MT L'].iloc[indSubs].values,dtype=float),np.array(dfSubjCat['MT R'].iloc[indSubs].values,dtype=float),
+              np.array(dfSubjCat['EVC R'].iloc[indSubs].values,dtype=float),np.array(df12way['MT L'].iloc[indSubs].values,dtype=float),
+              np.array(df12way['MT R'].iloc[indSubs].values,dtype=float),np.array(df12way['EVC R'].iloc[indSubs].values,dtype=float)]).T
 
     
 x = sm.add_constant(x)
@@ -748,16 +766,16 @@ print(hub_results.summary(yname='behavAcc',
 #N.B, first value in the matrix is the constant (no need to test)
 #sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,1],use_f=True) #pairwise
 
-#big model - hMT_lh, hMT_rh, EVC_rh x subjCat-orth and 12-way
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,1,0,0,0,0],use_f=True) #hMT_lh vs hMT_rh, subjCat, p=.0696
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,0,1,0,0,0],use_f=True) #hMT_lh vs EVC_rh, subjCat, p=.018
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,0,-1,1,0],use_f=True) #hMT_lh vs hMT_rh, 12-way, p=.36
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,0,-1,0,1],use_f=True) #hMT_lh vs EVC_rh, subjCat, p=.39
+#big model - MT L, MT R, EVC R x subjCat-orth and 12-way
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,1,0,0,0,0],use_f=True) #MT L vs MT R, subjCat, p=.0696
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,0,1,0,0,0],use_f=True) #MT L vs EVC R, subjCat, p=.018
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,0,-1,1,0],use_f=True) #MT L vs MT R, 12-way, p=.36
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,0,-1,0,1],use_f=True) #MT L vs EVC R, subjCat, p=.39
 
 
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,0,0,1,0,0],use_f=True) #hMT_lh vs self, subjCat-vs-12-way, p=.65
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,-1,0,0,1,0],use_f=True) #hMT_rh vs self, subjCat-vs-12-way, p=.02
-sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,-1,0,0,1],use_f=True) #EVC_rh vs self, subjCat-vs-12-way, p=.045
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,-1,0,0,1,0,0],use_f=True) #MT L vs self, subjCat-vs-12-way, p=.65
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,-1,0,0,1,0],use_f=True) #MT R vs self, subjCat-vs-12-way, p=.02
+sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,-1,0,0,1],use_f=True) #EVC R vs self, subjCat-vs-12-way, p=.045
 
 
 

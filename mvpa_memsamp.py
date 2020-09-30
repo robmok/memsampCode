@@ -87,7 +87,7 @@ if bilateralRois:
     rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
             'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh']
 
-# temp
+# temp - atm doing one at a time.. saving one only
 rois = ['hMT_lh', 'MDroi_area8c_lh']
 rois = ['hMT_lh']
 

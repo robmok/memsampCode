@@ -71,7 +71,9 @@ dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 # %% plot subjCat condition wise classifier predictions / probabilities
 
 
-saveFigs = False
+saveFigs = True
+
+fntSiz=20
 
 # exclude subs with unequal conds in each cat for now
 exclSubs = False
@@ -103,12 +105,15 @@ acc_sem = np.std(acc_per_dir[indSubs], axis=0) / np.sqrt(indSubs.sum())
 
 plt.errorbar(np.arange(12), acc_mean, acc_sem)
 plt.ylim([.33, .66])
-plt.title('Left MT')
-#plt.title('Left mMFG')
-plt.xlabel('Direction')
-plt.ylabel('Mean Decoding Accuracy')
+plt.title('Left MT', fontsize=fntSiz)
+#plt.title('Left mMFG', fontsize=fntSiz)
+plt.xlabel('Direction', fontsize=fntSiz)
+plt.ylabel('Category Decoding Accuracy', fontsize=fntSiz)
+plt.xticks(fontsize=fntSiz-2)
+plt.yticks(fontsize=fntSiz-2)
+plt.tight_layout
 if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat_12dirs_outputs_' + roi + '.pdf'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat_12dirs_outputs_' + roi + '.pdf'), bbox_inches="tight")
 plt.show()
 
 
