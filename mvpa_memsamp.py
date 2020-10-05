@@ -88,8 +88,8 @@ if bilateralRois:
             'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh']
 
 # temp - atm doing one at a time.. saving one only
-rois = ['hMT_lh', 'MDroi_area8c_lh']
-rois = ['hMT_lh']
+rois = ['MDroi_area8c_lh']
+#rois = ['hMT_lh']
 
 # reRunROIs
 #rois = ['FFA_lrh_sm', 'PPA_lrh_sm'] #functional localisers

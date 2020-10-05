@@ -20,6 +20,8 @@ sns.set(style="ticks", color_codes=True)
 import scipy.stats as stats
 from statsmodels.stats.multitest import fdrcorrection as fdr
 #from statsmodels.stats.multitest import multipletests as multest
+import itertools as it
+from scipy.stats import norm
 
 mainDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI' #love06
 
@@ -49,8 +51,10 @@ fname = (os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' +
                       distMeth + '_' + normMeth + '_'  + trainSetMeth + 
                       '_fwhm' + str(fwhm) + '_' + imDat))
 
-fname = fname + '_trialwise_outputs_MT_lh'  # new, just with subjCat
-#fname = fname + '_trialwise_outputs_mMFG_lh'
+
+# right now - MT_1, mMFG_2 best
+#fname = fname + '_trialwise_outputs_MT_lh'  # new, just with subjCat
+fname = fname + '_trialwise_outputs_mMFG_lh_2'
 #
 fname = fname + '.pkl'
 
@@ -71,12 +75,12 @@ dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 # %% plot subjCat condition wise classifier predictions / probabilities
 
 
-saveFigs = True
+saveFigs = False
 
 fntSiz=20
 
 # exclude subs with unequal conds in each cat for now
-exclSubs = False
+exclSubs = True
 if exclSubs:
     indSubs=np.zeros(33,dtype=bool)
     for iSub in range(33):
@@ -97,34 +101,146 @@ for iSub in range(0,33):
 #plt.plot(proba_per_dir[indSubs].mean(axis=0))
 #plt.show()
 #
-#roi = 'mMFG_lh'
-roi = 'MT_lh'
+roi = 'mMFG_lh'
+area_name = 'Left mMFG'
+#roi = 'MT_lh'
+#area_name = 'Left MT'
 
 acc_mean = acc_per_dir[indSubs].mean(axis=0)
 acc_sem = np.std(acc_per_dir[indSubs], axis=0) / np.sqrt(indSubs.sum())
 
 plt.errorbar(np.arange(12), acc_mean, acc_sem)
 plt.ylim([.33, .66])
-plt.title('Left MT', fontsize=fntSiz)
-#plt.title('Left mMFG', fontsize=fntSiz)
+plt.title(area_name, fontsize=fntSiz)
 plt.xlabel('Direction', fontsize=fntSiz)
 plt.ylabel('Category Decoding Accuracy', fontsize=fntSiz)
 plt.xticks(fontsize=fntSiz-2)
 plt.yticks(fontsize=fntSiz-2)
 plt.tight_layout
-if saveFigs:
-    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat_12dirs_outputs_' + roi + '.pdf'), bbox_inches="tight")
+#if saveFigs:
+#    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat_12dirs_outputs_' + roi + '.pdf'), bbox_inches="tight")
 plt.show()
 
 
-
 # t-test on acc
+#import scipy.stats as stats
+#stats.ttest_1samp(acc_per_dir[indSubs], .5)
+##stats.ttest_1samp(proba_per_dir[indSubs], .5)
+
+
+dist2bound_acc = np.empty([33, 3])
+
+for iSub, idist in it.product(range(33), range(3)):
+    if len(dfmodel['a'][iSub]) == 5:
+        dist2bound = np.array([0, 1, 2, 1, 0, 0, 1, 2, 3, 2, 1, 0])
+    elif len(dfmodel['a'][iSub]) == 7:
+        dist2bound = np.array([0, 1, 2, 3, 2, 1, 0, 0, 1, 2, 1, 0])
+    else:
+        dist2bound = np.array([0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0])  # standard in deg: 15, 45, 60, 60, 45, 15
+    dist2bound_acc[iSub, idist] = acc_per_dir[iSub, dist2bound == idist].mean()
+
+# include imbalanced category subs
+acc_mean = dist2bound_acc.mean(axis=0)
+acc_sem = np.std(dist2bound_acc, axis=0) / np.sqrt(33)
+plt.errorbar(np.arange(3), acc_mean, acc_sem)
+plt.show()
+
+# exclude
+acc_mean = dist2bound_acc[indSubs].mean(axis=0)
+acc_sem = np.std(dist2bound_acc[indSubs], axis=0) / np.sqrt(indSubs.sum())
+plt.errorbar(np.arange(3), acc_mean, acc_sem)
+plt.show()
+
+
+# violin plot
+#df_d2b = pd.DataFrame(data=dist2bound_acc, columns=['Small', 'Medium', 'Large'])
+df_d2b = pd.DataFrame(data=dist2bound_acc[indSubs], columns=['Small', 'Medium', 'Large'])
+g = sns.catplot(data=df_d2b,height=5,aspect=1, kind="violin", ci=None, palette='Purples', fontsize=fntSiz)
+plt.setp(g.ax.collections, alpha=.85)
+g.ax.set(ylim=(.28, .78))
+#g = sns.catplot(data=df_d2b,height=5,aspect=1, kind='point', fontsize=fntSiz)
+#df_d2b.mean().plot(yerr=df_d2b.sem(),ylim=(.045, .55), elinewidth=2.5,fmt='k,',alpha=0.8)
+#sns.stripplot(color="k", alpha=0.4, size=3, data=df_d2b, ax=g.ax);
+sns.swarmplot(color="k", alpha=0.4, size=3, data=df_d2b, ax=g.ax);
+plt.title(area_name, fontsize=fntSiz)
+#plt.title('Left mMFG', fontsize=fntSiz)
+g.set_xlabels('Distance from Category Bound')
+g.set_ylabels('Categeory Decoding Accuracy')
+plt.tight_layout()
+if saveFigs:
+    plt.savefig(os.path.join(figDir,'mvpaROI_svm_subjCat_dist2bound_violin_' + roi + '.pdf'), bbox_inches="tight")
+plt.show()
+
+
+# t-test
 import scipy.stats as stats
-stats.ttest_1samp(acc_per_dir[indSubs], .5)
-#stats.ttest_1samp(proba_per_dir[indSubs], .5)
+stats.ttest_1samp(dist2bound_acc, .5)
+#stats.ttest_1samp(dist2bound_acc[indSubs], .5)
 
+# paired t-tests - pvals for MT
+#stats.ttest_rel(dist2bound_acc[:, 1], dist2bound_acc[:, 0])  # p=.00639
+#stats.ttest_rel(dist2bound_acc[:, 2], dist2bound_acc[:, 0])  # p=.1268
+#stats.ttest_rel(dist2bound_acc[:, 2], dist2bound_acc[:, 1])  # p=.422
 
+stats.ttest_rel(dist2bound_acc[indSubs, 1], dist2bound_acc[indSubs, 0])  # p=.0401
+stats.ttest_rel(dist2bound_acc[indSubs, 2], dist2bound_acc[indSubs, 0])  # p=.03454
+stats.ttest_rel(dist2bound_acc[indSubs, 2], dist2bound_acc[indSubs, 1])  # p=.9
 
+# regression
+b = np.empty(33)
+for iSub in range(33):
+    b[iSub], _, _, _, _ = stats.linregress(np.arange(3),dist2bound_acc[iSub])
+
+stats.ttest_1samp(b, 0)  # p=0.1126
+stats.ttest_1samp(b[indSubs], 0)  # MT p=0.0345, mMFG p=0.65. can use one-tailed (half these values)
+
+# %% compute pr category (inverse entropy) - correlate with category decoding
+
+def angdiff(x, y):
+    return np.arctan2(np.sin(x-y), np.cos(x-y))
+
+# distance from bound 1 and 2
+#angdiff1 = angdiff(np.radians(x),np.radians(y))
+
+pr = np.empty([33, 12])
+angdist = np.empty([33, 12])
+sd = np.empty([33, 12])
+#sd = np.empty(33)
+for iSub in range(33):
+    params = dfmodel['bestparams'].loc[iSub]
+    a = dfmodel['a'].loc[iSub]
+    b = dfmodel['b'].loc[iSub]
+    sd[iSub] = params[2]
+    
+    # compute ang diff, then get the smaller one (needs this if unbalanced cat)
+    delta1 = abs(np.degrees(angdiff(params[0], a)))
+    delta2 = abs(np.degrees(angdiff(params[1], a)))
+    delta_a = np.amin([delta1, delta2], axis=0)
+    
+    delta1 = abs(np.degrees(angdiff(params[0], b)))
+    delta2 = abs(np.degrees(angdiff(params[1], b)))
+    delta_b = np.amin([delta1, delta2], axis=0)
+    
+    pr[iSub] = (norm.cdf(np.concatenate([delta_a, delta_b]), 0, params[2])) 
+    angdist[iSub] = np.concatenate([delta_a, delta_b])
+
+#plt.scatter(pr, angdist)
+#stats.pearsonr(pr.flatten(), angdist.flatten())
+
+plt.scatter(pr, acc_per_dir)
+plt.show()
+stats.spearmanr(pr.flatten(), acc_per_dir.flatten())
+
+# inverse entropy (without negative)
+#plt.scatter(pr, np.log2(pr))
+plt.scatter(np.log2(pr), acc_per_dir)
+plt.show()
+stats.pearsonr(np.log2(pr).flatten(), acc_per_dir.flatten())
+stats.spearmanr(np.log2(pr).flatten(), acc_per_dir.flatten())
+
+#plt.scatter(sd, acc_per_dir)
+#stats.pearsonr(sd.flatten(), acc_per_dir.flatten())
+#stats.spearmanr(sd.flatten(), acc_per_dir.flatten())
 
 #%% subjCat-all - organise
 plt.style.use('seaborn-darkgrid')

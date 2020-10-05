@@ -58,13 +58,19 @@ locals().update(behav) #load in each variable into workspace
 #df = df.drop(columns=['V3a_lh', 'V3a_rh'])
 #df.to_pickle(fname + '.pkl')
 
+# get sd param to correle with acc
+modelsd = np.empty(33)
+for iSub in range(33):
+    params = dfmodel['bestparams'].loc[iSub]
+    modelsd[iSub] = params[2]
+    
 #%% plot bar / errorbar plot
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
 
 fntSiz = 20
 
-saveFigs = True
+saveFigs = False
 
 #barplot
 if (decodeFeature=="subjCat-orth")|(decodeFeature=="objCat-orth")|(decodeFeature=="subjCat-minus-motor"):
@@ -347,7 +353,7 @@ fntSiz=18
 sns.set(font_scale=1.4) #set font scale for sns
 sns.set_style("ticks")
 
-saveFigs = False
+saveFigs = True
     
 decodeFeature = 'subjCat-orth'
 dfSubjCat=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth 
@@ -359,7 +365,7 @@ decodeFeature = 'motor'
 dfMotor=pd.read_pickle((os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + '_' + normMeth  
                                         + '_' + trainSetMeth + '_fwhm' + str(fwhm) + '_' + imDat + '_lock2resp.pkl')))
 
-dfHeader=['Abstract \nCategory','Direction','Motor']
+dfHeader=[' Abstract \nCategory','Direction','Motor']
 
  
 columns = ['EVC L', 'EVC R', 'MT L', 'MT R', 'IPS1-5 L', 'IPS1-5 R', 'pMFG L', 'pMFG R',
@@ -380,6 +386,7 @@ g.set_ylabels('Decoding Accuracy (normalized)')
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
     #plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_' + roi + '.eps'))
 plt.show()
 
@@ -394,6 +401,7 @@ g.set_ylabels('Decoding Accuracy (normalized)',fontsize=fntSiz-1)
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
 plt.show()
 
 roi='motor R'
@@ -407,6 +415,7 @@ g.set_ylabels('Decoding Accuracy (normalized)',fontsize=fntSiz-1)
 plt.tight_layout()
 if saveFigs:
     plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.svg'))
+    plt.savefig(os.path.join(figDir,'mvpaROI_barStripPlot_catDirMotor_' + roi + '.pdf'))
 plt.show()
 
 
@@ -510,22 +519,24 @@ if saveFigs:
 
 decodeFeature = 'subjCat-orth'
 
-
-#indSubs = np.arange(0,33) # allsubs
-#y=acc[indSubs]
-#x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float)]).T
-###x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float),np.array(df['EVC R'].iloc[indSubs],dtype=float)]).T
-##x=np.array(df['mMFG L'].iloc[indSubs],dtype=float)
-###x=np.array(df['MT L'].iloc[indSubs],dtype=float)
-###x=np.array(df['EVC R'].iloc[indSubs],dtype=float)
+indSubs = np.arange(0,33) # allsubs
+y=acc[indSubs]
+#y=sd[indSubs]
+x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float)]).T
+##x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),np.array(df['MT L'].iloc[indSubs],dtype=float),np.array(df['EVC R'].iloc[indSubs],dtype=float)]).T
+#x=np.array(df['mMFG L'].iloc[indSubs],dtype=float)
+##x=np.array(df['MT L'].iloc[indSubs],dtype=float)
+##x=np.array(df['EVC R'].iloc[indSubs],dtype=float)
 #
-#x = sm.add_constant(x)
-#huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
-#hub_results = huber_t.fit()
-#print(hub_results.params)
-#print(hub_results.bse)
-#print(hub_results.summary(yname='behavAcc',
-#            xname=['var_%d' % i for i in range(len(hub_results.params))]))
+#x=np.array([np.array(df['mMFG L'].iloc[indSubs],dtype=float),acc[indSubs]]).T
+#x=np.array([np.array(df['MT L'].iloc[indSubs],dtype=float), acc[indSubs]]).T
+x = sm.add_constant(x)
+huber_t = sm.RLM(y,x, M=sm.robust.norms.HuberT()) 
+hub_results = huber_t.fit()
+print(hub_results.params)
+print(hub_results.bse)
+print(hub_results.summary(yname='behavAcc',
+            xname=['var_%d' % i for i in range(len(hub_results.params))]))
 
 plt.rcdefaults()
 #plt.style.use('seaborn-darkgrid')
@@ -540,6 +551,7 @@ roi = 'mMFG L'
 #roi = 'mMFG L'
 indSubs = np.arange(0,33) # allsubs
 y = acc[indSubs]
+#y = modelsd[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
 
 ## outliers
@@ -590,6 +602,7 @@ roi = 'MT L'
 roi = 'MT L'
 indSubs = np.arange(0,33)  # allsubs
 y = acc[indSubs]
+#y = modelsd[indSubs]
 x = np.array(df[roi].iloc[indSubs], dtype=float)
 ## outliers
 #indSubs = ~((x > x.mean()+(x.std()*2)) | (x < x.mean()-(x.std()*2)))
@@ -781,3 +794,49 @@ sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,-
 
 #sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=np.tile([0,-1,1],(33,1)),use_f=True) 
 #sm.robust.robust_linear_model.RLMResults.wald_test_terms(hub_results) #test all terms..?
+
+
+# %%
+
+saveFigs = True
+
+decodeFeature = 'subjCat-orth'
+
+plt.rcdefaults()
+#plt.style.use('seaborn-darkgrid')
+fntSiz = 14  # fntSiz>10 cuts offf...
+legFntSiz = 12
+
+robustPlot = True  # set to false when testing out things in plotting (takes time) 
+
+# plot with CIs of the slopes
+indSubs = np.arange(0,33) # allsubs
+y = acc[indSubs]
+x = modelsd[indSubs]
+
+x = sm.add_constant(x)
+huber_t = sm.RLM(y, x, M=sm.robust.norms.HuberT())
+hub_results = huber_t.fit()
+if decodeFeature[0:7] == 'subjCat':
+    decodeLabel = 'Model standard deviation parameter'
+dfPlot = pd.DataFrame(data=[y, x[:, 1]], index=['Behavioral Accuracy / Consistency', decodeLabel], columns=None)
+ax = sns.lmplot(x=decodeLabel, y='Behavioral Accuracy / Consistency', data=dfPlot.T, robust=robustPlot, height=4, aspect=1.1)
+ax.set_xlabels(fontsize=fntSiz)
+ax.set_ylabels(fontsize=fntSiz)
+ax.set_xticklabels(fontsize=fntSiz-2)
+ax.set_yticklabels(fontsize=fntSiz-2)
+legTxt = '\n'.join(
+        ('b = %.2f' % hub_results.params[1],
+         'p = %.3f' % (hub_results.pvalues[1]/2)))
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+if decodeFeature[0:7] == 'subjCat':
+    legTxt = '\n'.join(
+            ('b = %.2f' % hub_results.params[1],
+             'p = %s' % '3.74e-35'))
+    ax.fig.text(0.7, 0.94, legTxt, fontsize=legFntSiz,verticalalignment='top',
+                bbox=props) #rcdefaults - white bg
+#    ax.fig.text(0.75, 0.17, legTxt, fontsize=legFntSiz, verticalalignment='bottom', bbox=props) #rcdefaults - white bg
+
+ax.fig.tight_layout
+if saveFigs:
+    plt.savefig(os.path.join(figDir, 'behavacc_modelsd_corr_robustReg_' +'.pdf'))
