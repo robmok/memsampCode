@@ -798,7 +798,7 @@ sm.robust.robust_linear_model.RLMResults.wald_test(hub_results,r_matrix=[0,0,0,-
 
 # %%
 
-saveFigs = True
+saveFigs = False
 
 decodeFeature = 'subjCat-orth'
 
@@ -807,7 +807,7 @@ plt.rcdefaults()
 fntSiz = 14  # fntSiz>10 cuts offf...
 legFntSiz = 12
 
-robustPlot = True  # set to false when testing out things in plotting (takes time) 
+robustPlot = False  # set to false when testing out things in plotting (takes time) 
 
 # plot with CIs of the slopes
 indSubs = np.arange(0,33) # allsubs
