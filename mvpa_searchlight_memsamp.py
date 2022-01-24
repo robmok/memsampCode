@@ -38,23 +38,22 @@ from memsamp_RM import crossEuclid, mNobis, getConds2comp, compCovMat
 
 imDat = 'cope' # cope or tstat images
 slSiz = 12 #searchlight size
-normMeth = 'noNorm' # 'niNormalised', 'noNorm', 'slNorm', 'sldemeaned' # slNorm = searchlight norm by mean and var
+normMeth = 'noNorm' # 'noNorm', 'slNorm' # slNorm = searchlight norm by mean and var
 distMeth = 'svm' # 'svm', 'crossNobis'
-trainSetMeth = 'trials' # 'trials' or 'block'
+trainSetMeth = 'trials' # 'trials'
 fwhm = None # smoothing - set to None if no smoothing
-nCores = 3 #number of cores for searchlight - up to 6 on love06 (i think 8 max)
+nCores = 3 # number of cores for searchlight
 
-decodeFeature = 'subjCatRaw-orth' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
-# category: 'objCat' (objective catgeory), 'subjCat' 
+decodeFeature = 'subjCat' # '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+# category: 'objCat' (objective catgeory), 'subjCat', 'subjCatRaw-orth (to subtract subjCat)
+# subjCat, subjCatRaw-orth, objCat, objCatRaw-orth # subtract these SL images from one another later to create subjCat-orth
+# subjCat-resp - decode on category subject responded
 
 lock2resp = False # if loading in lock2resp glms (to get motor effect)
 
 # model estimated subjective category
 dfmodel = pd.read_pickle(mainDir + '/behav/modelsubjcatfinal.pkl')
 
-# subjCat, subjCatRaw-orth, objCat, objCatRaw-orth # subtract these SL images from one another later to create subjCat-orth
-
-# subjCat-resp - decode on category subject responded
 #%% load in trial log and append image paths
 
 for iSub in range(1, 34):

@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# At the very end, I removed some of the files - I think mainly from when I tried some FSL GLMs
+# At the very end, I removed some of the files - I think mainly from when I tried some FSL preproc
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'
 

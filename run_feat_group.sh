@@ -10,7 +10,7 @@ fwhm=8 #6/8
 standardScript="memsamp_run-01_block_fwhm6"
 
 # focus on feedback faces vs buildings
-standardScript="memsamp_run-01_block_feedback_fwhm6"
+# standardScript="memsamp_run-01_block_feedback_fwhm6"
 
 cd ${wd}
 while read subject; do

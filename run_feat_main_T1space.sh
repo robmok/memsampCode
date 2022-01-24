@@ -6,7 +6,6 @@ dataDir=${wd}/fmriprep_output/fmriprep
 
 fwhm=0 #0/2
 standardScript="memsamp_run-01_block_fwhm2_T1"
-#standardScript="memsamp_run-01_block_fwhm2_T1_brainmask" #very similar if not same
 
 cd ${wd}
 while read subject; do

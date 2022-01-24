@@ -22,13 +22,14 @@ roiDir='/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI/mvpa_roi'
 subjCat=pd.read_pickle(os.path.join(roiDir, 'subjCat.pkl'))
 
 imDat    = 'cope' # cope or tstat images
-normMeth = 'noNorm' #  'noNorm', 'niNormalised', 'demeaned', 'demeaned_stdNorm', 'dCentred'
-distMeth = 'svm' # 'svm', 'crossNobis', 'lda'
-trainSetMeth = 'trials' # 'trials' or 'block' 
+normMeth = 'noNorm' #  'noNorm'
+distMeth = 'svm' # 'svm'
+trainSetMeth = 'trials' # 'trials'
 fwhm = None # optional smoothing param - 1, or None
 
-decodeFeature = 'subjCat-minus-motor' # '12-way' (12-way dir decoding - only svm), 'dir' (opposite dirs), 'ori' (orthogonal angles)
-# others: 
+decodeFeature = 'subjCat-minus-motor' # 'subjCat', '12-way' (12-way dir decoding), 'dir' (opposite dirs), 'ori' (orthogonal angles)
+# subjCat, subjCat-orth, objCat, objCatRaw-orth 
+# subjCat-resp - decode on category subject responded
 
 fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth + 
                       '_' + normMeth + '_'  + trainSetMeth + '_fwhm' + 
@@ -40,14 +41,11 @@ fname = os.path.join(roiDir, 'roi_' + decodeFeature + 'Decoding_' + distMeth +
 #bilateral
 #fname = fname + '_bilateral'
 
-##decoding at feedback time
+#decoding at feedback time
 #fname = fname + '_fromfeedback'
 
 df=pd.read_pickle(fname + '.pkl')
 ##df=pd.read_pickle(fname + '_model.pkl')
-##df=pd.read_pickle(fname + '_guess.pkl')
-##df=pd.read_pickle(fname + '_v2.pkl')
-##df=pd.read_pickle(fname + '_RMsubjCat.pkl')
 print(df.loc['stats'])
 
 pvals=np.empty((len(list(df))))
@@ -62,31 +60,9 @@ for iRoi in range(0,len(list(df))):
 #print(fdr(pvals[2:len(pvals)-2]/2,alpha=0.05,method='indep',is_sorted=False))
 #multest(pvals[2:len(pvals)-2]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
 
-# no EVC and motor - after added ffa/ppa
+# no EVC and motor
 #ind = np.concatenate([np.arange(2,11), [len(pvals)-3, len(pvals)-2]])
 ind = np.concatenate([np.arange(2,12), [len(pvals)-2, len(pvals)-1]]) # new
 ind = np.concatenate([np.arange(2,12)]) # without FFA/PPA
 print(fdr(pvals[ind]/2,alpha=0.05,method='indep',is_sorted=False))
 #multest(pvals[ind]/2, alpha=0.05, method='bonferroni', is_sorted=False, returnsorted=False)
-
-#%% exclude subs
-
-exclSubs = False
-exclParietalSubs = True
-if exclSubs:
-    indSubs[[1,6,31]] = False #trying without subs that couldn't flip motor response well - worse here always, but better for RDm cat pfc (w/out excluding above)
-#    indSubs=np.ones(33,dtype=bool)
-elif exclParietalSubs: # same, IPS no diff, others no diff
-    indSubs=np.ones(33,dtype=bool)
-    indSubs[[0,2,19,23]] = False #subs 1,3,20,24
-else:
-    indSubs=np.ones(33,dtype=bool)
-    
-
-newStats = pd.DataFrame(columns=list(df))
-chance = 0 #0, 0.5, 1/12
-for roi in list(df):
-    newStats[roi] = stats.ttest_1samp(df[roi].iloc[indSubs].astype(float), chance, nan_policy='omit')
-print(newStats.T)
-
-pvals=newStats.iloc[1].values
