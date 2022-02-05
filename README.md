@@ -4,8 +4,8 @@ Bash and Python code for: Mok & Love, 2021, Abstract Neural Representations of C
 
 ## Software and packages
 
-FSL version:
-Python version:
+FSL version: 6.00
+Python version: 3.7
 
 Python packages:
 - numpy

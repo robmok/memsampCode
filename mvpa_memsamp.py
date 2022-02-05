@@ -39,7 +39,6 @@ import scipy.stats as stats
 from sklearn.calibration import CalibratedClassifierCV
 
 mainDir = '/Users/robert.mok/Documents/Postdoc_ucl/memsamp_fMRI'  # love06
-#mainDir = '/home/robmok/Documents/memsamp_fMRI' #love01
 
 sys.path.append(mainDir)
 
@@ -86,10 +85,6 @@ rois = ['EVC_lh', 'EVC_rh', 'hMT_lh', 'hMT_rh',
 if bilateralRois:
     rois = ['EVC_lrh', 'V3a_lrh', 'hMT_lrh', 'IPS1-5_lrh', 'MDroi_ifg_lrh',
             'MDroi_area8c_lrh', 'MDroi_area9_lrh', 'motor_lrh']
-
-# temp - atm doing one at a time.. saving one only
-rois = ['MDroi_area8c_lh']
-#rois = ['hMT_lh']
 
 # reRunROIs
 #rois = ['FFA_lrh_sm', 'PPA_lrh_sm'] #functional localisers
